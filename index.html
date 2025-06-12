@@ -10,6 +10,7 @@
   <div class="container">
     <header class="hero">
       <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
       <h1>Greeny Group Manager</h1>
       <p class="subtitle">Effiziente Gruppenorganisation. Modern. Einfach. Schnell.</p>
       <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">
@@ -32,5 +33,21 @@
       <p>&copy; 2025 Greeny Group Manager. Alle Rechte vorbehalten.</p>
     </footer>
   </div>
+<script>
+
+  const toggle = document.getElementById('theme-toggle');
+  const body = document.body;
+
+  // Beim Laden prüfen
+  if (localStorage.getItem('theme') === 'dark') {
+    body.classList.add('dark');
+  }
+
+  toggle.addEventListener('click', () => {
+    body.classList.toggle('dark');
+    localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+</script>
 </body>
 </html>

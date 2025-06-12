@@ -89,42 +89,71 @@ footer {
   margin-top: 60px;
 }
 
-/* Dark Mode Unterstützung */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #1e1e1e;
-    color: #ddd;
-  }
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-  .hero {
-    background: linear-gradient(to right, #256d47, #2e8b57);
-    color: white;
-  }
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-  .subtitle {
-    color: #cde7db;
-  }
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+  padding: 8px 12px;
+  font-size: 1.25rem;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-  .content {
-    background-color: #2c2c2c;
-    color: #eee;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  }
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
 
-  .content h2 {
-    color: #90ee90;
-  }
+body.dark .theme-toggle {
+  color: #ddd;
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
-  .button {
-    background-color: #3aa97b;
-    color: #fff;
-  }
+/* Dark Theme Styles */
+body.dark {
+  background-color: #1e1e1e;
+  color: #ddd;
+}
 
-  .button:hover {
-    background-color: #2e8b57;
-  }
+body.dark .hero {
+  background: linear-gradient(to right, #256d47, #2e8b57);
+}
 
-  footer {
-    color: #888;
-  }
+body.dark .subtitle {
+  color: #cde7db;
+}
+
+body.dark .content {
+  background-color: #2c2c2c;
+  color: #eee;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .content h2 {
+  color: #90ee90;
+}
+
+body.dark .button {
+  background-color: #3aa97b;
+}
+
+body.dark .button:hover {
+  background-color: #2e8b57;
+}
+
+body.dark footer {
+  color: #888;
 }
