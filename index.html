@@ -1,31 +1,70 @@
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Greeny Group Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
     <header class="hero">
-      <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo">
+      <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo" />
       <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
       <h1>Greeny Group Manager</h1>
       <p class="subtitle">Effiziente Gruppenorganisation. Modern. Einfach. Schnell.</p>
-      <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">
-        Jetzt starten
-      </a>
+      <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">Jetzt starten</a>
     </header>
 
     <main>
       <section class="content">
-        <h2>Was ist Greeny?</h2>
-        <p>Greeny Group Manager ist dein intelligenter Assistent zur Organisation von Gruppen, Aufgaben und Kommunikation. Entwickelt mit Fokus auf Benutzerfreundlichkeit und moderne Technologien.</p>
+        <h2>Was ist Greeny Group Management?</h2>
+        <p>Greeny Group Management steht für moderne, automatisierte Verwaltung von sozialen Gruppen – effizient, sicher und skalierbar. Unsere spezialisierten Bots für Plattformen wie Telegram, Discord und Co. unterstützen Admins bei der Moderation, Nutzerverwaltung, Rollenvergabe, Inhaltssteuerung und Automatisierung wiederkehrender Aufgaben. Entwickelt mit modernen Technologien, APIs und einem klaren Fokus auf Benutzerfreundlichkeit bietet Greeny eine leistungsstarke Grundlage für Community-Management auf hohem Niveau.</p>
 
-        <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">
-          🚀 Telegram Supportgruppe beitreten
-        </a>
+        <h3>Unterstützte Plattformen</h3>
+        <ul>
+          <li><strong>Telegram</strong> (voll funktionsfähig)</li>
+          <li><em>Discord</em> (in Vorbereitung)</li>
+        </ul>
+
+        <h3>Funktionen des Greeny Bots</h3>
+        <ul>
+          <li>Automatische Begrüßung neuer Mitglieder</li>
+          <li>Rollenzuweisung und Benutzerverwaltung</li>
+          <li>Gruppenregeln und Inhaltsmoderation</li>
+          <li>Planung und Durchführung wiederkehrender Aufgaben</li>
+          <li>Benutzerdefinierte Kommandos und API-Integration</li>
+        </ul>
+
+        <h3>Roadmap</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">Ende Juni 2025</div>
+            <div class="timeline-content">
+              <h4>Version 0.5</h4>
+              <p>Erweiterung der Benutzerverwaltung, optimierte Telegram-Integration, stabilere Rechtevergabe.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Ende August 2025</div>
+            <div class="timeline-content">
+              <h4>Version 1.0</h4>
+              <p>Einführung von Free- und Pro-Version. Free-Version enthält werbebasierte Hinweise, Pro-Version werbefrei mit erweiterten Funktionen.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Ende November 2025</div>
+            <div class="timeline-content">
+              <h4>Discord-Support</h4>
+              <p>Veröffentlichung der Discord-Version mit identischem Funktionsumfang wie bei Telegram.</p>
+            </div>
+          </div>
+        </div>
+
+        <p><strong>Anmeldung zur BETA-Testphase</strong> ist über unsere <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Supportgruppe</a> möglich.</p>
+
+        <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">🚀 Telegram Supportgruppe beitreten</a>
       </section>
     </main>
 
@@ -33,21 +72,19 @@
       <p>&copy; 2025 Greeny Group Manager. Alle Rechte vorbehalten.</p>
     </footer>
   </div>
-<script>
 
-  const toggle = document.getElementById('theme-toggle');
-  const body = document.body;
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const body = document.body;
 
-  // Beim Laden prüfen
-  if (localStorage.getItem('theme') === 'dark') {
-    body.classList.add('dark');
-  }
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
+    }
 
-  toggle.addEventListener('click', () => {
-    body.classList.toggle('dark');
-    localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-  });
-
-</script>
+    toggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
 </body>
 </html>
