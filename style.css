@@ -30,6 +30,24 @@ body {
   position: relative;
 }
 
+.donation {
+  margin-top: 40px;
+  padding: 15px 20px;
+  background: #f0fff5;
+  border-left: 4px solid #2e8b57;
+  border-radius: 6px;
+  font-style: normal;
+}
+
+.donation ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.donation li {
+  margin-bottom: 6px;
+}
+
 .logo {
   width: 100px;
   height: auto;
