@@ -1,7 +1,5 @@
+
 <!DOCTYPE html>
-// Zugriffsschutz
-if (sessionStorage.getItem('authenticated') !== 'true') {
-  window.location.href = "login.html";}
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -55,7 +53,11 @@ if (sessionStorage.getItem('authenticated') !== 'true') {
   </div>
 
   <script>
-    // Platzhalter-Funktion für spätere Datenanbindung via Fetch/API
+    // Zugriffsschutz
+    if (sessionStorage.getItem('authenticated') !== 'true') {
+      window.location.href = "login.html";
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("group-count").innerText = "23";
       document.getElementById("group-list").innerText = "- Gruppe A (ID 12345)\n- Gruppe B (ID 67890)";
