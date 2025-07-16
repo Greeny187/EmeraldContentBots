@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+// Zugriffsschutz
+if (sessionStorage.getItem('authenticated') !== 'true') {
+  window.location.href = "login.html";}
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container dashboard">
+    <h2>👨‍💻 Developer Dashboard</h2>
+
+    <section class="dashboard-section">
+      <h3>📊 Gruppen-Daten</h3>
+      <ul>
+        <li><strong>Anzahl Gruppen:</strong> <span id="group-count">...</span></li>
+        <li><strong>Gruppenliste:</strong> <pre id="group-list">...</pre></li>
+        <li><strong>Einstellungen:</strong> tägliche Statistik, Mood-Frage, RSS</li>
+      </ul>
+    </section>
+
+    <section class="dashboard-section">
+      <h3>👤 Nutzer-Analysen</h3>
+      <ul>
+        <li>Mitgliederzahlen pro Gruppe</li>
+        <li>Neue Mitglieder (heute / gestern)</li>
+        <li>Aktive Mitglieder</li>
+        <li>Mood-Verteilung</li>
+        <li>Top 3 Schreiber heute</li>
+      </ul>
+    </section>
+
+    <section class="dashboard-section">
+      <h3>📈 Bot-Aktivität</h3>
+      <ul>
+        <li><strong>Startzeit:</strong> <span id="start-time">...</span></li>
+        <li><strong>Uptime:</strong> <span id="uptime">...</span></li>
+        <li><strong>Verarbeitete Nachrichten (heute):</strong> <span id="messages-today">...</span></li>
+        <li><strong>Log-Zugriffe:</strong> <span id="logged-events">...</span></li>
+      </ul>
+    </section>
+
+    <section class="dashboard-section">
+      <h3>🔐 Zugriffshistorie</h3>
+      <ul>
+        <li>Befehle wie <code>/start</code>, <code>/menu</code>, <code>/version</code></li>
+        <li>Zuletzt aktive Nutzer</li>
+        <li>Gruppenzuordnung + ID</li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    // Platzhalter-Funktion für spätere Datenanbindung via Fetch/API
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("group-count").innerText = "23";
+      document.getElementById("group-list").innerText = "- Gruppe A (ID 12345)\n- Gruppe B (ID 67890)";
+      document.getElementById("start-time").innerText = "2025-07-16 08:00";
+      document.getElementById("uptime").innerText = "3 Tage, 6 Stunden";
+      document.getElementById("messages-today").innerText = "1274";
+      document.getElementById("logged-events").innerText = "945";
+    });
+  </script>
+</body>
+</html>
