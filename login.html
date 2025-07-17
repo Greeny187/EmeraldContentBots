@@ -1,69 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Developer Login</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .login-box {
-      max-width: 400px;
-      margin: 120px auto;
-      padding: 30px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .login-box input {
-      width: 80%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 1rem;
-    }
-    .login-box button {
-      background: #2e8b57;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    .login-box button:hover {
-      background: #256d47;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-      margin-top: 10px;
-    }
-    body.dark .login-box {
-      background-color: #2c2c2c;
-      color: #eee;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="login-box">
-    <h2>🔐 Developer Login</h2>
-    <input type="password" id="password" placeholder="Passwort eingeben">
-    <br>
-    <button onclick="login()">Login</button>
-    <p class="error" id="error"></p>
+  <div class="container">
+    <section class="content">
+      <h2>🔐 Developer Login</h2>
+      <form id="login-form">
+        <label for="password">Passwort:</label>
+        <input type="password" id="password" required placeholder="Passwort eingeben" />
+        <button type="submit" class="button">Anmelden</button>
+        <p id="login-error" class="error" style="display:none;color:red;">Falsches Passwort.</p>
+      </form>
+    </section>
   </div>
 
   <script>
-    const correctPassword = "greenydev2025";
-    function login() {
-      const pw = document.getElementById('password').value;
-      if (pw === correctPassword) {
-        sessionStorage.setItem('authenticated', 'true');
-        window.location.href = "dashboard.html";
+    const DEV_PASSWORD = 'greenydev2025';
+    const form = document.getElementById('login-form');
+    const error = document.getElementById('login-error');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (document.getElementById('password').value === DEV_PASSWORD) {
+        window.location.href = 'dashboard.html';
       } else {
-        document.getElementById('error').innerText = "Falsches Passwort.";
+        error.style.display = 'block';
       }
-    }
+    });
   </script>
 </body>
 </html>

@@ -8,24 +8,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-   <!-- Developer-Login -->
-  <div id="login-screen" class="container">
-    <h2>🔐 Developer Login</h2>
-    <form id="login-form">
-      <label for="password">Passwort:</label>
-      <input type="password" id="password" required>
-      <button type="submit" class="button">Anmelden</button>
-      <p id="login-error" style="color:red; display:none;">Falsches Passwort.</p>
-    </form>
+  <header class="hero">
+  <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo" />
+  <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
+  <h1>Greeny Group Manager</h1>
+  <p class="subtitle">Effiziente Gruppenorganisation. Modern. Einfach. Schnell.</p>
+  <div class="hero-buttons">
+    <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">
+      Jetzt starten
+    </a>
+    <a class="button header-button secondary" href="login.html">
+      Developer Dashboard
+    </a>
   </div>
-  <div class="container">
-    <header class="hero">
-      <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo" />
-      <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
-      <h1>Greeny Group Manager</h1>
-      <p class="subtitle">Effiziente Gruppenorganisation. Modern. Einfach. Schnell.</p>
-      <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">Jetzt starten</a>
-    </header>
+</header>
 
     <main>
       <section class="content">
@@ -156,28 +152,5 @@
       localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
     });
   </script>
-  <script>
-  // Nur für dich: definiere hier ein starkes Passwort
-  const DEV_PASSWORD = 'greenydev2025';
-
-  const loginForm = document.getElementById('login-form');
-  const loginError = document.getElementById('login-error');
-  const loginScreen = document.getElementById('login-screen');
-  const landingPage = document.getElementById('landingpage');
-
-  loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const pw = document.getElementById('password').value;
-    if (pw === DEV_PASSWORD) {
-      // Login erfolgreich
-      loginScreen.style.display = 'none';
-      landingPage.style.display = 'block';
-      // Direkt zum Dashboard weiterleiten
-      window.location.href = 'dashboard.html';
-    } else {
-      loginError.style.display = 'block';
-    }
-  });
-</script>
 </body>
 </html>
