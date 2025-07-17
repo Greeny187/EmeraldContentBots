@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -15,56 +14,88 @@
     <section class="dashboard-section">
       <h3>📊 Gruppen-Daten</h3>
       <ul>
-        <li><strong>Anzahl Gruppen:</strong> <span id="group-count">...</span></li>
-        <li><strong>Gruppenliste:</strong> <pre id="group-list">...</pre></li>
-        <li><strong>Einstellungen:</strong> tägliche Statistik, Mood-Frage, RSS</li>
+        <li><strong>Anzahl Gruppen:</strong> <span id="group-count"></span></li>
+        <li><strong>Gruppenliste:</strong> <pre id="group-list"></pre></li>
+        <li><strong>Einstellungen pro Gruppe:</strong> <pre id="group-settings"></pre></li>
       </ul>
     </section>
 
     <section class="dashboard-section">
       <h3>👤 Nutzer-Analysen</h3>
       <ul>
-        <li>Mitgliederzahlen pro Gruppe</li>
-        <li>Neue Mitglieder (heute / gestern)</li>
-        <li>Aktive Mitglieder</li>
-        <li>Mood-Verteilung</li>
-        <li>Top 3 Schreiber heute</li>
+        <li><strong>Mitglieder gesamt:</strong> <span id="total-members"></span></li>
+        <li><strong>Neue Mitglieder (heute):</strong> <span id="new-members"></span></li>
+        <li><strong>Aktive Mitglieder:</strong> <span id="active-members"></span></li>
+        <li><strong>Mood-Verteilung:</strong> <pre id="mood-stats"></pre></li>
+        <li><strong>Top 3 Schreiber:</strong> <pre id="top-users"></pre></li>
       </ul>
     </section>
 
     <section class="dashboard-section">
       <h3>📈 Bot-Aktivität</h3>
       <ul>
-        <li><strong>Startzeit:</strong> <span id="start-time">...</span></li>
-        <li><strong>Uptime:</strong> <span id="uptime">...</span></li>
-        <li><strong>Verarbeitete Nachrichten (heute):</strong> <span id="messages-today">...</span></li>
-        <li><strong>Log-Zugriffe:</strong> <span id="logged-events">...</span></li>
+        <li><strong>Startzeit:</strong> <span id="start-time"></span></li>
+        <li><strong>Uptime:</strong> <span id="uptime"></span></li>
+        <li><strong>Verarbeitete Nachrichten (heute):</strong> <span id="messages-today"></span></li>
+        <li><strong>Log-Zugriffe:</strong> <span id="logged-events"></span></li>
       </ul>
     </section>
 
     <section class="dashboard-section">
       <h3>🔐 Zugriffshistorie</h3>
-      <ul>
-        <li>Befehle wie <code>/start</code>, <code>/menu</code>, <code>/version</code></li>
-        <li>Zuletzt aktive Nutzer</li>
-        <li>Gruppenzuordnung + ID</li>
+      <ul id="access-history">
+        <!-- Wird dynamisch gefüllt -->
       </ul>
     </section>
   </div>
 
   <script>
-    // Zugriffsschutz
+    // Zugriffsschutz: nur eingeloggte Developer
     if (sessionStorage.getItem('authenticated') !== 'true') {
-      window.location.href = "login.html";
+      window.location.href = 'login.html';
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("group-count").innerText = "23";
-      document.getElementById("group-list").innerText = "- Gruppe A (ID 12345)\n- Gruppe B (ID 67890)";
-      document.getElementById("start-time").innerText = "2025-07-16 08:00";
-      document.getElementById("uptime").innerText = "3 Tage, 6 Stunden";
-      document.getElementById("messages-today").innerText = "1274";
-      document.getElementById("logged-events").innerText = "945";
+    // API Token
+    const API_TOKEN = 'supersecrettoken123';
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/dashboard', {
+          headers: { 'Authorization': `Bearer ${API_TOKEN}` }
+        });
+        if (res.status === 401) {
+          alert('Unauthorized');
+          window.location.href = 'login.html';
+          return;
+        }
+        const data = await res.json();
+        // Gruppen
+        document.getElementById('group-count').innerText = data.total_groups;
+        const list = data.groups.map(g => `${g.title} (ID ${g.id})`).join('\n');
+        document.getElementById('group-list').innerText = list;
+        // Einstellungen: hier als JSON
+        const settings = data.groups.map(g => `${g.title}: Stats=${g.settings?.daily_stats_enabled}, Mood="${g.settings?.mood_question}", RSS Topic=${g.settings?.rss_topic_id}`).join('\n');
+        document.getElementById('group-settings').innerText = settings;
+        // Nutzer-Analyse
+        document.getElementById('total-members').innerText = data.total_members;
+        document.getElementById('new-members').innerText = data.new_members || 'N/A';
+        document.getElementById('active-members').innerText = data.active_members || 'N/A';
+        document.getElementById('mood-stats').innerText = JSON.stringify(data.mood_stats, null, 2);
+        document.getElementById('top-users').innerText = data.top_users.map(u => `ID ${u.user_id}: ${u.messages} msgs`).join('\n');
+        // Bot-Aktivität
+        document.getElementById('start-time').innerText = data.start_time;
+        document.getElementById('uptime').innerText = data.uptime;
+        document.getElementById('messages-today').innerText = data.daily_messages;
+        document.getElementById('logged-events').innerText = data.logged_events;
+        // Zugriffshistorie
+        const historyEl = document.getElementById('access-history');
+        data.access_history.forEach(entry => {
+          const li = document.createElement('li');
+          li.innerText = `${entry.timestamp} – User ${entry.user_id} in Chat ${entry.chat_id}: ${entry.command}`;
+          historyEl.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Fehler beim Laden des Dashboards');
+      }
     });
   </script>
 </body>
