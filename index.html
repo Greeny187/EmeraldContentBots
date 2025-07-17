@@ -8,6 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+   <!-- Developer-Login -->
+  <div id="login-screen" class="container">
+    <h2>🔐 Developer Login</h2>
+    <form id="login-form">
+      <label for="password">Passwort:</label>
+      <input type="password" id="password" required>
+      <button type="submit" class="button">Anmelden</button>
+      <p id="login-error" style="color:red; display:none;">Falsches Passwort.</p>
+    </form>
+  </div>
   <div class="container">
     <header class="hero">
       <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo" />
@@ -130,7 +140,6 @@
     <li>📩 <strong>PayPal:</strong> <a href="mailto:greeny187@outlook.de">greeny187@outlook.de</a></li>
     <li>💎 <strong>TON Wallet:</strong> <code>UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></li>
   </ul>
-  <a class="button" href="dashboard.html">Developer Login</a>
 </div>
     </footer>
   </div>
@@ -147,5 +156,28 @@
       localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
     });
   </script>
+  <script>
+  // Nur für dich: definiere hier ein starkes Passwort
+  const DEV_PASSWORD = 'greenydev2025';
+
+  const loginForm = document.getElementById('login-form');
+  const loginError = document.getElementById('login-error');
+  const loginScreen = document.getElementById('login-screen');
+  const landingPage = document.getElementById('landingpage');
+
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const pw = document.getElementById('password').value;
+    if (pw === DEV_PASSWORD) {
+      // Login erfolgreich
+      loginScreen.style.display = 'none';
+      landingPage.style.display = 'block';
+      // Direkt zum Dashboard weiterleiten
+      window.location.href = 'dashboard.html';
+    } else {
+      loginError.style.display = 'block';
+    }
+  });
+</script>
 </body>
 </html>
