@@ -55,12 +55,12 @@
       window.location.href = 'login.html';
     }
     // API Token
-    const DASHBOARD_TOKEN = 'greenydev2025';
+    const API_TOKEN = 'greenydev2025';
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const API_HOST = 'https://greenygroupmanager.herokuapp.com';
         const res = await fetch(`${API_HOST}/api/dashboard`, {
-          headers: { 'Authorization': `Bearer ${DASHBOARD_TOKEN}` }
+          headers: { 'Authorization': `Bearer ${API_TOKEN}` }
         });
         if (res.status === 401) {
           alert('Unauthorized');
