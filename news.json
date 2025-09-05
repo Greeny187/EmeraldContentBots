@@ -1,0 +1,29 @@
+[
+  {
+    "date": "2025-09-05",
+    "title": "Content Bot v0.91 – Stabilitäts-Release",
+    "points": [
+      "Feinere Spam-Kontrollen & globale Admin-Links",
+      "Verbessertes Menü-Routing & Topic-Import",
+      "Statistiken: aktive Nutzer, Befehle, Features"
+    ],
+    "link": "https://t.me/GreenyGroupBot"
+  },
+  {
+    "date": "2025-08-29",
+    "title": "Nachtmodus aktiviert",
+    "points": [
+      "Planbare Ruhezeiten",
+      "Sanftere Notifications in Peak-Phasen"
+    ]
+  },
+  {
+    "date": "2025-08",
+    "title": "Free vs. Pro – vorbereitet",
+    "points": [
+      "Free: 7-Tage-Stats, Basis-Automationen",
+      "Pro: bis 60-Tage-Historie, KI-Features",
+      "Zahlung: Stars, PayPal, Coinbase (in Planung)"
+    ]
+  }
+]

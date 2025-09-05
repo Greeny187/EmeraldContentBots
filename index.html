@@ -12,7 +12,7 @@
 <body>
   <div class="container">
 
-    <!-- HERO: Nur Titel & Untertitel (keine Buttons) -->
+    <!-- HERO: Nur Titel & Untertitel (keine Buttons/Links) -->
     <header class="hero">
       <button id="theme-toggle" class="theme-toggle" aria-label="Theme umschalten">🌗</button>
       <h1>Emerald Content</h1>
@@ -125,13 +125,63 @@
         </div>
       </div>
 
-      <!-- Optionaler CTA nur zu News -->
-      <div class="product-cta">
-        <a class="button secondary" href="#news">Zu den News & Updates</a>
+      <!-- Feature-Matrix Free vs Pro -->
+      <div class="feature-matrix-wrap">
+        <h3>Free vs. Pro</h3>
+        <div class="feature-matrix" role="table" aria-label="Feature Matrix Free vs Pro">
+          <div class="fm-row fm-head" role="row">
+            <div class="fm-cell" role="columnheader">Funktion</div>
+            <div class="fm-cell" role="columnheader">Free</div>
+            <div class="fm-cell" role="columnheader">Pro</div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell" role="cell">Moderation (Regeln, Anti-Spam, Captcha)</div>
+            <div class="fm-cell" role="cell"><span class="check">✓</span></div>
+            <div class="fm-cell" role="cell"><span class="check">✓</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell" role="cell">Topics importieren & verwalten</div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell" role="cell">Automationen (geplante Posts, Nachtmodus)</div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell">Statistik-Zeitraum</div>
+            <div class="fm-cell"><span class="pill">7 Tage</span></div>
+            <div class="fm-cell"><span class="pill pro">bis 60 Tage</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell">Erweiterte Insights (Feature- & Command-Detail)</div>
+            <div class="fm-cell"><span class="dash">–</span></div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell">KI-Features (smarte Antworten/Analysen)</div>
+            <div class="fm-cell"><span class="dash">–</span></div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+          </div>
+
+          <div class="fm-row" role="row">
+            <div class="fm-cell">Werbefreiheit</div>
+            <div class="fm-cell"><span class="dash">–</span></div>
+            <div class="fm-cell"><span class="check">✓</span></div>
+          </div>
+        </div>
+        <p class="muted small">Zahlungsoptionen vorbereitet: Telegram Stars, PayPal, Coinbase Commerce.</p>
       </div>
     </section>
 
-    <!-- PRODUKT: Geplante Bots -->
+    <!-- PRODUKT: Geplante Bots (Kurzinfos) -->
     <section class="content product-section" id="trade-api">
       <h2>Emerald Trade API <span class="status-badge inline planned">GEPLANT</span></h2>
       <ul class="bullets">
@@ -177,17 +227,18 @@
       </ul>
     </section>
 
-    <!-- NEWS & UPDATES (konkretisiert) -->
+    <!-- NEWS & UPDATES (statisch + optionaler JSON-Loader) -->
     <section class="content news" id="news">
       <h3>Aktuelles</h3>
-      <div class="news-grid">
+      <div class="news-grid" id="news-grid">
+        <!-- Fallback-Items (werden durch JSON-Loader ergänzt/ersetzt) -->
         <article class="news-card">
           <div class="news-date">05.09.2025</div>
           <h4>Content Bot v0.91: Stabiler & klarer</h4>
           <ul>
-            <li>Feinere Spam-Kontrollen, globale Admin-Links (statt je Topic)</li>
-            <li>Verbesserte Topic-Imports & Menü-Routing</li>
-            <li>Statistik-Module überarbeitet (aktive Nutzer, Befehle, Features)</li>
+            <li>Feinere Spam-Kontrollen, globale Admin-Links</li>
+            <li>Verbessertes Menü-Routing & Topic-Importe</li>
+            <li>Statistik-Module: aktive Nutzer, Befehle, Features</li>
           </ul>
         </article>
 
@@ -195,7 +246,7 @@
           <div class="news-date">29.08.2025</div>
           <h4>Nachtmodus aktiviert</h4>
           <ul>
-            <li>Planbare Ruhezeiten & sanftere Benachrichtigungen</li>
+            <li>Planbare Ruhezeiten & sanftere Notifications</li>
             <li>Besseres UX in stark aktiven Gruppen</li>
           </ul>
         </article>
@@ -206,7 +257,7 @@
           <ul>
             <li>Free: 7-Tage-Statistik, Basis-Automationen</li>
             <li>Pro: bis 60-Tage-Historie, KI-Funktionen, erweiterte Auswertungen</li>
-            <li>Zahlung: Telegram Stars, PayPal, Coinbase Commerce (in Planung)</li>
+            <li>Zahlung: Stars, PayPal, Coinbase Commerce (in Planung)</li>
           </ul>
         </article>
       </div>
@@ -244,7 +295,32 @@
         localStorage.setItem('theme', mode);
       });
     }
+
+    // Optional: News aus news.json laden (gleicher Ordner wie index.html)
+    // Struktur siehe Beispiel unten.
+    (async () => {
+      try {
+        const res = await fetch('./news.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const items = await res.json();
+        if (!Array.isArray(items) || !items.length) return;
+
+        const grid = document.getElementById('news-grid');
+        grid.innerHTML = ''; // Fallback-News entfernen
+
+        items.forEach(n => {
+          const card = document.createElement('article');
+          card.className = 'news-card';
+          card.innerHTML = `
+            <div class="news-date">${n.date || ''}</div>
+            <h4>${n.title || ''}</h4>
+            ${Array.isArray(n.points) ? `<ul>${n.points.map(p=>`<li>${p}</li>`).join('')}</ul>` : (n.text ? `<p>${n.text}</p>` : '')}
+            ${n.link ? `<a class="news-link" href="${n.link}" target="_blank" rel="noopener noreferrer">Mehr</a>` : ''}
+          `;
+          grid.appendChild(card);
+        });
+      } catch(e) { /* stiller Fallback */ }
+    })();
   </script>
 </body>
 </html>
-
