@@ -3,22 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Greeny Group Manager</title>
+  <title>Emerald Content</title>
+  <meta name="theme-color" content="#0C1424" />
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="hero">
-  <img src="./assets/Logo.jpg" alt="Greeny Logo" class="logo" />
-  <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
-  <h1>Greeny Group Manager</h1>
-  <p class="subtitle">Effiziente Gruppenorganisation. Modern. Einfach. Schnell.</p>
-  </header>
+  <div class="container">
+    <header class="hero">
+      <!-- Hauptlogo -->
+      <img src="./assets/emerald-content-bot.png" alt="Emerald Content Bot" class="logo" />
+      <button id="theme-toggle" class="theme-toggle" aria-label="Designmodus wechseln" title="Designmodus wechseln">🌓</button>
+
+      <h1>Emerald Content</h1>
+      <p class="subtitle">
+        Moderation, Automatisierung und Analytics für deine Community – schnell, sicher, skalierbar.
+      </p>
+      <div class="hero-buttons">
+        <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">Jetzt starten</a>
+        <a class="button header-button secondary" href="login.html">Developer Dashboard</a>
+      </div>
+    </header>
 
     <main>
       <section class="content">
-        <h2>Was ist Greeny Group Management?</h2>
-        <p>Greeny Group Management steht für moderne, automatisierte Verwaltung von sozialen Gruppen – effizient, sicher und skalierbar. Unsere spezialisierten Bots für Plattformen wie Telegram, Discord und Co. unterstützen Admins bei der Moderation, Nutzerverwaltung, Rollenvergabe, Inhaltssteuerung und Automatisierung wiederkehrender Aufgaben. Entwickelt mit modernen Technologien, APIs und einem klaren Fokus auf Benutzerfreundlichkeit bieten Greeny Management Bots eine leistungsstarke Grundlage für Community-Management auf hohem Niveau.</p>
+        <h2>Was ist Emerald Content?</h2>
+        <p>
+          Emerald Content ist Teil der <strong>EMERALD Suite</strong> – spezialisierte Bots & Tools für Social- und
+          Community-Management. Der Emerald Content Bot automatisiert Begrüßung, Moderation, Rollen & Aufgaben
+          und liefert dir aussagekräftige Statistiken.
+        </p>
 
         <h3>Unterstützte Plattformen</h3>
         <ul>
@@ -26,22 +40,31 @@
           <li><em>Discord</em> (in Vorbereitung)</li>
         </ul>
 
-        <h3>Funktionen des Greeny Group Bots</h3>
+        <h3>Funktionen des Emerald Content Bot</h3>
         <div class="features">
-            <div class="feature-group">
+          <div class="feature-group">
+            <h4>🛡 Moderation & Sicherheit</h4>
+            <ul>
+              <li>Begrüßung & Regeln für neue Mitglieder</li>
+              <li>Inhaltsmoderation (Links, Spam, Sprache)</li>
+              <li>Verwaltung von Gruppenrichtlinien & Ausnahmen</li>
+              <li>Erkennung/Entfernung gelöschter Accounts</li>
+            </ul>
+          </div>
+          <div class="feature-group">
             <h4>⚙️ Automatisierung & Verwaltung</h4>
             <ul>
+              <li>Automatische Rollenzuweisung</li>
+              <li>Geplante Aufgaben & Erinnerungen</li>
               <li>Tägliche Aktivitätsstatistik (Top 3)</li>
-              <li>Stimmungsumfrage mit individueller Frage</li>
-              <li>Geplante RSS-Veröffentlichung in Forenthemen</li>
-              <li>Erweiterbare Gruppeneinstellungen über /menu</li>
-              <li>Verwaltung via Inline-Menüsystem</li>
+              <li>RSS-Veröffentlichung in Forenthemen</li>
+              <li>Verwaltung via Inline-Menü / <code>/menu</code></li>
             </ul>
           </div>
           <div class="feature-group">
             <h4>🌐 Kommunikation & Erweiterung</h4>
             <ul>
-              <li>Mehrsprachige und konfigurierbare Texte</li>
+              <li>Mehrsprachige & konfigurierbare Texte</li>
               <li>Gruppenübergreifende Administration</li>
               <li>Kompatibel mit Telegram (Discord geplant)</li>
             </ul>
@@ -49,113 +72,123 @@
         </div>
 
         <h3>📌 Versionsübersicht – Roadmap bis Version 1.0</h3>
-<div class="timeline">
-  <div class="timeline-item completed">
-    <div class="timeline-date">✅ Version 0.5 (Ende Juni 2025)</div>
-    <div class="timeline-content">
-      <p>Erweiterung der Benutzerverwaltung, optimierte Telegram-Integration, stabilere Rechtevergabe.</p>
-    </div>
-  </div>
+        <div class="timeline">
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.5 (Ende Juni 2025)</div>
+            <div class="timeline-content">
+              <p>Erweiterte Benutzerverwaltung, optimierte Telegram-Integration, stabilere Rechtevergabe.</p>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.5.5 (Ende Juni 2025)</div>
+            <div class="timeline-content">
+              <ul><li>🛠️ Fix: Speicherung von Gruppenmanagement-Daten</li></ul>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.6 (Mitte Juli 2025)</div>
+            <div class="timeline-content">
+              <ul>
+                <li>📢 Kanalverwaltung</li>
+                <li>🐞 Fix für <code>/settopic</code></li>
+                <li>🌐 Deutsch & Englisch</li>
+              </ul>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.7 (Mitte Juli 2025)</div>
+            <div class="timeline-content">
+              <ul>
+                <li>📊 Mehr Statistiken</li>
+                <li>📰 Bessere RSS-Integration</li>
+              </ul>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.8 (Ende Juli 2025)</div>
+            <div class="timeline-content">
+              <ul>
+                <li>📢 Werbefunktion (Free-Vorbereitung)</li>
+                <li>🤖 Captcha bei Beitritt (optional)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-date">✅ Version 0.9 (Mitte August 2025)</div>
+            <div class="timeline-content">
+              <ul>
+                <li>🚫 Feinsteuerung Spam-/Link-Sperren</li>
+                <li>⚙️ Manuelle Konfiguration erweitert</li>
+              </ul>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Version 1.0 (Ende August 2025)</div>
+            <div class="timeline-content">
+              <ul><li>🚀 Launch: Free & Pro</li></ul>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <div class="timeline-item completed">
-    <div class="timeline-date">✅ Version 0.5.5 (Ende Juni 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li>🛠️ Fehlerbehebung bei der Speicherung von Gruppenmanagementdaten</li>
-      </ul>
-    </div>
-  </div>
+      <!-- EMERALD Suite – Logos / Produkte -->
+      <section class="content suite">
+        <h3>EMERALD Suite</h3>
+        <div class="brand-grid">
+          <div class="brand-card">
+            <img src="./assets/emerald-trade-api.png" alt="Emerald Trade API" />
+            <h4>Trade API</h4>
+          </div>
+          <div class="brand-card">
+            <img src="./assets/emerald-trade-dex.png" alt="Emerald Trade DEX" />
+            <h4>Trade DEX</h4>
+          </div>
+          <div class="brand-card">
+            <img src="./assets/emerald-learning.png" alt="Emerald Learning" />
+            <h4>Learning</h4>
+          </div>
+          <div class="brand-card">
+            <img src="./assets/emerald-content-bot.png" alt="Emerald Content Bot" />
+            <h4>Content Bot</h4>
+          </div>
+          <div class="brand-card">
+            <img src="./assets/emerald-crossposter.png" alt="Emerald Crossposter" />
+            <h4>Crossposter</h4>
+          </div>
+          <div class="brand-card">
+            <img src="./assets/emerald-support.png" alt="Emerald Support" />
+            <h4>Support</h4>
+          </div>
+        </div>
+      </section>
 
-  <div class="timeline-item completed">
-    <div class="timeline-date">✅ Version 0.6 (Mitte Juli 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li>📰 Verbesserte RSS-Feed-Integration</li>
-        <li>🚿 Fix: Probleme bei /settopic-Befehlen behoben</li>
-        <li>🌐 Mehrsprachigkeit mit OpenAI-Unterstützung: de + en + es + fr + it + ru</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="timeline-item completed">
-    <div class="timeline-date">✅ Version 0.7 (Mitte Juli 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li>📊 Erweiterungen im Bereich Statistiken</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="timeline-item completed">
-    <div class="timeline-date">✅ Version 0.8 (Ende Juli 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li></li>
-        <li>🤖 Captcha bei Gruppenbeitritt aktivierbar</li>
-        <li>🔒 Zusätzliche Sicherheitsmaßnahmen für Gruppen</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="timeline-item">
-    <div class="timeline-date">Version 0.9 (Mitte August 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li>🔧 Verbesserte Spam- & Link-Filter mit individuellen Regeln</li>
-        <li>🌙 Nachtmodus </li>
-        <li>📢 Werbefunktion (Vorbereitung für Free-Version)</li>
-        <li>🧭 Topic-Router zur automatischen Themenzuordnung</li>
-        <li>🤖 KI-Moderation: automatische Erkennung & Handlungsmöglichkeiten</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="timeline-item">
-    <div class="timeline-date">Version 1.0 (Ende August 2025)</div>
-    <div class="timeline-content">
-      <ul>
-        <li>🚀 Launch der kostenpflichtigen Pro- und Free-Version</li>
-      </ul>
-    </div>
-  </div>
-</div>
-<div class="hero-buttons">
-    <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank">
-      Jetzt starten
-    </a>
-  </a>
-  </div>
-        
+      <section class="content cta">
+        <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">🚀 Telegram Supportgruppe beitreten</a>
       </section>
     </main>
-  
+
     <footer>
-      <!-- Spenden-Box -->
       <div class="donation">
-        <ul>
-        <p><strong>Anmeldung zur BETA-Testphase</strong> ist über unsere <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Supportgruppe</a> möglich.</p>
-        </ul>
-      
         <p>💚 Du möchtest das Projekt unterstützen?</p>
         <ul>
-          <p>📩 <strong>PayPal:</strong> <a href="mailto:greeny187@outlook.de">greeny187@outlook.de</a></p>
-          <p>💎 <strong>TON Wallet:</strong> <code>UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></p>
+          <li>📩 <strong>PayPal:</strong> <a href="mailto:Emerald@mail.de">Emerald@mail.de</a></li>
+          <li>💎 <strong>TON:</strong> <code>UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></li>
         </ul>
       </div>
-
-      <!-- Footer-Hinweis -->
-      <p>&copy; 2025 Greeny Group Manager. Alle Rechte vorbehalten.</p>
+      <p>&copy; 2025 Emerald Content</p>
     </footer>
   </div>
-  <script>
-    const toggle = document.getElementById('theme-toggle');
-    const body = document.body;
 
-    if (localStorage.getItem('theme') === 'dark') {
+  <script>
+    // Dark/Light: lokale Präferenz + OS
+    const body = document.body;
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      body.classList.toggle('dark', saved === 'dark');
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       body.classList.add('dark');
     }
-
-    toggle.addEventListener('click', () => {
+    document.getElementById('theme-toggle').addEventListener('click', () => {
       body.classList.toggle('dark');
       localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
     });
