@@ -12,16 +12,11 @@
 <body>
   <div class="container">
 
-    <!-- HERO: Nur Titel/Untertitel/Buttons -->
+    <!-- HERO: Nur Titel & Untertitel (keine Buttons) -->
     <header class="hero">
       <button id="theme-toggle" class="theme-toggle" aria-label="Theme umschalten">🌗</button>
       <h1>Emerald Content</h1>
       <p class="subtitle">Bots & Mini-Apps für Content, Moderation & Automatisierung</p>
-
-      <div class="hero-buttons">
-        <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">🚀 Jetzt starten (Telegram)</a>
-        <a class="button header-button secondary" href="login.html">Developer Dashboard</a>
-      </div>
     </header>
 
     <!-- SUITE: 3×2 Raster direkt unter dem Header -->
@@ -81,34 +76,62 @@
         <p class="muted">Telegram voll funktionsfähig · Discord in Vorbereitung</p>
       </div>
 
+      <!-- Feature-Highlights als Stichpunkte -->
       <div class="features two-col">
         <div class="feature-group">
           <h4>🛡 Moderation & Sicherheit</h4>
           <ul>
-            <li>Begrüßung & Regeln für neue Mitglieder</li>
-            <li>Feinsteuerung für Links/Spam/Sprache</li>
-            <li>Verwaltung von Gruppenrichtlinien & Ausnahmen</li>
-            <li>Erkennung/Entfernung gelöschter Accounts</li>
+            <li>Begrüßungsposts, Regeln & Onboarding</li>
+            <li>Feingranulare Anti-Spam-Policies (Links, Sprache, Medien)</li>
+            <li>Whitelist/Blacklist (gruppenweit), gelöschte Accounts erkennen/entfernen</li>
+            <li>Captcha/Verifizierung bei neuen Mitgliedern</li>
+          </ul>
+          <h4>🗂 Themen & Inhalte</h4>
+          <ul>
+            <li>Topics/Threads importieren & verwalten</li>
+            <li>RSS → automatische Posts in definierte Forenthemen</li>
+            <li>Cross-Posting Hooks vorbereitet (für späteren Crossposter)</li>
+          </ul>
+          <h4>⚙️ Automationen</h4>
+          <ul>
+            <li>Geplante Nachrichten & Erinnerungen</li>
+            <li>Rollen-/Berechtigungs-Workflows (z. B. Auto-Role)</li>
+            <li>Nachtmodus & stille Phasen</li>
           </ul>
         </div>
+
         <div class="feature-group">
-          <h4>⚙️ Automatisierung & Verwaltung</h4>
+          <h4>📊 Statistik & Insights</h4>
           <ul>
-            <li>Automatische Rollenzuweisung</li>
-            <li>Geplante Aufgaben & Erinnerungen</li>
-            <li>Tägliche Aktivitätsstatistik (Top 3)</li>
-            <li>RSS-Veröffentlichung in Forenthemen</li>
+            <li>Aktive Nutzer pro Gruppe, Command-Nutzung, Feature-Interaktionen</li>
+            <li>Tageszeiten-Heatmap, Top-Gruppen, Feature-Verteilung</li>
+            <li><strong>Free:</strong> 7-Tage-Ansicht · <strong>Pro:</strong> bis 60-Tage-Historie</li>
+          </ul>
+          <h4>🌍 Sprache & UX</h4>
+          <ul>
+            <li>Mehrsprachig (DE/EN/FR/RU), Hybrid-Translator für Inhalte</li>
+            <li>Klares Menü, Dev-Menü für Tests/Diagnose</li>
+          </ul>
+          <h4>💳 Monetarisierung & Pro</h4>
+          <ul>
+            <li>Vorbereitet: Telegram Stars (In-App), PayPal-Link, Coinbase Commerce</li>
+            <li>KI-Funktionen exklusiv für Pro (z. B. smarte Antworten/Analysen)</li>
+          </ul>
+          <h4>🔌 Integrationen</h4>
+          <ul>
+            <li>Telegram (live), Discord (in Planung)</li>
+            <li>Saubere APIs/Hooks für weitere Services</li>
           </ul>
         </div>
       </div>
 
+      <!-- Optionaler CTA nur zu News -->
       <div class="product-cta">
-        <a class="button" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">Jetzt auf Telegram testen</a>
         <a class="button secondary" href="#news">Zu den News & Updates</a>
       </div>
     </section>
 
-    <!-- PRODUKT: Geplante Bots (kurz & knackig) -->
+    <!-- PRODUKT: Geplante Bots -->
     <section class="content product-section" id="trade-api">
       <h2>Emerald Trade API <span class="status-badge inline planned">GEPLANT</span></h2>
       <ul class="bullets">
@@ -154,34 +177,39 @@
       </ul>
     </section>
 
-    <!-- NEWS & UPDATES -->
+    <!-- NEWS & UPDATES (konkretisiert) -->
     <section class="content news" id="news">
       <h3>Aktuelles</h3>
       <div class="news-grid">
         <article class="news-card">
           <div class="news-date">05.09.2025</div>
-          <h4>Emerald Content Bot v0.91 ist live</h4>
-          <p>Stabilitäts-Update, klare Menüführung, feinere Spam-Kontrollen, Roadmap für Free/Pro vorbereitet.</p>
-          <a class="news-link" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">Zum Bot</a>
+          <h4>Content Bot v0.91: Stabiler & klarer</h4>
+          <ul>
+            <li>Feinere Spam-Kontrollen, globale Admin-Links (statt je Topic)</li>
+            <li>Verbesserte Topic-Imports & Menü-Routing</li>
+            <li>Statistik-Module überarbeitet (aktive Nutzer, Befehle, Features)</li>
+          </ul>
+        </article>
+
+        <article class="news-card">
+          <div class="news-date">29.08.2025</div>
+          <h4>Nachtmodus aktiviert</h4>
+          <ul>
+            <li>Planbare Ruhezeiten & sanftere Benachrichtigungen</li>
+            <li>Besseres UX in stark aktiven Gruppen</li>
+          </ul>
         </article>
 
         <article class="news-card">
           <div class="news-date">08.2025</div>
-          <h4>Free & Pro – Vorbereitung</h4>
-          <p>Free mit 7-Tage-Statistik & optionalen Hinweisen; Pro mit bis zu 60-Tage-Statistik und KI-Extras.</p>
-        </article>
-
-        <article class="news-card">
-          <div class="news-date">Q4 2025</div>
-          <h4>Roadmap: Crossposter, Learning & Support</h4>
-          <p>Gezielte Mini-Apps, saubere Workflows, einheitliches Branding – alles aus einer Hand.</p>
+          <h4>Free vs. Pro vorbereitet</h4>
+          <ul>
+            <li>Free: 7-Tage-Statistik, Basis-Automationen</li>
+            <li>Pro: bis 60-Tage-Historie, KI-Funktionen, erweiterte Auswertungen</li>
+            <li>Zahlung: Telegram Stars, PayPal, Coinbase Commerce (in Planung)</li>
+          </ul>
         </article>
       </div>
-    </section>
-
-    <!-- CTA & FOOTER -->
-    <section class="content cta">
-      <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank" rel="noopener noreferrer">💬 Telegram-Supportgruppe beitreten</a>
     </section>
 
     <footer>
