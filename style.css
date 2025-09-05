@@ -346,25 +346,75 @@ body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
   .features.two-col{ grid-template-columns: 1fr; }
 }
 
-/* Feature-Matrix */
-.feature-matrix-wrap{ margin-top:18px; }
-.feature-matrix[role="table"]{
-  display:grid; gap:8px;
-  border:1px solid var(--border); border-radius:12px; padding:10px;
-  background: rgba(255,255,255,.02);
+/* Feature-Tabelle (responsive & sauber gerahmt) */
+.feature-table-wrap{ margin-top:18px; }
+
+.feature-table-wrap h3{
+  margin: 0 0 10px;
 }
-.fm-row{ display:grid; grid-template-columns: 2fr 1fr 1fr; align-items:center; gap:8px; }
-.fm-head{ font-weight:700; }
-.fm-row:not(.fm-head){ border-top:1px dashed var(--border); padding-top:8px; }
-.fm-cell .check{ font-weight:700; }
-.fm-cell .dash{ opacity:.7; }
+
+.feature-table{
+  width:100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;               /* für runde Ecken */
+  background: rgba(255,255,255,.02);
+  font-size: .98rem;
+}
+
+.feature-table thead th{
+  text-align:left;
+  font-weight:700;
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  background: rgba(255,255,255,.03);
+}
+
+.feature-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+.feature-table tr:last-child td{
+  border-bottom: none;
+}
+
+/* Spaltenausrichtung & Breite für Free/Pro */
+.feature-table th:nth-child(2),
+.feature-table th:nth-child(3),
+.feature-table td:nth-child(2),
+.feature-table td:nth-child(3){
+  text-align:center;
+  width: 9rem;
+}
+
+.feature-table .center{ text-align:center; }
+
+/* Badges/Pills wiederverwenden */
 .pill{
-  display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--border);
-  font-size:.85rem; background: rgba(255,255,255,.04);
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-size:.85rem;
+  background: rgba(255,255,255,.04);
 }
 .pill.pro{
   border-color: rgba(16,199,160,.45);
   background: linear-gradient(0deg, rgba(16,199,160,.12), rgba(16,199,160,.12));
+}
+
+/* Mobile: horizontales Scrollen statt kaputt umbrechen */
+@media (max-width: 640px){
+  .feature-table-wrap{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .feature-table{
+    min-width: 560px; /* verhindert, dass die Spalten zu eng werden */
+  }
 }
 
 /* News */
