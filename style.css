@@ -72,6 +72,45 @@ h1{font-size: clamp(26px,3.2vw,42px);margin:6px 0 8px;font-weight:700;letter-spa
 .header-button.secondary{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
 .header-button.secondary:hover{background:rgba(255,255,255,.08)}
 
+/* Hero: 3x2 Familienraster */
+.hero-family{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  justify-items:center;
+  align-items:center;
+  max-width: 820px;
+  margin: 0 auto 12px; /* etwas Abstand zur Headline */
+}
+.hero-family img{
+  width: 100%;
+  height: auto;
+  max-width: 240px; /* deine Zielgröße */
+  border-radius: 12px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 8px;
+}
+
+/* Mobil: 2 Spalten */
+@media (max-width: 640px){
+  .hero-family{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hero-family img{ max-width: 200px; padding: 6px; border-radius: 10px; }
+}
+
+/* Suite-Grid: Desktop strikt 3 Spalten, Mobil 2 */
+.suite .brand-grid{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 640px){
+  .suite .brand-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
 /* Theme Toggle */
 .theme-toggle{
   position:absolute;top:18px;right:18px;
