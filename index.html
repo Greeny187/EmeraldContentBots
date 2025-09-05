@@ -5,161 +5,184 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emerald Content</title>
   <meta name="theme-color" content="#0C1424" />
+  <meta name="description" content="Emerald Content – Bots & Mini-Apps für Content, Moderation und Automatisierung. Teil der EMERALD Suite." />
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-        <div class="hero-family">
-        <img src="./assets/emerald-trade-api.png" alt="Emerald Trade API" loading="eager" width="240" height="120" />
-        <img src="./assets/emerald-trade-dex.png" alt="Emerald Trade DEX" loading="eager" width="240" height="120" />
-        <img src="./assets/emerald-learning.png" alt="Emerald Learning" loading="eager" width="240" height="120" />
-        <img src="./assets/emerald-content-bot.png" alt="Emerald Content Bot" loading="eager" width="240" height="120" />
-        <img src="./assets/emerald-crossposter.png" alt="Emerald Crossposter" loading="eager" width="240" height="120" />
-        <img src="./assets/emerald-support.png" alt="Emerald Support" loading="eager" width="240" height="120" />
+  <div class="container">
+
+    <!-- HERO: Nur Titel/Untertitel/Buttons -->
+    <header class="hero">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Theme umschalten">🌗</button>
+      <h1>Emerald Content</h1>
+      <p class="subtitle">Bots & Mini-Apps für Content, Moderation & Automatisierung</p>
+
+      <div class="hero-buttons">
+        <a class="button header-button" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">🚀 Jetzt starten (Telegram)</a>
+        <a class="button header-button secondary" href="login.html">Developer Dashboard</a>
       </div>
     </header>
 
-    <main>
-      <section class="content">
-        <h2>Was ist Emerald Content?</h2>
-        <p>
-          Emerald Content ist Teil der <strong>EMERALD Suite</strong> – spezialisierte Bots & Tools für Social- und
-          Community-Management. Der Emerald Content Bot automatisiert Begrüßung, Moderation, Rollen & Aufgaben
-          und liefert dir aussagekräftige Statistiken.
-        </p>
+    <!-- SUITE: 3×2 Raster direkt unter dem Header -->
+    <section class="content suite" id="suite">
+      <h3>EMERALD Suite</h3>
+      <p class="muted">Sechs Bausteine – ein Ökosystem. Klicke eine Karte für Details.</p>
 
-        <h3>Unterstützte Plattformen</h3>
-        <ul>
-          <li><strong>Telegram</strong> (voll funktionsfähig)</li>
-          <li><em>Discord</em> (in Vorbereitung)</li>
-        </ul>
+      <div class="brand-grid">
+        <a class="brand-card" href="#content-bot">
+          <img src="./assets/emerald-content-bot.png" alt="Emerald Content Bot" width="96" height="48" />
+          <h4>Content Bot</h4>
+          <span class="status-badge online">ONLINE v0.91</span>
+          <p>Gruppen-Management, Moderation, Automationen, Statistiken.</p>
+        </a>
 
-        <h3>Funktionen des Emerald Content Bot</h3>
-        <div class="features">
-          <div class="feature-group">
-            <h4>🛡 Moderation & Sicherheit</h4>
-            <ul>
-              <li>Begrüßung & Regeln für neue Mitglieder</li>
-              <li>Inhaltsmoderation (Links, Spam, Sprache)</li>
-              <li>Verwaltung von Gruppenrichtlinien & Ausnahmen</li>
-              <li>Erkennung/Entfernung gelöschter Accounts</li>
-            </ul>
-          </div>
-          <div class="feature-group">
-            <h4>⚙️ Automatisierung & Verwaltung</h4>
-            <ul>
-              <li>Automatische Rollenzuweisung</li>
-              <li>Geplante Aufgaben & Erinnerungen</li>
-              <li>Tägliche Aktivitätsstatistik (Top 3)</li>
-              <li>RSS-Veröffentlichung in Forenthemen</li>
-              <li>Verwaltung via Inline-Menü / <code>/menu</code></li>
-            </ul>
-          </div>
-          <div class="feature-group">
-            <h4>🌐 Kommunikation & Erweiterung</h4>
-            <ul>
-              <li>Mehrsprachige & konfigurierbare Texte</li>
-              <li>Gruppenübergreifende Administration</li>
-              <li>Kompatibel mit Telegram (Discord geplant)</li>
-            </ul>
-          </div>
+        <a class="brand-card" href="#trade-api">
+          <img src="./assets/emerald-trade-api.png" alt="Emerald Trade API" width="96" height="48" />
+          <h4>Trade API</h4>
+          <span class="status-badge planned">GEPLANT</span>
+          <p>Spot/Futures via API – Signale, Risk-Controls, Alarme.</p>
+        </a>
+
+        <a class="brand-card" href="#trade-dex">
+          <img src="./assets/emerald-trade-dex.png" alt="Emerald Trade DEX" width="96" height="48" />
+          <h4>Trade DEX</h4>
+          <span class="status-badge planned">GEPLANT</span>
+          <p>Wallet-Connect, DEX-Signale, Portfolioblick ohne Custody.</p>
+        </a>
+
+        <a class="brand-card" href="#crossposter">
+          <img src="./assets/emerald-crossposter.png" alt="Emerald Crossposter" width="96" height="48" />
+          <h4>Crossposter</h4>
+          <span class="status-badge planned">GEPLANT</span>
+          <p>Posts zwischen Telegram, X, Discord, … synchronisieren.</p>
+        </a>
+
+        <a class="brand-card" href="#learning">
+          <img src="./assets/emerald-learning.png" alt="Emerald Learning" width="96" height="48" />
+          <h4>Learning</h4>
+          <span class="status-badge planned">GEPLANT</span>
+          <p>Lernkarten, Quiz, Micro-Lernen, Kurs-Flows.</p>
+        </a>
+
+        <a class="brand-card" href="#support">
+          <img src="./assets/emerald-support.png" alt="Emerald Support" width="96" height="48" />
+          <h4>Support</h4>
+          <span class="status-badge planned">GEPLANT</span>
+          <p>Self-Service FAQ, Tickets, Übergabe an Team – 24/7.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- PRODUKT: Emerald Content Bot (online) -->
+    <section class="content product-section" id="content-bot">
+      <div class="product-head">
+        <h2>Emerald Content Bot <span class="status-badge inline online">ONLINE v0.91</span></h2>
+        <p class="muted">Telegram voll funktionsfähig · Discord in Vorbereitung</p>
+      </div>
+
+      <div class="features two-col">
+        <div class="feature-group">
+          <h4>🛡 Moderation & Sicherheit</h4>
+          <ul>
+            <li>Begrüßung & Regeln für neue Mitglieder</li>
+            <li>Feinsteuerung für Links/Spam/Sprache</li>
+            <li>Verwaltung von Gruppenrichtlinien & Ausnahmen</li>
+            <li>Erkennung/Entfernung gelöschter Accounts</li>
+          </ul>
         </div>
-
-        <h3>📌 Versionsübersicht – Roadmap bis Version 1.0</h3>
-        <div class="timeline">
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.5 (Ende Juni 2025)</div>
-            <div class="timeline-content">
-              <p>Erweiterte Benutzerverwaltung, optimierte Telegram-Integration, stabilere Rechtevergabe.</p>
-            </div>
-          </div>
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.5.5 (Ende Juni 2025)</div>
-            <div class="timeline-content">
-              <ul><li>🛠️ Fix: Speicherung von Gruppenmanagement-Daten</li></ul>
-            </div>
-          </div>
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.6 (Mitte Juli 2025)</div>
-            <div class="timeline-content">
-              <ul>
-                <li>📢 Kanalverwaltung</li>
-                <li>🐞 Fix für <code>/settopic</code></li>
-                <li>🌐 Deutsch & Englisch</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.7 (Mitte Juli 2025)</div>
-            <div class="timeline-content">
-              <ul>
-                <li>📊 Mehr Statistiken</li>
-                <li>📰 Bessere RSS-Integration</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.8 (Ende Juli 2025)</div>
-            <div class="timeline-content">
-              <ul>
-                <li>📢 Werbefunktion (Free-Vorbereitung)</li>
-                <li>🤖 Captcha bei Beitritt (optional)</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-item completed">
-            <div class="timeline-date">✅ Version 0.9 (Mitte August 2025)</div>
-            <div class="timeline-content">
-              <ul>
-                <li>🚫 Feinsteuerung Spam-/Link-Sperren</li>
-                <li>⚙️ Manuelle Konfiguration erweitert</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-date">Version 1.0 (Ende August 2025)</div>
-            <div class="timeline-content">
-              <ul><li>🚀 Launch: Free & Pro</li></ul>
-            </div>
-          </div>
+        <div class="feature-group">
+          <h4>⚙️ Automatisierung & Verwaltung</h4>
+          <ul>
+            <li>Automatische Rollenzuweisung</li>
+            <li>Geplante Aufgaben & Erinnerungen</li>
+            <li>Tägliche Aktivitätsstatistik (Top 3)</li>
+            <li>RSS-Veröffentlichung in Forenthemen</li>
+          </ul>
         </div>
-      </section>
+      </div>
 
-      <!-- EMERALD Suite – Logos / Produkte -->
-      <section class="content suite">
-        <h3>EMERALD Suite</h3>
-        <div class="brand-grid">
-          <div class="brand-card">
-            <img src="./assets/emerald-trade-api.png" alt="Emerald Trade API" />
-            <h4>Trade API</h4>
-          </div>
-          <div class="brand-card">
-            <img src="./assets/emerald-trade-dex.png" alt="Emerald Trade DEX" />
-            <h4>Trade DEX</h4>
-          </div>
-          <div class="brand-card">
-            <img src="./assets/emerald-learning.png" alt="Emerald Learning" />
-            <h4>Learning</h4>
-          </div>
-          <div class="brand-card">
-            <img src="./assets/emerald-content-bot.png" alt="Emerald Content Bot" />
-            <h4>Content Bot</h4>
-          </div>
-          <div class="brand-card">
-            <img src="./assets/emerald-crossposter.png" alt="Emerald Crossposter" />
-            <h4>Crossposter</h4>
-          </div>
-          <div class="brand-card">
-            <img src="./assets/emerald-support.png" alt="Emerald Support" />
-            <h4>Support</h4>
-          </div>
-        </div>
-      </section>
+      <div class="product-cta">
+        <a class="button" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">Jetzt auf Telegram testen</a>
+        <a class="button secondary" href="#news">Zu den News & Updates</a>
+      </div>
+    </section>
 
-      <section class="content cta">
-        <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">🚀 Telegram Supportgruppe beitreten</a>
-      </section>
-    </main>
+    <!-- PRODUKT: Geplante Bots (kurz & knackig) -->
+    <section class="content product-section" id="trade-api">
+      <h2>Emerald Trade API <span class="status-badge inline planned">GEPLANT</span></h2>
+      <ul class="bullets">
+        <li>Spot & Futures via Exchange-API (Signale, Positions-Hilfen)</li>
+        <li>Risikolimits, Alerts & Auto-Logs in deine Gruppe</li>
+        <li>Optionale KI-Signale, Backtests & Paper-Trading</li>
+      </ul>
+    </section>
+
+    <section class="content product-section" id="trade-dex">
+      <h2>Emerald Trade DEX <span class="status-badge inline planned">GEPLANT</span></h2>
+      <ul class="bullets">
+        <li>Wallet-Connect, non-custodial</li>
+        <li>DEX-Scanner, Token-Watchlists, Gas-Hinweise</li>
+        <li>Signals nur an deine private Gruppe</li>
+      </ul>
+    </section>
+
+    <section class="content product-section" id="crossposter">
+      <h2>Emerald Crossposter <span class="status-badge inline planned">GEPLANT</span></h2>
+      <ul class="bullets">
+        <li>Einmal posten, überall sichtbar (Telegram, X, Discord …)</li>
+        <li>Format-Helper (Vorschau, Trim, Link-Handling)</li>
+        <li>Zeitplanung & UTM-Tracking</li>
+      </ul>
+    </section>
+
+    <section class="content product-section" id="learning">
+      <h2>Emerald Learning <span class="status-badge inline planned">GEPLANT</span></h2>
+      <ul class="bullets">
+        <li>Lernkarten, Quiz, Micro-Units, Kursfortschritt</li>
+        <li>Import aus CSV/Google Sheets</li>
+        <li>Mini-App Oberflächen für schnelle Lernpfade</li>
+      </ul>
+    </section>
+
+    <section class="content product-section" id="support">
+      <h2>Emerald Support <span class="status-badge inline planned">GEPLANT</span></h2>
+      <ul class="bullets">
+        <li>Self-Service FAQ, Tickets, Übergabe an Agent</li>
+        <li>Mehrsprachig, Bausteine für wiederkehrende Antworten</li>
+        <li>Statistik: Zeit bis Antwort, Zufriedenheit</li>
+      </ul>
+    </section>
+
+    <!-- NEWS & UPDATES -->
+    <section class="content news" id="news">
+      <h3>Aktuelles</h3>
+      <div class="news-grid">
+        <article class="news-card">
+          <div class="news-date">05.09.2025</div>
+          <h4>Emerald Content Bot v0.91 ist live</h4>
+          <p>Stabilitäts-Update, klare Menüführung, feinere Spam-Kontrollen, Roadmap für Free/Pro vorbereitet.</p>
+          <a class="news-link" href="https://t.me/GreenyGroupBot" target="_blank" rel="noopener noreferrer">Zum Bot</a>
+        </article>
+
+        <article class="news-card">
+          <div class="news-date">08.2025</div>
+          <h4>Free & Pro – Vorbereitung</h4>
+          <p>Free mit 7-Tage-Statistik & optionalen Hinweisen; Pro mit bis zu 60-Tage-Statistik und KI-Extras.</p>
+        </article>
+
+        <article class="news-card">
+          <div class="news-date">Q4 2025</div>
+          <h4>Roadmap: Crossposter, Learning & Support</h4>
+          <p>Gezielte Mini-Apps, saubere Workflows, einheitliches Branding – alles aus einer Hand.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CTA & FOOTER -->
+    <section class="content cta">
+      <a class="button" href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank" rel="noopener noreferrer">💬 Telegram-Supportgruppe beitreten</a>
+    </section>
 
     <footer>
       <div class="donation">
@@ -174,18 +197,26 @@
   </div>
 
   <script>
-    // Dark/Light: lokale Präferenz + OS
+    // Theme: lokale Präferenz + OS
     const body = document.body;
     const saved = localStorage.getItem('theme');
     if (saved) {
+      body.classList.toggle('light', saved === 'light');
       body.classList.toggle('dark', saved === 'dark');
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       body.classList.add('dark');
     }
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      body.classList.toggle('dark');
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-    });
+
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        body.classList.toggle('light');
+        body.classList.toggle('dark');
+        const mode = body.classList.contains('light') ? 'light' : 'dark';
+        localStorage.setItem('theme', mode);
+      });
+    }
   </script>
 </body>
 </html>
+

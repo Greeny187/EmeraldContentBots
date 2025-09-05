@@ -219,3 +219,71 @@ a:hover{color:#BFF5E8}
 body.light .hero{background: linear-gradient(135deg, #2E8B57, #3AA97B)}
 body.light .header-button{background:#0C1424;color:#fff;border-color:#0C1424}
 body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
+
+
+/* --- Helpers --- */
+.muted{ color: var(--muted); }
+
+/* Brand cards als Links */
+.brand-card{ display:block; text-decoration:none; color:inherit; }
+.brand-card p{ margin:6px 0 0; color: var(--muted); font-size:.95rem; }
+
+/* Status-Badges */
+.status-badge{
+  display:inline-block; font-weight:700; letter-spacing:.02em;
+  padding:4px 8px; border-radius:999px; font-size:.8rem; vertical-align:middle;
+  border:1px solid var(--border); background: rgba(255,255,255,.04);
+}
+.status-badge.inline{ margin-left:8px; position:relative; top:-2px; }
+.status-badge.online{
+  background: linear-gradient(0deg, rgba(16,199,160,.12), rgba(16,199,160,.12));
+  border-color: rgba(16,199,160,.45);
+  color: #BFF5E8;
+}
+.status-badge.planned{ color: var(--muted); }
+
+/* Produktsektionen */
+.product-section .bullets{ margin:10px 0 0; padding-left:18px; }
+.product-section .product-cta{ margin-top:14px; display:flex; gap:12px; flex-wrap:wrap; }
+.features.two-col{
+  display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px;
+}
+@media (max-width: 800px){
+  .features.two-col{ grid-template-columns: 1fr; }
+}
+
+/* News */
+.news-grid{
+  display:grid; gap:16px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+}
+@media (max-width: 900px){
+  .news-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 640px){
+  .news-grid{ grid-template-columns: 1fr; }
+}
+.news-card{
+  background: rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:12px; padding:14px 16px;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.news-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(16,199,160,.55);
+  box-shadow: 0 12px 24px rgba(16,199,160,.12);
+}
+.news-date{ font-size:.85rem; color: var(--muted); margin-bottom:6px; }
+.news-card h4{ margin:4px 0 8px; }
+.news-link{ display:inline-block; margin-top:6px; }
+
+/* Suite-Grid: 3×2 Desktop, 2×3 mobil (erzwingen) */
+.suite .brand-grid{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 640px){
+  .suite .brand-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
