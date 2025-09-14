@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gruppenmenü • Mini‑App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#111318;--card:#161a20;--text:#eef1f6;--muted:#a7b1c2;--primary:#2ea6ff;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+      --radius:16px
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial}
+    .wrap{max-width:760px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin:10px 0}
+    .row > label{color:var(--muted)}
+    .grp{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+    .input, textarea{width:100%;background:#0e1116;color:var(--text);border:1px solid #242a33;border-radius:12px;padding:10px 12px;outline:none}
+    .select{appearance:none}
+    .pill{padding:6px 10px;border-radius:999px;background:#0e1116;border:1px solid #242a33;color:var(--muted)}
+    .title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+    .title h1{font-size:18px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+    .hint{font-size:12px;color:var(--muted)}
+    .hr{height:1px;background:#232831;margin:14px 0}
+    .switch{position:relative;display:inline-block;width:44px;height:26px}
+    .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#3a414d;transition:.2s;border-radius:99px}
+    .slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s}
+    input:checked + .slider{background:var(--ok)}
+    input:checked + .slider:before{transform:translateX(18px)}
+    .footer{margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid #2b3340;background:#0e1116;color:var(--text);cursor:pointer}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:white}
+    .btn.ghost{background:transparent}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title">
+        <div>
+          <h1>Gruppenmenü</h1>
+          <div class="sub" id="groupLine">–</div>
+        </div>
+        <span class="pill" id="userLine">–</span>
+      </div>
+
+      <div class="row">
+        <label for="welcome_on">Begrüßung aktiv</label>
+        <label class="switch">
+          <input id="welcome_on" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="row" style="grid-template-columns:1fr;">
+        <textarea id="welcome_text" rows="3" class="input" placeholder="Willkommen {user}!">Willkommen {user} 👋</textarea>
+        <div class="hint">Platzhalter: <code>{user}</code> wird mit dem Namen ersetzt.</div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <label for="spam_level">Spam‑Level</label>
+        <select id="spam_level" class="input select">
+          <option value="off">Aus</option>
+          <option value="low">Niedrig</option>
+          <option value="mid" selected>Mittel</option>
+          <option value="high">Hoch</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="faq_ai">FAQ‑KI Fallback</label>
+        <label class="switch">
+          <input id="faq_ai" type="checkbox" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="footer">
+        <button id="closeBtn" class="btn ghost">Schließen</button>
+        <button id="saveBtn" class="btn primary">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    // Helpers
+    function qp(name){ return new URLSearchParams(location.search).get(name) }
+    function safeJSON(v, fallback){ try{ return JSON.parse(v) }catch{ return fallback } }
+
+    // Init Telegram WebApp
+    if(tg){
+      tg.expand();
+      tg.setHeaderColor('#0e1116');
+      tg.setBackgroundColor('#111318');
+      tg.MainButton.hide();
+    }
+
+    // Read context
+    const cid = qp('cid');
+    const title = decodeURIComponent(qp('title')||'').trim();
+
+    // Fill header lines
+    const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+    document.getElementById('groupLine').textContent = title ? `${title} (ID ${cid||'?'})` : (cid?`Gruppen‑ID ${cid}`:'Keine Gruppe übergeben');
+    document.getElementById('userLine').textContent  = user ? `@${user.username||user.first_name}` : 'ohne Telegram‑Kontext';
+
+    // Demo: Load defaults from localStorage keyed by cid (optional/offline)
+    const storeKey = cid ? `miniapp:${cid}` : 'miniapp:demo';
+    const saved = safeJSON(localStorage.getItem(storeKey), {});
+    document.getElementById('welcome_on').checked = saved.welcome_on ?? true;
+    document.getElementById('welcome_text').value  = saved.welcome_text ?? 'Willkommen {user} 👋';
+    document.getElementById('spam_level').value    = saved.spam_level ?? 'mid';
+    document.getElementById('faq_ai').checked      = saved.faq_ai ?? true;
+
+    // Save logic → send to Bot via WebApp.sendData
+    function collect(){
+      return {
+        cid,
+        title,
+        welcome_on: document.getElementById('welcome_on').checked,
+        welcome_text: document.getElementById('welcome_text').value.trim(),
+        spam_level: document.getElementById('spam_level').value,
+        faq_ai: document.getElementById('faq_ai').checked,
+        // housekeeping
+        t: Date.now(),
+        by: user ? user.id : null
+      }
+    }
+
+    async function save(){
+      const payload = collect();
+      localStorage.setItem(storeKey, JSON.stringify(payload));
+
+      if(tg){
+        try{
+          tg.HapticFeedback.impactOccurred('medium');
+          tg.sendData(JSON.stringify(payload)); // → update.message.web_app_data.data
+          tg.close();
+          return;
+        }catch(e){ console.error(e) }
+      }
+      alert('Gespeichert (lokal). In Telegram wird an den Bot gesendet.');
+    }
+
+    // Buttons
+    document.getElementById('saveBtn').addEventListener('click', save);
+    document.getElementById('closeBtn').addEventListener('click', () => tg ? tg.close() : window.close());
+  </script>
+</body>
+</html>
