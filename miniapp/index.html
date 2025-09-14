@@ -1,14 +1,9 @@
 <!doctype html>
-<script>
-  if(!window.Telegram || !window.Telegram.WebApp){
-    document.body.innerHTML = '<div style="padding:20px;font:16px system-ui">❌ Diese Mini-App kann nur aus Telegram heraus geöffnet werden.</div>';
-  }
-</script>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Emerald • Gruppen‑Mini‑App</title>
+  <title>Emerald • Gruppen-Mini-App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -54,7 +49,7 @@
     <div class="card">
       <div class="title">
         <div>
-          <h1>Gruppen‑Mini‑App</h1>
+          <h1>Gruppen-Mini-App</h1>
           <div class="sub" id="groupLine">–</div>
         </div>
         <span class="pill" id="userLine">–</span>
@@ -81,28 +76,54 @@
 
       <!-- Spamfilter -->
       <section class="section" id="sec-spam">
-        <div class="row"><label>Spam‑Level</label>
-          <select id="spam_level" class="input">
-            <option value="off">Aus</option><option value="low">Niedrig</option>
-            <option value="mid" selected>Mittel</option><option value="high">Hoch</option>
-          </select>
-        </div>
-        <div class="row"><label>Nur Admins dürfen Links</label><label class="switch"><input id="links_admins_only" type="checkbox"><span class="slider"></span></label></div>
+        <div class="row"><label>Nur Admins dürfen Links</label><label class="switch"><input id="admins_only" type="checkbox"><span class="slider"></span></label></div>
+        <div class="row"><label>Warnhinweis anzeigen</label><label class="switch"><input id="warning_on" type="checkbox"><span class="slider"></span></label></div>
+        <div class="row single"><textarea id="warning_text" placeholder="⚠️ Nur Admins dürfen Links posten."></textarea></div>
+        <div class="row"><label>Ausnahmen erlauben</label><label class="switch"><input id="exceptions_on" type="checkbox"><span class="slider"></span></label></div>
+
+        <div class="hr"></div>
         <div class="grid2">
           <div>
             <label>Whitelist (Domains, eine pro Zeile)</label>
-            <textarea id="whitelist" placeholder="beispiel.de
-*.schule.de"></textarea>
+            <textarea id="whitelist" placeholder="beispiel.de&#10;*.schule.de"></textarea>
           </div>
           <div>
             <label>Blacklist (Domains, eine pro Zeile)</label>
-            <textarea id="blacklist" placeholder="spam.tld
-kurz.link"></textarea>
+            <textarea id="blacklist" placeholder="spam.tld&#10;kurz.link"></textarea>
           </div>
         </div>
+
         <div class="row">
-          <div class="stack"><label for="topic_id">Für Topic‑ID anwenden (optional):</label><input id="topic_id" class="input" placeholder="z. B. 123"></div>
-          <span class="hint">leer = global</span>
+          <div class="stack">
+            <label for="topic_id">Für Topic-ID anwenden (optional):</label>
+            <input id="topic_id" class="input" placeholder="z. B. 123">
+          </div>
+          <span class="hint">leer = ignorieren, 0 = globaler Override</span>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label>Aktion bei Verstoß</label>
+            <select id="spam_action" class="input">
+              <option value="">(unverändert)</option>
+              <option value="delete">Löschen</option>
+              <option value="mute">Stumm 60 Min</option>
+            </select>
+          </div>
+          <div>
+            <label>Tageslimit/Topic</label>
+            <input id="topic_limit" type="number" min="0" class="input" placeholder="0 = aus">
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Benachrichtigung</label>
+          <select id="quota_notify" class="input">
+            <option value="">(unverändert)</option>
+            <option value="off">Aus</option>
+            <option value="smart">Smart</option>
+            <option value="always">Immer</option>
+          </select>
         </div>
       </section>
 
@@ -110,23 +131,25 @@ kurz.link"></textarea>
       <section class="section" id="sec-rss">
         <div class="row"><label>Bilder in RSS Beiträgen</label><label class="switch"><input id="rss_images" type="checkbox" checked><span class="slider"></span></label></div>
         <div class="grid2">
-          <div><label>Feeds hinzufügen (eine URL pro Zeile)</label><textarea id="rss_add" placeholder="https://example.com/feed.xml
-https://…"></textarea></div>
+          <div><label>Feeds hinzufügen (eine URL pro Zeile)</label><textarea id="rss_add" placeholder="https://example.com/feed.xml&#10;https://…"></textarea></div>
           <div><label>Feeds entfernen (eine URL pro Zeile)</label><textarea id="rss_del" placeholder="https://example.com/feed.xml"></textarea></div>
         </div>
       </section>
 
       <!-- KI -->
       <section class="section" id="sec-ai">
-        <div class="row"><label>FAQ‑KI Fallback</label><label class="switch"><input id="ai_faq" type="checkbox" checked><span class="slider"></span></label></div>
-        <div class="row"><label>RSS‑Zusammenfassung per KI</label><label class="switch"><input id="ai_rss" type="checkbox"><span class="slider"></span></label></div>
+        <div class="row"><label>FAQ-KI Fallback</label><label class="switch"><input id="ai_faq" type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="row"><label>RSS-Zusammenfassung per KI</label><label class="switch"><input id="ai_rss" type="checkbox"><span class="slider"></span></label></div>
       </section>
 
       <!-- FAQ Verwaltung -->
       <section class="section" id="sec-faq">
         <div class="row single"><input id="faq_q" class="input" placeholder="Frage (Schlüssel)"></div>
         <div class="row single"><textarea id="faq_a" placeholder="Antwort (HTML erlaubt)"></textarea></div>
-        <div class="row"><button class="btn" id="faq_add">FAQ hinzufügen/ersetzen</button><button class="btn" id="faq_del">FAQ löschen</button></div>
+        <div class="row">
+          <button class="btn" id="faq_add">FAQ hinzufügen/ersetzen</button>
+          <button class="btn" id="faq_del">FAQ löschen</button>
+        </div>
         <div class="hint">Bestehende FAQs werden nicht geladen – du kannst neue hinzufügen oder bekannte Schlüssel löschen.</div>
       </section>
 
@@ -137,13 +160,17 @@ https://…"></textarea></div>
 
       <!-- Mood -->
       <section class="section" id="sec-mood">
-        <div class="row"><div class="stack"><label for="mood_topic">Topic‑ID</label><input id="mood_topic" class="input" placeholder="z. B. 123"></div><span class="hint">Pflicht für Foren‑Gruppen</span></div>
+        <div class="row">
+          <div class="stack"><label for="mood_topic">Topic-ID</label><input id="mood_topic" class="input" placeholder="z. B. 123"></div>
+          <span class="hint">Pflicht für Foren-Gruppen</span>
+        </div>
         <div class="row single"><textarea id="mood_question" placeholder="Tagesfrage…">Wie war dein Tag von 1–5?</textarea></div>
       </section>
 
       <!-- Sprache / Nachtmodus / Router -->
       <section class="section" id="sec-more">
-        <div class="row"><label>Sprache</label>
+        <div class="row">
+          <label>Sprache</label>
           <select id="language" class="input">
             <option value="de" selected>Deutsch</option>
             <option value="en">English</option>
@@ -157,9 +184,9 @@ https://…"></textarea></div>
           <div><label>Start (HH:MM)</label><input id="night_start" class="input" placeholder="22:00"></div>
           <div><label>Ende (HH:MM)</label><input id="night_end" class="input" placeholder="07:00"></div>
         </div>
-        <div class="row single"><input id="night_days" class="input" placeholder="Tage, z. B. 1,2,3,4,5 (Mo–Fr)"><div class="hint">1=Mo … 7=So, leer = täglich</div></div>
+        <div class="row single"><input id="night_days" class="input" placeholder="Tage, z. B. 1,2,3,4,5 (Mo–Fr)"><div class="hint">1=Mo … 7=So, leer = täglich (Serverseitig derzeit ohne Wirkung)</div></div>
         <div class="hr"></div>
-        <div class="row single"><textarea id="router_rule" placeholder="Router‑Regel: Wenn Text enthält → Topic‑ID, z. B.:
+        <div class="row single"><textarea id="router_rule" placeholder="Router-Regel: Wenn Text enthält → Topic-ID, z. B.:
 #job → 101
 angebot → 102"></textarea></div>
       </section>
@@ -175,17 +202,34 @@ angebot → 102"></textarea></div>
   </div>
 
   <script>
-    const tg = window.Telegram?.WebApp || null;
-    if(tg){ tg.expand(); tg.setHeaderColor('#0b0e12'); tg.setBackgroundColor('#0f1217'); tg.MainButton.hide(); }
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    // Softgate: nur in Telegram sinnvoll
+    if(!tg){
+      document.body.innerHTML = '<div style="padding:20px;font:16px system-ui">❌ Diese Mini-App kann nur aus Telegram heraus geöffnet werden.</div>';
+    }
+
+    // Init Telegram WebApp
+    if(tg){
+      tg.expand();
+      tg.setHeaderColor('#0b0e12');
+      tg.setBackgroundColor('#0f1217');
+      tg.MainButton.hide();
+    }
+
+    // Tabs
     const tabs = [
       ['welcome','Begrüßung'],['rules','Regeln'],['spam','Spam'],['rss','RSS'],['ai','KI'],
       ['faq','FAQ'],['stats','Report'],['mood','Mood'],['more','Mehr']
     ];
-
-    // Build tabs
     const tabsEl = document.getElementById('tabs');
     tabs.forEach(([key,label],i)=>{
-      const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.dataset.key=key;b.textContent=label;b.onclick=()=>selectTab(key);tabsEl.appendChild(b);
+      const b=document.createElement('button');
+      b.className='tab'+(i===0?' active':'');
+      b.dataset.key=key;
+      b.textContent=label;
+      b.onclick=()=>selectTab(key);
+      tabsEl.appendChild(b);
     });
     function selectTab(key){
       document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.key===key));
@@ -193,19 +237,17 @@ angebot → 102"></textarea></div>
     }
     selectTab('welcome');
 
-    // Context lines
+    // Query-Params / Context
     function qp(n){ return new URLSearchParams(location.search).get(n) }
     const cid = qp('cid');
     const title = decodeURIComponent(qp('title')||'').trim();
     const user = tg?.initDataUnsafe?.user || null;
-    document.getElementById('groupLine').textContent = title ? `${title} (ID ${cid||'?'})` : (cid?`Gruppen‑ID ${cid}`:'Keine Gruppe übergeben');
-    document.getElementById('userLine').textContent  = user ? `@${user.username||user.first_name}` : 'ohne Telegram‑Kontext';
+    document.getElementById('groupLine').textContent = title ? `${title} (ID ${cid||'?'})` : (cid?`Gruppen-ID ${cid}`:'Keine Gruppe übergeben');
+    document.getElementById('userLine').textContent  = user ? `@${user.username||user.first_name}` : 'ohne Telegram-Kontext';
 
     // Local presets per group
     const storeKey = cid ? `miniapp:${cid}` : 'miniapp:demo';
-    function load(){
-      try{ return JSON.parse(localStorage.getItem(storeKey))||{} }catch{ return {} }
-    }
+    function load(){ try{ return JSON.parse(localStorage.getItem(storeKey))||{} }catch{ return {} } }
     function saveLocal(v){ localStorage.setItem(storeKey, JSON.stringify(v)) }
 
     // Fill defaults
@@ -214,39 +256,83 @@ angebot → 102"></textarea></div>
       const map = {
         welcome_on:true, welcome_text:'Willkommen {user} 👋', farewell_on:false, farewell_text:'Schade {user}, bis bald!',
         rules_on:false, rules_text:'', clean_deleted:false,
-        spam_level:'mid', links_admins_only:false, whitelist:'', blacklist:'', topic_id:'',
+
+        // Spam global
+        admins_only:false, warning_on:false, warning_text:'', exceptions_on:false,
+        // Spam topic override
+        whitelist:'', blacklist:'', topic_id:'', spam_action:'', topic_limit:'', quota_notify:'',
+
         rss_images:true, rss_add:'', rss_del:'',
         ai_faq:true, ai_rss:false,
         faq_q:'', faq_a:'',
         daily_stats:false,
         mood_topic:'', mood_question:'Wie war dein Tag von 1–5?',
-        language:'de', night_on:false, night_start:'22:00', night_end:'07:00', night_days:'',
+        language:'de',
+        night_on:false, night_start:'22:00', night_end:'07:00', night_days:'',
         router_rule:''
       };
-      Object.keys(map).forEach(k=>{ const el=document.getElementById(k); if(!el) return; const v=(k in s)?s[k]:map[k]; if(el.type==='checkbox'){el.checked=!!v}else{el.value=v} });
+      Object.keys(map).forEach(k=>{
+        const el=document.getElementById(k);
+        if(!el) return;
+        const v=(k in s)?s[k]:map[k];
+        if(el.type==='checkbox'){el.checked=!!v}else{el.value=v}
+      });
     })();
 
-    // FAQ buttons → stash into local only
-    document.getElementById('faq_add').onclick = ()=>{ const s=load(); s.faq_add= { q:document.getElementById('faq_q').value.trim(), a:document.getElementById('faq_a').value.trim() }; saveLocal(s); alert('FAQ zum Senden vorgemerkt. „Speichern“ drücken.'); };
-    document.getElementById('faq_del').onclick = ()=>{ const s=load(); s.faq_del= { q:document.getElementById('faq_q').value.trim() }; saveLocal(s); alert('FAQ‑Löschung vorgemerkt. „Speichern“ drücken.'); };
+    // FAQ staging → local only; send on Save
+    document.getElementById('faq_add').onclick = ()=>{
+      const s=load();
+      s.faq_add= { q:document.getElementById('faq_q').value.trim(), a:document.getElementById('faq_a').value.trim() };
+      saveLocal(s);
+      alert('FAQ zum Senden vorgemerkt. „Speichern“ drücken.');
+    };
+    document.getElementById('faq_del').onclick = ()=>{
+      const s=load();
+      s.faq_del= { q:document.getElementById('faq_q').value.trim() };
+      saveLocal(s);
+      alert('FAQ-Löschung vorgemerkt. „Speichern“ drücken.');
+    };
 
     function collect(){
-      const get = id=>{ const el=document.getElementById(id); return el? (el.type==='checkbox'? el.checked : el.value.trim()) : undefined };
+      const get = id=>{
+        const el=document.getElementById(id);
+        return el? (el.type==='checkbox'? el.checked : el.value.trim()) : undefined
+      };
       const payload = {
         cid, title,
+
+        // Welcome/Farewell/Rules
         welcome_on:get('welcome_on'), welcome_text:get('welcome_text'),
         farewell_on:get('farewell_on'), farewell_text:get('farewell_text'),
         rules_on:get('rules_on'), rules_text:get('rules_text'), clean_deleted:get('clean_deleted'),
-        spam_level:get('spam_level'), links_admins_only:get('links_admins_only'),
-        whitelist:get('whitelist'), blacklist:get('blacklist'), topic_id:get('topic_id'),
+
+        // Spam global
+        admins_only:get('admins_only'),
+        warning_on:get('warning_on'),
+        warning_text:get('warning_text'),
+        exceptions_on:get('exceptions_on'),
+
+        // Spam topic override
+        whitelist:get('whitelist'),
+        blacklist:get('blacklist'),
+        topic_id:get('topic_id'),
+        spam_action:get('spam_action'),
+        topic_limit:get('topic_limit'),
+        quota_notify:get('quota_notify'),
+
+        // RSS / AI / FAQ / Stats / Mood
         rss_images:get('rss_images'), rss_add:get('rss_add'), rss_del:get('rss_del'),
         ai_faq:get('ai_faq'), ai_rss:get('ai_rss'),
         faq_add: load().faq_add || null, faq_del: load().faq_del || null,
         daily_stats:get('daily_stats'),
         mood_topic:get('mood_topic'), mood_question:get('mood_question'),
+
+        // Sprache / Nacht / Router
         language:get('language'),
         night: { on:get('night_on'), start:get('night_start'), end:get('night_end'), days:get('night_days') },
         router_rule:get('router_rule'),
+
+        // housekeeping
         t:Date.now(), by: user? user.id : null
       };
       saveLocal(payload);
@@ -255,7 +341,14 @@ angebot → 102"></textarea></div>
 
     async function save(){
       const payload = collect();
-      if(tg){ try{ tg.HapticFeedback.impactOccurred('medium'); tg.sendData(JSON.stringify(payload)); tg.close(); return }catch(e){ console.error(e) } }
+      if(tg){
+        try{
+          tg.HapticFeedback.impactOccurred('medium');
+          tg.sendData(JSON.stringify(payload)); // → update.message.web_app_data.data
+          tg.close();
+          return;
+        }catch(e){ console.error(e) }
+      }
       alert('Gespeichert (lokal). In Telegram wird an den Bot gesendet.');
     }
 
@@ -265,3 +358,4 @@ angebot → 102"></textarea></div>
   </script>
 </body>
 </html>
+
