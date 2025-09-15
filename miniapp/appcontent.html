@@ -1,159 +1,128 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <title>Emerald Content – Mini-App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emerald Content – Mini‑App</title>
   <style>
     :root{
-      --bg:#0a0f14;
-      --panel:#0e141b;
-      --ring:#243041;
-      --text:#d7e0ea;
-      --muted:#9aa7b5;
-      --brand:#22c55e;
-      --danger:#ef4444;
-      --yellow:#f59e0b;
+      --bg:#0b1220; --panel:#0f172a; --ring:#1f2937; --text:#e5e7eb; --muted:#94a3b8;
+      --brand:#22c55e; --danger:#ef4444; --yellow:#f59e0b; --shadow:0 10px 30px rgba(0,0,0,.35);
     }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
+    [data-theme="light"]{
+      --bg:#f7fafc; --panel:#ffffff; --ring:#e5e7eb; --text:#0b1220; --muted:#4b5563;
+      --brand:#16a34a; --danger:#dc2626; --yellow:#d97706; --shadow:0 6px 22px rgba(0,0,0,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
-    h1{font-size:22px;margin:0 0 12px}
-    h2{font-size:16px;margin:10px 0}
-    .row{display:block;margin:10px 0}
-    .row.single{margin:14px 0}
-    .stack{display:flex;gap:8px;align-items:center}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .card{background:var(--panel);border:1px solid var(--ring);border-radius:14px;padding:12px}
-    .muted{color:var(--muted)}
-    .dim{opacity:.8}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--ring);background:#0b0e12;color:var(--text);cursor:pointer}
-    .btn.primary{background:var(--brand);border-color:var(--brand);color:#031406}
-    .btn.ghost{background:transparent}
-    .btn.warn{background:transparent;border-color:var(--danger);color:var(--danger)}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:10px 0 6px}
-    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-    .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--ring);background:#0b0e12;cursor:pointer}
-    .tab.active{background:var(--brand);border-color:var(--brand);color:#031406}
-    .section{display:none}
-    .section.active{display:block}
-    label.switch{display:inline-flex;align-items:center;gap:8px;user-select:none;cursor:pointer}
-    input[type="text"],input[type="url"],input[type="number"],input[type="time"],textarea,select{
-      width:100%;box-sizing:border-box;background:#0b0e12;border:1px solid var(--ring);color:var(--text);
-      border-radius:10px;padding:10px;outline:none
+    .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-start;margin:4px 0 14px}
+    .title{font-weight:700;font-size:20px;letter-spacing:.2px}
+    .btn{border:1px solid var(--ring);background:transparent;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
+    .btn.ghost{opacity:.9}
+    .btn.small{padding:6px 9px;border-radius:10px}
+    .btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media (max-width:760px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+    label{display:block;font-weight:600;margin:6px 0 6px;color:var(--muted)}
+    input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{
+      width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px
     }
-    textarea{min-height:110px;resize:vertical}
-    .table{width:100%;border-collapse:collapse;margin-top:8px}
-    .table th,.table td{border:1px solid #2a3240;padding:6px 8px;text-align:left;font-size:13px}
-    .table th{background:#0b0e12}
-    .footer{margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center}
-    .hint{font-size:12px}
-    details summary{cursor:pointer}
-    .badge{display:inline-block;padding:2px 8px;border:1px solid var(--ring);border-radius:999px;font-size:12px}
+    textarea{min-height:92px;resize:vertical}
+    .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+    .pill{border:1px solid var(--ring);background:#0000;color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .pill.active{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
+    section{display:none}
+    section.active{display:block}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .hint{font-size:12px;color:var(--muted)}
+    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
+    .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .item{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--ring);border-radius:12px;padding:8px 10px;background:#00000008}
+    .item .left{display:flex;flex-direction:column;gap:4px;min-width:0}
+    .item .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .switch{display:inline-flex;align-items:center;gap:6px}
+    .switch input{accent-color:var(--brand)}
+    .sep{height:1px;background:var(--ring);margin:10px 0}
+    .danger-text{color:var(--danger)}
+    footer{margin-top:12px;display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Emerald Content – Mini-App</h1>
-
     <div class="toolbar">
+      <div class="title">Emerald Content – Mini‑App</div>
+      <span style="flex:1"></span>
+      <button class="btn ghost" id="themeBtn" title="Hell/Dunkel umschalten">🌓</button>
       <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
-      <button class="btn" id="closeBtn">Schließen</button>
+      <button class="btn ghost" id="closeBtn">Schließen</button>
       <button class="btn primary" id="saveBtn">Speichern</button>
     </div>
 
-    <div class="tabs" id="tabs"></div>
+    <div class="pillbar" id="tabs">
+      <button class="pill active" data-tab="welcome">Begrüßung</button>
+      <button class="pill" data-tab="rules">Regeln</button>
+      <button class="pill" data-tab="farewell">Verabschiedung</button>
+      <button class="pill" data-tab="spam">Spam</button>
+      <button class="pill" data-tab="rss">RSS</button>
+      <button class="pill" data-tab="ai">KI</button>
+      <button class="pill" data-tab="aimod">KI‑Moderation</button>
+      <button class="pill" data-tab="faq">FAQ</button>
+      <button class="pill" data-tab="report">Report</button>
+      <button class="pill" data-tab="mood">Mood</button>
+      <button class="pill" data-tab="night">Nachtmodus</button>
+      <button class="pill" data-tab="router">Router</button>
+      <button class="pill" data-tab="more">Mehr</button>
+      <button class="pill" data-tab="pro">Pro</button>
+    </div>
 
-    <!-- SECTIONS -->
-    <section id="sec-welcome" class="section card">
-      <h2>Begrüßung</h2>
-      <label class="switch row"><input type="checkbox" data-key="welcome.on" id="welcome_on"> Aktiv</label>
+    <!-- WELCOME -->
+    <section class="card active" id="sec-welcome">
       <div class="row">
-        <label>Text</label>
-        <textarea data-key="welcome.text" id="welcome_text" placeholder="Willkommenstext …"></textarea>
-        <div class="hint muted">Hinweis: Bilder werden weiterhin via Telegram gesendet. Hier siehst du die gespeicherte Vorschau.</div>
+        <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
       </div>
-      <div id="welcome_preview_wrap" class="row" style="display:none">
-        <img id="welcome_preview" alt="Welcome Bild" style="max-width:100%;border-radius:12px">
-      </div>
+      <label>Text</label>
+      <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
+      <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
     </section>
 
-    <section id="sec-rules" class="section card">
-      <h2>Regeln</h2>
-      <label class="switch row"><input type="checkbox" data-key="rules.on" id="rules_on"> Aktiv</label>
+    <!-- RULES -->
+    <section class="card" id="sec-rules">
       <div class="row">
-        <label>Text</label>
-        <textarea data-key="rules.text" id="rules_text" placeholder="Regeltext …"></textarea>
+        <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
       </div>
+      <label>Text</label>
+      <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
     </section>
 
-    <section id="sec-farewell" class="section card">
-      <h2>Verabschiedung</h2>
-      <label class="switch row"><input type="checkbox" data-key="farewell.on" id="farewell_on"> Aktiv</label>
+    <!-- FAREWELL -->
+    <section class="card" id="sec-farewell">
       <div class="row">
-        <label>Text</label>
-        <textarea data-key="farewell.text" id="farewell_text" placeholder="Verabschiedungstext …"></textarea>
+        <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
       </div>
+      <label>Text</label>
+      <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
     </section>
 
-    <section id="sec-spam" class="section card">
-      <h2>Spam</h2>
+    <!-- SPAM -->
+    <section class="card" id="sec-spam">
       <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="spam.on" id="spam_on"> Spam-Filter aktiv</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_links" id="spam_links"> Links blockieren</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_media" id="spam_media"> Medien blockieren</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_invite_links" id="spam_invites"> Einladungslinks löschen</label>
-      </div>
-      <div class="row">
-        <label>Policy-Topic (ID)</label>
-        <input type="text" data-key="spam.policy_topic" id="spam_policy_topic" placeholder="z.B. 123">
-      </div>
-    </section>
-
-    <section id="sec-rss" class="section card">
-      <h2>RSS</h2>
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="rss.on" id="rss_on"> RSS aktiv</label>
-        <label class="switch"><input type="checkbox" data-key="rss.post_images" id="rss_images"> Bilder posten</label>
-      </div>
-      <div class="row">
-        <span id="rssTopicInfo" class="badge">Topic: –</span>
-      </div>
-      <div class="row">
-        <label>Neuen Feed hinzufügen</label>
-        <div class="grid">
-          <input type="url" data-key="rss.url" id="rss_url" placeholder="https://…">
-          <input type="number" data-key="rss.interval" id="rss_interval" placeholder="Intervall (min)">
-        </div>
-      </div>
-      <div class="row">
-        <div id="rssList" class="card"></div>
-      </div>
-    </section>
-
-    <section id="sec-ai" class="section card">
-      <h2>KI (Allgemein)</h2>
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="ai.on" id="ai_on"> KI-Features aktiv</label>
-      </div>
-      <div class="row">
-        <label>FAQ-Prompt / Wissensbasis</label>
-        <textarea data-key="ai.faq" id="ai_faq" placeholder="Frage-Antwort-Wissen …"></textarea>
-      </div>
-    </section>
-
-    <section id="sec-aimod" class="section card">
-      <h2>KI-Moderation</h2>
-      <div class="grid">
-        <label class="switch"><input type="checkbox" id="aimod_enabled"> Aktiv</label>
-        <label class="switch"><input type="checkbox" id="aimod_shadow"> Schattenmodus (nur Log)</label>
+        <label class="switch"><input type="checkbox" data-key="spam.on"> Spam‑Filter aktiv</label>
+        <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (nur Admins)</label>
+        <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
+        <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
       </div>
       <div class="grid">
-        <label>Topic-ID <input id="aimod_topic" type="number" min="0" step="1" placeholder="0 = Hauptthread"></label>
-        <label>Primäraktion
-          <select id="aimod_action">
+        <label>Policy‑Topic (ID)
+          <input type="text" data-key="spam.policy_topic" placeholder="z.B. 123" />
+        </label>
+        <label>Spam‑Aktion
+          <select data-key="spam.action" id="spam_action">
+            <option value="">—</option>
             <option value="delete">Löschen</option>
             <option value="warn">Warnen</option>
             <option value="mute">Stummschalten</option>
@@ -161,502 +130,444 @@
         </label>
       </div>
       <div class="grid">
-        <label>Mute (Minuten) <input id="aimod_mute" type="number" min="0" step="1"></label>
-        <label>Warn-Text <input id="aimod_warn" type="text" placeholder="z.B. Bitte Formulierung anpassen …"></label>
+        <label>Whitelist‑Domains (eine pro Zeile)
+          <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
+        </label>
+        <label>Blacklist‑Domains (eine pro Zeile)
+          <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
+        </label>
       </div>
-      <div class="row">
-        <label>Appeal-URL <input id="aimod_appeal" type="url" placeholder="https://…"></label>
-      </div>
-      <fieldset class="row card">
-        <legend>Schwellen (0.00–1.00)</legend>
-        <div class="grid3">
-          <label>Toxicity <input id="thr_toxicity" type="number" min="0" max="1" step="0.01"></label>
-          <label>Hate <input id="thr_hate" type="number" min="0" max="1" step="0.01"></label>
-          <label>Harassment <input id="thr_harassment" type="number" min="0" max="1" step="0.01"></label>
-          <label>Sexual <input id="thr_sexual" type="number" min="0" max="1" step="0.01"></label>
-          <label>Self-harm <input id="thr_selfharm" type="number" min="0" max="1" step="0.01"></label>
-          <label>Violence <input id="thr_violence" type="number" min="0" max="1" step="0.01"></label>
-          <label>Nudity <input id="thr_nudity" type="number" min="0" max="1" step="0.01"></label>
-          <label>Weapons <input id="thr_weapons" type="number" min="0" max="1" step="0.01"></label>
-          <label>Gore <input id="thr_gore" type="number" min="0" max="1" step="0.01"></label>
-          <label>Link-Risiko <input id="thr_link" type="number" min="0" max="1" step="0.01"></label>
-        </div>
-      </fieldset>
       <div class="grid">
-        <label class="switch"><input type="checkbox" id="aimod_exempt_admins"> Admins ausnehmen</label>
-        <label class="switch"><input type="checkbox" id="aimod_exempt_owner"> Topic-Owner ausnehmen</label>
+        <label>Tägliches Limit pro Nutzer
+          <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
+        </label>
+        <label>Quota‑Notify
+          <select data-key="spam.quota_notify" id="spam_quota">
+            <option value="">—</option>
+            <option value="off">Aus</option>
+            <option value="smart">Smart</option>
+            <option value="always">Immer</option>
+          </select>
+        </label>
       </div>
     </section>
 
-    <section id="sec-faq" class="section card">
-      <h2>FAQ</h2>
-      <div class="row">
-        <label>Neuen FAQ-Eintrag</label>
-        <div class="grid">
-          <input type="text" id="faq_q" placeholder="Frage …">
-          <input type="text" id="faq_a" placeholder="Antwort …">
-        </div>
-      </div>
-      <div class="row">
-        <div id="faqList" class="card"></div>
-      </div>
-    </section>
-
-    <section id="sec-stats" class="section card">
-      <h2>Report / Statistik</h2>
-      <p id="dailyStatsInfo" class="hint"></p>
-      <div id="statsOut" class="row mono"></div>
-    </section>
-
-    <section id="sec-mood" class="section card">
-      <h2>Mood</h2>
-      <div class="row">
-        <span class="badge">Aktuelle Frage:</span>
-        <span id="moodQuestion" class="mono"></span>
-      </div>
-      <div class="row stack">
-        <button class="btn" id="btnSendMood">Jetzt in der Gruppe senden</button>
-      </div>
-    </section>
-
-    <section id="sec-night" class="section card">
-      <h2>Nachtmodus</h2>
+    <!-- RSS -->
+    <section class="card" id="sec-rss">
       <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="night.on" id="night_on"> Nachtmodus aktiv</label>
-        <label>Start <input type="time" data-key="night.start" id="night_start"></label>
-        <label>Ende <input type="time" data-key="night.end" id="night_end"></label>
+        <label>RSS‑Feed URL
+          <input type="text" id="rss_url" placeholder="https://example.com/feed.xml"/>
+        </label>
+        <label>Topic (ID)
+          <input type="text" id="rss_topic" placeholder="0 = Standard"/>
+        </label>
       </div>
-      <div class="hint muted">Nachrichten im Zeitraum werden gemäß Regeln behandelt (stumm/ablehnen/löschen – Bot-Konfiguration).</div>
+      <div class="row">
+        <label class="switch"><input type="checkbox" id="rss_postimg"> Beitragsbilder posten</label>
+        <label class="switch"><input type="checkbox" id="rss_enabled" checked> Feed aktivieren</label>
+        <button class="btn small" id="rss_add">Hinzufügen</button>
+      </div>
+      <div class="sep"></div>
+      <div id="rssList" class="list"></div>
+      <div class="hint">Bestehende Feeds unten verwalten.</div>
     </section>
 
-    <section id="sec-router" class="section card">
-      <h2>Topic-Router</h2>
+    <!-- KI (Assistent/FAQ Umschalter) -->
+    <section class="card" id="sec-ai">
       <div class="row">
-        <label>Neue Regel</label>
-        <div class="grid">
-          <input type="text" id="router_keywords" placeholder="Keywords (Komma-getrennt)">
-          <input type="text" id="router_domains" placeholder="Domains (Komma-getrennt)">
-          <input type="number" id="router_target" placeholder="Ziel-Topic-ID">
-        </div>
-        <div class="row stack">
-          <label class="switch"><input type="checkbox" id="router_enabled" checked> Aktiv</label>
-          <button class="btn" id="btnAddRule">Regel hinzufügen</button>
-        </div>
+        <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
       </div>
-      <div class="row">
-        <div id="routerList" class="card"></div>
-      </div>
+      <label>FAQ‑Hinweis / Prompt (optional)</label>
+      <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
     </section>
 
-    <section id="sec-more" class="section card">
-      <h2>Mehr</h2>
-      <div class="row">
-        <div class="muted">Website: <a href="https://greeny187.github.io/GreenyManagementBots/" target="_blank">greeny187.github.io/GreenyManagementBots</a></div>
-        <div class="muted">Support: <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Telegram</a></div>
-      </div>
-      <h3>Bereinigung gelöschter Accounts</h3>
+    <!-- KI‑Moderation -->
+    <section class="card" id="sec-aimod">
       <div class="grid">
-        <label>Plan (Cron-ähnlich, optional)<input type="text" id="cleanup_schedule" placeholder="z. B. täglich 03:00"></label>
-        <button class="btn" id="btnCleanupNow">Jetzt bereinigen</button>
+        <label class="switch"><input type="checkbox" data-key="ai_mod.enabled"> Aktiviert</label>
+        <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow‑Mode (nur loggen)</label>
       </div>
-      <div class="hint muted">Hinweis: Sofort-Bereinigung löst den Prozess direkt aus; Planung wird serverseitig gespeichert (falls unterstützt).</div>
+      <div class="grid">
+        <label>Primär‑Aktion
+          <select data-key="ai_mod.action_primary">
+            <option value="">—</option>
+            <option value="delete">Löschen</option>
+            <option value="warn">Warnen</option>
+            <option value="mute">Stummschalten</option>
+          </select>
+        </label>
+        <label>Mute‑Minuten
+          <input type="number" data-key="ai_mod.mute_minutes" min="0" placeholder="0 = aus" />
+        </label>
+      </div>
+      <div class="grid">
+        <label>Warntext
+          <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI‑Moderation)."/>
+        </label>
+        <label>Appeal‑URL
+          <input type="text" data-key="ai_mod.appeal_url" placeholder="https://…"/>
+        </label>
+      </div>
+      <div class="grid">
+        <label>Anfragen / Minute (Max)
+          <input type="number" data-key="ai_mod.max_per_min" min="1" placeholder="20" />
+        </label>
+        <label>Cooldown (Sekunden)
+          <input type="number" data-key="ai_mod.cooldown_s" min="0" placeholder="30" />
+        </label>
+      </div>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_admins"> Admins ausnehmen</label>
+        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic‑Owner ausnehmen</label>
+      </div>
+      <div class="sep"></div>
+      <div class="grid">
+        <label>Toxicity‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.toxicity" placeholder="0.90" />
+        </label>
+        <label>Hate‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.hate" placeholder="0.85" />
+        </label>
+        <label>Sexual‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.sexual" placeholder="0.90" />
+        </label>
+        <label>Harassment‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.harassment" placeholder="0.90" />
+        </label>
+        <label>Self‑Harm‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.selfharm" placeholder="0.95" />
+        </label>
+        <label>Violence‑Schwelle
+          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.violence" placeholder="0.90" />
+        </label>
+      </div>
     </section>
 
-    <section id="sec-pro" class="section card">
-      <h2>Pro</h2>
-      <div id="proInfo" class="row single"></div>
-      <div id="adBanner" class="row single" style="display:none">
-        <div class="card" style="padding:16px;border-radius:12px">
-          <b>Unterstütze das Projekt & werde Pro</b>
-          <p class="dim">Mit Pro blendest du Werbung aus und schaltest erweiterte Funktionen frei (z. B. KI-Moderation, längere Statistiken).</p>
-          <ul style="margin:0 0 8px 18px">
-            <li>Website: <a href="https://greeny187.github.io/GreenyManagementBots/" target="_blank">Infos</a></li>
-            <li>TON-Wallet: <code class="mono">UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></li>
-            <li>PayPal: <code class="mono">greeny187@outlook.de</code></li>
-            <li>Support: <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Telegram</a></li>
-          </ul>
-          <div class="row stack">
-            <button class="btn" id="buyPro1">Jetzt Pro (1&nbsp;Monat)</button>
-            <button class="btn" id="buyPro12">Pro (12&nbsp;Monate)</button>
-          </div>
-          <div class="hint muted">Diese Buttons senden den Kaufwunsch an den Bot (WebAppData). Die Bezahlung kann mit Telegram Stars / TON / PayPal verknüpft werden.</div>
-        </div>
+    <!-- FAQ -->
+    <section class="card" id="sec-faq">
+      <div class="grid">
+        <label>Frage
+          <input type="text" id="faq_q" placeholder="Deine Frage …" />
+        </label>
+        <label>Antwort
+          <input type="text" id="faq_a" placeholder="Kurze Antwort …" />
+        </label>
+      </div>
+      <div class="row">
+        <button class="btn small" id="faq_add">Hinzufügen</button>
+      </div>
+      <div class="sep"></div>
+      <div id="faqList" class="list"></div>
+    </section>
+
+    <!-- REPORT -->
+    <section class="card" id="sec-report">
+      <div class="row">
+        <label class="switch"><input type="checkbox" data-key="daily_stats"> Täglichen Report per PM senden</label>
       </div>
     </section>
 
-    <div class="footer">
-      <span class="muted hint">© Emerald Content</span>
-      <span id="out" class="muted hint"></span>
-    </div>
+    <!-- MOOD -->
+    <section class="card" id="sec-mood">
+      <div class="grid">
+        <label>Frage (Stimmungsumfrage)
+          <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung heute?" />
+        </label>
+        <label>Topic (ID)
+          <input type="text" data-key="mood.topic" placeholder="0 = Standard" />
+        </label>
+      </div>
+    </section>
+
+    <!-- NIGHT MODE -->
+    <section class="card" id="sec-night">
+      <div class="grid">
+        <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
+        <label>Start (HH:MM)
+          <input type="text" data-key="night.start" placeholder="22:00" />
+        </label>
+        <label>Ende (HH:MM)
+          <input type="text" data-key="night.end" placeholder="07:00" />
+        </label>
+      </div>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht‑Admin‑Nachrichten löschen</label>
+        <label class="switch"><input type="checkbox" data-key="night.warn_once"> Einmalige Warnung anzeigen</label>
+        <label>Zeitzone
+          <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
+        </label>
+        <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard‑Mode</label>
+      </div>
+      <div class="grid">
+        <label>Temporär bis (Override)
+          <input type="datetime-local" data-key="night.override_until" />
+        </label>
+      </div>
+    </section>
+
+    <!-- TOPIC ROUTER -->
+    <section class="card" id="sec-router">
+      <div class="grid">
+        <label>Ziel‑Topic (ID)
+          <input type="text" id="router_target" placeholder="Topic ID" />
+        </label>
+        <label>Keywords (Komma getrennt)
+          <input type="text" id="router_keywords" placeholder="hilfe, frage, support" />
+        </label>
+        <label>Domains (Komma getrennt)
+          <input type="text" id="router_domains" placeholder="example.com, foo.bar" />
+        </label>
+      </div>
+      <div class="row">
+        <label class="switch"><input type="checkbox" id="router_delete" checked> Original löschen</label>
+        <label class="switch"><input type="checkbox" id="router_warn" checked> Nutzer warnen</label>
+        <button class="btn small" id="router_add">Regel anlegen</button>
+      </div>
+      <div class="sep"></div>
+      <div id="routerList" class="list"></div>
+    </section>
+
+    <!-- MORE -->
+    <section class="card" id="sec-more">
+      <div class="row">
+        <label>Sprache
+          <select data-key="language">
+            <option value="">Automatisch</option>
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="ru">Русский</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- PRO -->
+    <section class="card" id="sec-pro">
+      <div class="row">
+        <label>Pro‑Monate kaufen/verlängern
+          <input type="number" id="pro_months" min="1" placeholder="z.B. 1" />
+        </label>
+        <button class="btn small" id="pro_buy">Abo setzen</button>
+      </div>
+    </section>
+
+    <footer>
+      <div id="out" class="hint">Bereit.</div>
+      <div class="hint">© Emerald Content</div>
+    </footer>
   </div>
 
   <script>
-    // ---- Grundsetup
-    const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
-    if (tg){ try{ tg.expand(); tg.enableClosingConfirmation(); }catch{} }
+    // --- Helpers ---
+    const qs=(s,el=document)=>el.querySelector(s);
+    const qa=(s,el=document)=>Array.from(el.querySelectorAll(s));
+    const getUrlParam=(k, def=null)=> new URL(location.href).searchParams.get(k) ?? def;
 
-    const qs = s => document.querySelector(s);
-    const qsa = s => Array.from(document.querySelectorAll(s));
-    const storeTabKey = "emerald-tab";
-    const API_BASE = ""; // relativ
+    // Telegram Context
+    const tg = window.Telegram?.WebApp || null;
+    const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
+    const cid = parseInt(getUrlParam("cid")||0);
+    const API_BASE = getUrlParam("api","") || ""; // z.B. /miniapp
 
-    function getUrlParam(name, def=null){
-      const u = new URL(location.href);
-      return u.searchParams.get(name) ?? def;
+    // Theme
+    const themeKey = "emerald-theme";
+    const currentTheme = localStorage.getItem(themeKey) || "dark";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    qs("#themeBtn").onclick=()=>{
+      const cur = document.documentElement.getAttribute("data-theme")||"dark";
+      const next = cur==="dark"?"light":"dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem(themeKey, next);
+    };
+
+    // Tabs
+    qa('#tabs .pill').forEach(p=>p.addEventListener('click',()=>{
+      qa('#tabs .pill').forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+      qa('section').forEach(s=>s.classList.remove('active'));
+      qs('#sec-'+p.dataset.tab).classList.add('active');
+    }));
+
+    // Events
+    qs('#closeBtn').onclick=()=>{ try{ tg.close(); }catch{ window.close(); } };
+    qs('#resetBtn').onclick=()=>loadState();
+    qs('#saveBtn').onclick=()=>sendPayload();
+
+    // RSS Ops
+    qs('#rss_add').onclick=()=>{
+      const url = qs('#rss_url').value.trim();
+      if(!url) return;
+      const topic = parseInt(qs('#rss_topic').value.trim()||'0');
+      sendPayload({ rss: { url, topic, post_images: qs('#rss_postimg').checked, enabled: qs('#rss_enabled').checked } });
+    };
+
+    // FAQ Ops
+    qs('#faq_add').onclick=()=>{
+      const q = qs('#faq_q').value.trim();
+      const a = qs('#faq_a').value.trim();
+      if(!q) return;
+      sendPayload({ faq_add: { q, a } });
+    };
+
+    // Router Ops
+    qs('#router_add').onclick=()=>{
+      const target = parseInt(qs('#router_target').value.trim()||'0');
+      if(!target) return;
+      const kw = qs('#router_keywords').value.split(',').map(s=>s.trim()).filter(Boolean);
+      const dom = qs('#router_domains').value.split(',').map(s=>s.trim()).filter(Boolean);
+      sendPayload({ router_add: { target_topic_id: target, keywords: kw, domains: dom, delete_original: qs('#router_delete').checked, warn_user: qs('#router_warn').checked } });
+    };
+
+    // Pro
+    qs('#pro_buy').onclick=()=>{
+      const months = parseInt(qs('#pro_months').value||'0');
+      if(months>0) sendPayload({ pro_months: months });
+    };
+
+    // Collect → nested object per data-key path
+    function setVal(path, val){
+      const el = qa(`[data-key="${path}"]`)[0];
+      if(!el) return;
+      if(el.type==='checkbox') el.checked = !!val; else el.value = (val ?? '')
     }
-    const cid = getUrlParam("cid","");
-    let uid = null; // wird aus initDataUnsafe gelesen
-    let lastState = null;
-
-    // ---- Tabs
-    const TABS = [
-      ['welcome','Begrüßung'],
-      ['rules','Regeln'],
-      ['farewell','Verabschiedung'],
-      ['spam','Spam'],
-      ['rss','RSS'],
-      ['ai','KI'],
-      ['aimod','KI-Moderation'],
-      ['faq','FAQ'],
-      ['stats','Report'],
-      ['mood','Mood'],
-      ['night','Nachtmodus'],
-      ['router','Router'],
-      ['more','Mehr'],
-      ['pro','Pro']
-    ];
-
-    (function renderTabs(){
-      const c = qs("#tabs");
-      c.innerHTML = "";
-      TABS.forEach(([key,label],i)=>{
-        const b = document.createElement("button");
-        b.className = "tab";
-        b.textContent = label;
-        b.dataset.key = key;
-        b.onclick = ()=>{
-          qsa(".tab").forEach(x=>x.classList.remove("active"));
-          b.classList.add("active");
-          qsa(".section").forEach(x=>x.classList.remove("active"));
-          qs("#sec-"+key).classList.add("active");
-          localStorage.setItem(storeTabKey, key);
-          if (key === "stats") loadStats(); // Autoload bei Tabwechsel
-        };
-        c.appendChild(b);
-      });
-      const last = localStorage.getItem(storeTabKey);
-      const btn = last ? qsa(".tab").find(x=>x.dataset.key===last) : null;
-      (btn || qsa(".tab")[0]).click();
-    })();
-
-    // ---- Helpers
-    function setVal(idOrKey, val){
-      const el = document.getElementById(idOrKey) || document.querySelector(`[data-key="${idOrKey}"]`);
-      if (!el) return;
-      if (el.type === "checkbox") el.checked = !!val;
-      else el.value = (val ?? "");
-    }
-    function setCheck(id, on){ const el = document.getElementById(id); if (el) el.checked = !!on; }
-    function getVal(id){ const el = document.getElementById(id); if (!el) return ""; return el.value; }
-    function isChecked(id){ const el = document.getElementById(id); return !!(el && el.checked); }
-    function toInt(v){ const n = parseInt(v,10); return Number.isFinite(n) ? n : 0; }
-    function toNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : null; }
-
     function collect(){
-      // Alle data-key Felder in verschachteltes Objekt
       const out = {};
-      qsa("[data-key]").forEach(el=>{
-        const path = el.dataset.key.split(".");
-        let ref = out;
-        for (let i=0;i<path.length;i++){
-          const k = path[i];
-          if (i===path.length-1){
-            ref[k] = el.type==="checkbox" ? !!el.checked : el.value;
-          } else {
-            if (!ref[k] || typeof ref[k] !== "object") ref[k] = {};
-            ref = ref[k];
-          }
+      qa('[data-key]').forEach(el=>{
+        const path = el.getAttribute('data-key');
+        const parts = path.split('.');
+        let cur = out;
+        for(let i=0;i<parts.length-1;i++){
+          if(!(parts[i] in cur)) cur[parts[i]]={};
+          cur=cur[parts[i]];
         }
+        const leaf = parts[parts.length-1];
+        let val = (el.type==='checkbox') ? !!el.checked : el.value;
+        if(el.type==='number') val = el.value===''? '': (Number(el.value));
+        cur[leaf]=val;
       });
-
-      // KI-Moderation anhängen
-      out.ai_mod = {
-        enabled: isChecked('aimod_enabled'),
-        shadow_mode: isChecked('aimod_shadow'),
-        topic_id: toInt(getVal('aimod_topic')),
-        action_primary: getVal('aimod_action'),
-        mute_minutes: toInt(getVal('aimod_mute')),
-        warn_text: getVal('aimod_warn'),
-        appeal_url: getVal('aimod_appeal'),
-        toxicity: toNum(getVal('thr_toxicity')),
-        hate: toNum(getVal('thr_hate')),
-        sexual: toNum(getVal('thr_sexual')),
-        harassment: toNum(getVal('thr_harassment')),
-        selfharm: toNum(getVal('thr_selfharm')),
-        violence: toNum(getVal('thr_violence')),
-        nudity: toNum(getVal('thr_nudity')),
-        weapons: toNum(getVal('thr_weapons')),
-        gore: toNum(getVal('thr_gore')),
-        link_risk: toNum(getVal('thr_link')),
-        exempt_admins: isChecked('aimod_exempt_admins'),
-        exempt_topic_owner: isChecked('aimod_exempt_owner')
-      };
-
-      // Router: Hinzufügen (falls Felder gefüllt)
-      const kw = getVal('router_keywords').trim();
-      const dm = getVal('router_domains').trim();
-      const rt = toInt(getVal('router_target'));
-      const en = isChecked('router_enabled');
-      if (kw || dm || rt){
-        out.router_add = {
-          keywords: kw ? kw.split(",").map(s=>s.trim()).filter(Boolean) : [],
-          domains: dm ? dm.split(",").map(s=>s.trim()).filter(Boolean) : [],
-          target_topic_id: rt,
-          enabled: !!en
-        };
-      }
-
-      // FAQ: Hinzufügen (falls befüllt)
-      const fq = getVal('faq_q').trim();
-      const fa = getVal('faq_a').trim();
-      if (fq && fa){ out.faq_add = { q: fq, a: fa }; }
-
-      // Cleanup-Plan
-      const plan = getVal('cleanup_schedule').trim();
-      if (plan) out.cleanup_schedule = plan;
-
       return out;
+    }
+
+    // Render helper
+    function renderRss(feeds){
+      const box = qs('#rssList'); box.innerHTML='';
+      (feeds||[]).forEach(f=>{
+        const item = document.createElement('div'); item.className='item';
+        const left = document.createElement('div'); left.className='left';
+        left.innerHTML = `<div class="title">${f.url}</div><div class="hint">Topic: ${f.topic ?? 0}</div>`;
+        const right = document.createElement('div');
+        right.innerHTML = `
+          <label class="switch"><input type="checkbox" ${f.enabled? 'checked':''} data-url="${f.url}" class="rss-toggle"> Aktiv</label>
+          <label class="switch"><input type="checkbox" ${f.post_images? 'checked':''} data-url="${f.url}" class="rss-img"> Bilder</label>
+          <button class="btn small danger rss-del" data-url="${f.url}">Löschen</button>`;
+        item.append(left,right); box.append(item);
+      });
+      qa('.rss-del', box).forEach(b=>b.onclick=()=>sendPayload({ rss_del: b.dataset.url }));
+      qa('.rss-toggle', box).forEach(ch=>ch.onchange=()=>sendPayload({ rss_update: { url: ch.dataset.url, enabled: ch.checked } }));
+      qa('.rss-img', box).forEach(ch=>ch.onchange=()=>sendPayload({ rss_update: { url: ch.dataset.url, post_images: ch.checked } }));
+    }
+    function renderFaq(list){
+      const box = qs('#faqList'); box.innerHTML='';
+      (list||[]).forEach(f=>{
+        const item = document.createElement('div'); item.className='item';
+        const left = document.createElement('div'); left.className='left';
+        left.innerHTML = `<div class="title">${f.q}</div><div class="hint">${f.a||''}</div>`;
+        const del = document.createElement('button'); del.className='btn small danger'; del.textContent='Löschen';
+        del.onclick=()=>sendPayload({ faq_del: { q: f.q } });
+        item.append(left, del); box.append(item);
+      });
+    }
+    function renderRouter(list){
+      const box = qs('#routerList'); box.innerHTML='';
+      (list||[]).forEach(r=>{
+        const item = document.createElement('div'); item.className='item';
+        const left = document.createElement('div'); left.className='left';
+        left.innerHTML = `<div class="title">Rule #${r.rule_id} → Topic ${r.target_topic_id}</div><div class="hint">${(r.keywords||[]).join(', ')} ${(r.domains||[]).join(', ')}</div>`;
+        const right = document.createElement('div'); right.className='right';
+        right.innerHTML = `<span class="hint">${r.enabled? 'aktiv':'inaktiv'}</span>`;
+        item.append(left,right); box.append(item);
+      });
+    }
+
+    // Load state
+    async function loadState(){
+      qs('#out').textContent='Lade …';
+      try{
+        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}`);
+        const j = await res.json();
+        // Welcome/Rules/Farewell
+        setVal('welcome.on', j.welcome?.on);
+        setVal('welcome.text', j.welcome?.text);
+        setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
+        setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
+        // Spam (inkl. Fallbacks)
+        setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
+        setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
+        setVal('spam.block_media', j.spam?.block_media ?? false);
+        setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false);
+        setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
+        if(Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value=(j.spam.whitelist||[]).join('\n');
+        if(Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value=(j.spam.blacklist||[]).join('\n');
+        setVal('spam.action', j.spam?.action ?? '');
+        setVal('spam.per_user_daily_limit', j.spam?.per_user_daily_limit ?? 0);
+        setVal('spam.quota_notify', j.spam?.quota_notify ?? '');
+        // RSS
+        renderRss(j.rss?.feeds||[]);
+        // AI
+        setVal('ai.on', j.ai?.on ?? (j.ai?.faq || j.ai?.rss));
+        setVal('ai.faq', j.ai?.faq ?? '');
+        // AIMOD
+        const am = j.aimod||{};
+        setVal('ai_mod.enabled', am.enabled);
+        setVal('ai_mod.shadow_mode', am.shadow_mode);
+        setVal('ai_mod.action_primary', am.action_primary);
+        setVal('ai_mod.mute_minutes', am.mute_minutes);
+        setVal('ai_mod.warn_text', am.warn_text);
+        setVal('ai_mod.appeal_url', am.appeal_url);
+        setVal('ai_mod.max_per_min', am.max_calls_per_min);
+        setVal('ai_mod.cooldown_s', am.cooldown_s);
+        setVal('ai_mod.exempt_admins', am.exempt_admins);
+        setVal('ai_mod.exempt_topic_owner', am.exempt_topic_owner);
+        setVal('ai_mod.toxicity', am.toxicity ?? am.tox_thresh);
+        setVal('ai_mod.hate', am.hate ?? am.hate_thresh);
+        setVal('ai_mod.sexual', am.sexual ?? am.sex_thresh);
+        setVal('ai_mod.harassment', am.harassment ?? am.harass_thresh);
+        setVal('ai_mod.selfharm', am.selfharm ?? am.selfharm_thresh);
+        setVal('ai_mod.violence', am.violence ?? am.violence_thresh);
+        // FAQ & Router
+        renderFaq(j.faqs||[]);
+        renderRouter(j.router_rules||[]);
+        // Mood
+        setVal('mood.question', j.mood?.question);
+        setVal('mood.topic', j.mood?.topic);
+        // Night
+        const n=j.night||{}; setVal('night.on', n.enabled); setVal('night.start', n.start||'22:00'); setVal('night.end', n.end||'07:00');
+        setVal('night.delete_non_admin_msgs', n.delete_non_admin_msgs);
+        setVal('night.warn_once', n.warn_once);
+        setVal('night.timezone', n.timezone||'Europe/Berlin');
+        setVal('night.hard_mode', n.hard_mode);
+        // More
+        setVal('language', j.language||'');
+        qs('#out').textContent='Bereit.';
+      }catch(e){
+        console.error(e); qs('#out').textContent='Fehler beim Laden.';
+      }
     }
 
     function sendPayload(extra={}){
       const out = collect();
-      Object.assign(out, extra);
-      if (tg){
-        try{ tg.HapticFeedback?.impactOccurred?.("medium"); }catch{}
+      Object.assign(out, { cid, uid }, extra);
+      if (tg && tg.sendData){
+        try{ tg.HapticFeedback?.impactOccurred?.('medium'); }catch{}
         tg.sendData(JSON.stringify(out));
-        qs("#out").textContent = "Gesendet.";
+        qs('#out').textContent = 'Gesendet.';
       } else {
-        alert("Bitte die Mini-App innerhalb von Telegram öffnen.");
+        qs('#out').textContent = 'Nicht in Telegram geöffnet – Speichern nicht möglich.';
+        console.warn('Mini‑App nicht in Telegram geöffnet.');
       }
     }
 
-    // ---- RSS / FAQ / Router Render
-    function renderRssList(feeds){
-      const box = qs("#rssList");
-      if (!feeds || !feeds.length){ box.innerHTML = "<p class='muted'>Keine Feeds gespeichert.</p>"; return; }
-      box.innerHTML = feeds.map(f => `
-        <div class="row stack" style="justify-content:space-between">
-          <div>
-            <div class="mono">${escapeHtml(f.url||"")}</div>
-            <div class="hint">Topic: ${f.topic ?? 0}</div>
-          </div>
-          <button class="btn warn" onclick="deleteRss('${encodeURIComponent(f.url||"")}')">Löschen</button>
-        </div>
-      `).join("");
-    }
-    function renderFaqs(items){
-      const box = qs("#faqList");
-      if (!items || !items.length){ box.innerHTML = "<p class='muted'>Keine FAQ hinterlegt.</p>"; return; }
-      box.innerHTML = items.map(x => `
-        <details class="row">
-          <summary>${escapeHtml(x.q||"")}</summary>
-          <div class="card" style="margin-top:6px"><pre style="white-space:pre-wrap">${escapeHtml(x.a||"")}</pre></div>
-          <div class="row"><button class="btn warn" onclick="delFaq('${encodeURIComponent(x.q||"")}')">Löschen</button></div>
-        </details>
-      `).join("");
-    }
-    function renderRouterList(items){
-      const box = qs("#routerList");
-      if (!items || !items.length){ box.innerHTML = "<p class='muted'>Keine Regeln definiert.</p>"; return; }
-      box.innerHTML = items.map(r => `
-        <div class="row card">
-          <div class="stack" style="justify-content:space-between">
-            <div>
-              <div>ID: <span class="mono">${r.rule_id}</span> – Ziel-Topic: <span class="mono">${r.target_topic_id}</span></div>
-              <div class="hint">Aktiv: ${r.enabled ? "Ja" : "Nein"}</div>
-              <div class="hint">Keywords: ${escapeHtml((r.keywords||[]).join(", ")) || "—"}</div>
-              <div class="hint">Domains: ${escapeHtml((r.domains||[]).join(", ")) || "—"}</div>
-            </div>
-            <div class="stack">
-              <button class="btn" onclick="toggleRule(${r.rule_id}, ${r.enabled?0:1})">${r.enabled?"Deaktivieren":"Aktivieren"}</button>
-              <button class="btn warn" onclick="delRule(${r.rule_id})">Löschen</button>
-            </div>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    // ---- Delete/Toggle Aktionen (senden Einzel-Payloads)
-    window.deleteRss = (encUrl)=>{
-      sendPayload({ rss_del: decodeURIComponent(encUrl) });
-    };
-    window.delFaq = (encQ)=>{
-      sendPayload({ faq_del: decodeURIComponent(encQ) });
-    };
-    window.delRule = (rule_id)=>{
-      sendPayload({ router_del: Number(rule_id)||0 });
-    };
-    window.toggleRule = (rule_id, enabled)=>{
-      sendPayload({ router_toggle: { rule_id:Number(rule_id)||0, enabled:!!enabled } });
-    };
-
-    // ---- State laden
-    async function loadState(){
-      const out = qs("#out");
-      out.textContent = "Lade …";
-      try{
-        uid = tg?.initDataUnsafe?.user?.id || "";
-        const url = `${API_BASE}/miniapp/state${cid&&uid?`?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}`:""}`;
-        const r = await fetch(url, { method:"GET" });
-        const j = await r.json();
-        lastState = j;
-
-        // Basismapping
-        setVal("welcome.on", j.welcome?.on);
-        setVal("welcome.text", j.welcome?.text);
-        setVal("rules.on", j.rules?.on);
-        setVal("rules.text", j.rules?.text);
-        setVal("farewell.on", j.farewell?.on);
-        setVal("farewell.text", j.farewell?.text);
-
-        setVal("spam.on", j.spam?.on);
-        setVal("spam.block_links", j.spam?.block_links);
-        setVal("spam.block_media", j.spam?.block_media);
-        setVal("spam.block_invite_links", j.spam?.block_invite_links);
-        setVal("spam.policy_topic", j.spam?.policy_topic);
-
-        setVal("rss.on", j.rss?.on);
-        setVal("rss.post_images", j.rss?.post_images);
-        setVal("rss.url", j.rss?.url);
-        setVal("rss.interval", j.rss?.interval);
-        qs("#rssTopicInfo").textContent = `Topic: ${j.rss?.topic ?? 0}`;
-        renderRssList(j.rss?.feeds || []);
-
-        setVal("ai.on", j.ai?.on);
-        setVal("ai.faq", j.ai?.faq);
-
-        // KI-Moderation
-        bindAimod(j.aimod || {});
-
-        // FAQ
-        renderFaqs(j.faqs || []);
-
-        // Mood
-        qs("#moodQuestion").textContent = j.mood?.question || "Wie ist deine Stimmung?";
-
-        // Nachtmodus (aus 'Mehr' herausgelöst)
-        setVal("night.on", j.night?.on);
-        setVal("night.start", j.night?.start);
-        setVal("night.end", j.night?.end);
-
-        // Router
-        renderRouterList(j.router_rules || []);
-
-        // Daily-Report-Hinweis
-        qs("#dailyStatsInfo").textContent = j.daily_stats
-          ? "📊 Tagesreport aktiv – Versand täglich um 08:00 Uhr."
-          : "Tagesreport ist aktuell deaktiviert.";
-
-        // Pro/Ads
-        applySubscriptionUI(j.subscription || {active:false,tier:'free',valid_until:null});
-
-        // Welcome Bild-Vorschau
-        if (j.welcome?.photo && j.welcome?.photo_id && cid && uid){
-          const src = `${API_BASE}/miniapp/file?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}&file_id=${encodeURIComponent(j.welcome.photo_id)}`;
-          const img = qs("#welcome_preview");
-          const wrap = qs("#welcome_preview_wrap");
-          if (img && wrap){ img.src = src; wrap.style.display = ""; }
-        }
-
-        out.textContent = "Bereit.";
-        // Statistik autoload
-        loadStats();
-      }catch(e){
-        console.error(e);
-        out.textContent = "Fehler beim Laden.";
-      }
-    }
-
-    function bindAimod(m){
-      setCheck('aimod_enabled', !!m.enabled);
-      setCheck('aimod_shadow', !!m.shadow_mode);
-      setVal('aimod_topic', m.topic_id || 0);
-      setVal('aimod_action', m.action_primary || 'delete');
-      setVal('aimod_mute', m.mute_minutes || 0);
-      setVal('aimod_warn', m.warn_text || '');
-      setVal('aimod_appeal', m.appeal_url || '');
-      setVal('thr_toxicity', m.toxicity ?? '');
-      setVal('thr_hate', m.hate ?? '');
-      setVal('thr_sexual', m.sexual ?? '');
-      setVal('thr_harassment', m.harassment ?? '');
-      setVal('thr_selfharm', m.selfharm ?? '');
-      setVal('thr_violence', m.violence ?? '');
-      setVal('thr_nudity', m.nudity ?? '');
-      setVal('thr_weapons', m.weapons ?? '');
-      setVal('thr_gore', m.gore ?? '');
-      setVal('thr_link', m.link_risk ?? '');
-      setCheck('aimod_exempt_admins', !!m.exempt_admins);
-      setCheck('aimod_exempt_owner', !!m.exempt_topic_owner);
-    }
-
-    // ---- Stats laden (Autoload)
-    async function loadStats(){
-      const out = qs("#statsOut");
-      out.textContent = "Lade …";
-      try{
-        const url = `${API_BASE}/miniapp/stats${cid&&uid?`?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}`:""}`;
-        const r = await fetch(url, { method:"GET" });
-        const j = await r.json();
-        out.textContent = JSON.stringify(j, null, 2);
-      }catch(e){
-        console.error(e);
-        out.textContent = "Fehler beim Laden der Statistiken.";
-      }
-    }
-
-    // ---- Pro UI / Werbung
-    function applySubscriptionUI(sub){
-      const ad = qs("#adBanner");
-      const info = qs("#proInfo");
-      if (info){
-        const label = sub.active ? "✅ PRO aktiv" : "❌ Free";
-        const until = sub.valid_until ? ` – gültig bis: ${new Date(sub.valid_until).toLocaleString()}` : "";
-        info.innerHTML = `<b>Status:</b> ${label}${until}`;
-      }
-      if (ad) ad.style.display = sub.active ? "none" : "";
-      qs("#buyPro1")?.addEventListener("click", ()=> sendPayload({pro_months:1}));
-      qs("#buyPro12")?.addEventListener("click", ()=> sendPayload({pro_months:12}));
-    }
-
-    // ---- Mood jetzt senden
-    async function sendMood(){
-      try{
-        const url = `${API_BASE}/miniapp/send_mood?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}`;
-        const r = await fetch(url, {method:"GET"});
-        const j = await r.json().catch(()=>({}));
-        alert(j && j.ok ? "✅ Mood gesendet." : `⚠️ Konnte Mood nicht senden: ${j && j.error || ""}`);
-      }catch(e){
-        alert("⚠️ Fehler beim Senden.");
-      }
-    }
-
-    // ---- Speichern / Aktionen
-    function save(){ sendPayload({}); }
-    function cleanupNow(){ sendPayload({ cleanup_now: true }); }
-    function addRouterRule(){ sendPayload({}); } // Felder werden in collect() zu router_add
-
-    // ---- Kleine Utils
-    function escapeHtml(s){ return (s??"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
-
-    // ---- Events
-    qs("#saveBtn").onclick = save;
-    qs("#closeBtn").onclick = ()=> tg ? tg.close() : window.close();
-    qs("#resetBtn").onclick = ()=>{ localStorage.removeItem(storeTabKey); location.reload() };
-    qs("#btnSendMood").onclick = sendMood;
-    qs("#btnAddRule").onclick = addRouterRule;
-    qs("#btnCleanupNow").onclick = cleanupNow;
-
-    // ---- Start
     loadState();
   </script>
 </body>
