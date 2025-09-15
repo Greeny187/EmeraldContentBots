@@ -6,11 +6,8 @@
   <title>Emerald • Gruppen-Mini-App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root{
-      --bg:#0f1217;--card:#151a22;--muted:#97a0af;--text:#eaf0ff;--brand:#2ea6ff;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;--ring:#2b3340;--input:#0b0e12;--radius:16px
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial}
+    :root{--bg:#0f1217;--card:#151a22;--muted:#97a0af;--text:#eaf0ff;--brand:#2ea6ff;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;--ring:#2b3340;--input:#0b0e12;--radius:16px}
+    *{box-sizing:border-box} html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial}
     a{color:var(--brand);text-decoration:none}
     .wrap{max-width:960px;margin:0 auto;padding:16px}
     .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
@@ -21,8 +18,7 @@
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
     .tab{padding:8px 12px;border:1px solid var(--ring);border-radius:999px;background:#0b0e12;color:var(--muted);cursor:pointer}
     .tab.active{background:var(--brand);color:white;border-color:var(--brand)}
-    .section{display:none}
-    .section.active{display:block}
+    .section{display:none}.section.active{display:block}
     .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin:10px 0}
     .row.single{grid-template-columns:1fr}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -34,14 +30,18 @@
     .switch input{opacity:0;width:0;height:0}
     .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#3a414d;transition:.2s;border-radius:99px}
     .slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s}
-    input:checked + .slider{background:var(--ok)}
-    input:checked + .slider:before{transform:translateX(18px)}
+    input:checked + .slider{background:var(--ok)} input:checked + .slider:before{transform:translateX(18px)}
     .footer{margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center}
     .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--ring);background:#0b0e12;color:var(--text);cursor:pointer}
     .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
     .btn.ghost{background:transparent}
     .row .stack{display:flex;gap:8px;align-items:center}
     .code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12px;color:var(--muted)}
+    .table{width:100%;border-collapse:collapse;margin-top:8px}
+    .table th,.table td{border:1px solid #2a3240;padding:6px 8px;text-align:left;font-size:13px}
+    .table th{background:#0b0e12}
+    .dim{opacity:.8}
   </style>
 </head>
 <body>
@@ -66,7 +66,7 @@
         <div class="row single"><textarea id="farewell_text" placeholder="Schade {user}, bis bald!">Schade {user}, bis bald!</textarea></div>
       </section>
 
-      <!-- Regeln & Aufräumen -->
+      <!-- Regeln -->
       <section class="section" id="sec-rules">
         <div class="row"><label>Regeln aktiv</label><label class="switch"><input id="rules_on" type="checkbox"><span class="slider"></span></label></div>
         <div class="row single"><textarea id="rules_text" placeholder="Regeln …"></textarea></div>
@@ -80,27 +80,15 @@
         <div class="row"><label>Warnhinweis anzeigen</label><label class="switch"><input id="warning_on" type="checkbox"><span class="slider"></span></label></div>
         <div class="row single"><textarea id="warning_text" placeholder="⚠️ Nur Admins dürfen Links posten."></textarea></div>
         <div class="row"><label>Ausnahmen erlauben</label><label class="switch"><input id="exceptions_on" type="checkbox"><span class="slider"></span></label></div>
-
         <div class="hr"></div>
         <div class="grid2">
-          <div>
-            <label>Whitelist (Domains, eine pro Zeile)</label>
-            <textarea id="whitelist" placeholder="beispiel.de&#10;*.schule.de"></textarea>
-          </div>
-          <div>
-            <label>Blacklist (Domains, eine pro Zeile)</label>
-            <textarea id="blacklist" placeholder="spam.tld&#10;kurz.link"></textarea>
-          </div>
+          <div><label>Whitelist (Domains, eine pro Zeile)</label><textarea id="whitelist" placeholder="beispiel.de&#10;*.schule.de"></textarea></div>
+          <div><label>Blacklist (Domains, eine pro Zeile)</label><textarea id="blacklist" placeholder="spam.tld&#10;kurz.link"></textarea></div>
         </div>
-
         <div class="row">
-          <div class="stack">
-            <label for="topic_id">Für Topic-ID anwenden (optional):</label>
-            <input id="topic_id" class="input" placeholder="z. B. 123">
-          </div>
+          <div class="stack"><label for="topic_id">Für Topic-ID anwenden (optional):</label><input id="topic_id" class="input" placeholder="z. B. 123"></div>
           <span class="hint">leer = ignorieren, 0 = globaler Override</span>
         </div>
-
         <div class="grid2">
           <div>
             <label>Aktion bei Verstoß</label>
@@ -110,12 +98,8 @@
               <option value="mute">Stumm 60 Min</option>
             </select>
           </div>
-          <div>
-            <label>Tageslimit/Topic</label>
-            <input id="topic_limit" type="number" min="0" class="input" placeholder="0 = aus">
-          </div>
+          <div><label>Tageslimit/Topic</label><input id="topic_limit" type="number" min="0" class="input" placeholder="0 = aus"></div>
         </div>
-
         <div class="row">
           <label>Benachrichtigung</label>
           <select id="quota_notify" class="input">
@@ -129,7 +113,7 @@
 
       <!-- RSS -->
       <section class="section" id="sec-rss">
-        <div class="row"><label>Bilder in RSS Beiträgen</label><label class="switch"><input id="rss_images" type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="row"><label>Bilder in RSS-Beiträgen</label><label class="switch"><input id="rss_images" type="checkbox" checked><span class="slider"></span></label></div>
         <div class="grid2">
           <div><label>Feeds hinzufügen (eine URL pro Zeile)</label><textarea id="rss_add" placeholder="https://example.com/feed.xml&#10;https://…"></textarea></div>
           <div><label>Feeds entfernen (eine URL pro Zeile)</label><textarea id="rss_del" placeholder="https://example.com/feed.xml"></textarea></div>
@@ -155,7 +139,17 @@
 
       <!-- Statistiken / Report -->
       <section class="section" id="sec-stats">
-        <div class="row"><label>Tagesreport (DM an Admins)</label><label class="switch"><input id="daily_stats" type="checkbox"><span class="slider"></span></label></div>
+        <div class="row">
+          <label>Tagesreport (DM an Admins)</label><label class="switch"><input id="daily_stats" type="checkbox"><span class="slider"></span></label>
+        </div>
+        <div class="row">
+          <div class="stack">
+            <label for="days">Zeitraum (Tage)</label>
+            <input id="days" type="number" class="input" value="14" min="1" max="60" style="width:100px">
+          </div>
+          <button class="btn" id="loadStats">Laden</button>
+        </div>
+        <div id="statsOut" class="mono dim">Keine Daten geladen.</div>
       </section>
 
       <!-- Mood -->
@@ -167,7 +161,7 @@
         <div class="row single"><textarea id="mood_question" placeholder="Tagesfrage…">Wie war dein Tag von 1–5?</textarea></div>
       </section>
 
-      <!-- Sprache / Nachtmodus / Router -->
+      <!-- Mehr -->
       <section class="section" id="sec-more">
         <div class="row">
           <label>Sprache</label>
@@ -202,66 +196,45 @@ angebot → 102"></textarea></div>
   </div>
 
   <script>
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    const tg = window.Telegram?.WebApp || null;
+    if(!tg){ document.body.innerHTML='<div style="padding:20px;font:16px system-ui">❌ Diese Mini-App kann nur aus Telegram heraus geöffnet werden.</div>'; }
 
-    // Softgate: nur in Telegram sinnvoll
-    if(!tg){
-      document.body.innerHTML = '<div style="padding:20px;font:16px system-ui">❌ Diese Mini-App kann nur aus Telegram heraus geöffnet werden.</div>';
-    }
-
-    // Init Telegram WebApp
     if(tg){
-      tg.expand();
-      tg.setHeaderColor('#0b0e12');
-      tg.setBackgroundColor('#0f1217');
-      tg.MainButton.hide();
+      tg.expand(); tg.setHeaderColor('#0b0e12'); tg.setBackgroundColor('#0f1217'); tg.MainButton.hide();
     }
 
     // Tabs
-    const tabs = [
-      ['welcome','Begrüßung'],['rules','Regeln'],['spam','Spam'],['rss','RSS'],['ai','KI'],
-      ['faq','FAQ'],['stats','Report'],['mood','Mood'],['more','Mehr']
-    ];
+    const tabs = [['welcome','Begrüßung'],['rules','Regeln'],['spam','Spam'],['rss','RSS'],['ai','KI'],['faq','FAQ'],['stats','Report'],['mood','Mood'],['more','Mehr']];
     const tabsEl = document.getElementById('tabs');
-    tabs.forEach(([key,label],i)=>{
-      const b=document.createElement('button');
-      b.className='tab'+(i===0?' active':'');
-      b.dataset.key=key;
-      b.textContent=label;
-      b.onclick=()=>selectTab(key);
-      tabsEl.appendChild(b);
-    });
     function selectTab(key){
       document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.key===key));
       document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id==='sec-'+key));
     }
+    tabs.forEach(([key,label],i)=>{ const b=document.createElement('button'); b.className='tab'+(i===0?' active':''); b.dataset.key=key; b.textContent=label; b.onclick=()=>selectTab(key); tabsEl.appendChild(b); });
     selectTab('welcome');
 
-    // Query-Params / Context
-    function qp(n){ return new URLSearchParams(location.search).get(n) }
-    const cid = qp('cid');
-    const title = decodeURIComponent(qp('title')||'').trim();
+    // Params & Kontext
+    const qp = new URLSearchParams(location.search);
+    const cid = qp.get('cid');
+    const apiBase = (qp.get('api')||'').replace(/\/+$/,''); // vom Bot mitgegeben
+    const title = decodeURIComponent(qp.get('title')||'').trim();
     const user = tg?.initDataUnsafe?.user || null;
     document.getElementById('groupLine').textContent = title ? `${title} (ID ${cid||'?'})` : (cid?`Gruppen-ID ${cid}`:'Keine Gruppe übergeben');
     document.getElementById('userLine').textContent  = user ? `@${user.username||user.first_name}` : 'ohne Telegram-Kontext';
 
-    // Local presets per group
     const storeKey = cid ? `miniapp:${cid}` : 'miniapp:demo';
     function load(){ try{ return JSON.parse(localStorage.getItem(storeKey))||{} }catch{ return {} } }
     function saveLocal(v){ localStorage.setItem(storeKey, JSON.stringify(v)) }
 
-    // Fill defaults
+    // Defaults setzen
     (function init(){
       const s = load();
-      const map = {
-        welcome_on:true, welcome_text:'Willkommen {user} 👋', farewell_on:false, farewell_text:'Schade {user}, bis bald!',
+      const def = {
+        welcome_on:true, welcome_text:'Willkommen {user} 👋',
+        farewell_on:false, farewell_text:'Schade {user}, bis bald!',
         rules_on:false, rules_text:'', clean_deleted:false,
-
-        // Spam global
         admins_only:false, warning_on:false, warning_text:'', exceptions_on:false,
-        // Spam topic override
         whitelist:'', blacklist:'', topic_id:'', spam_action:'', topic_limit:'', quota_notify:'',
-
         rss_images:true, rss_add:'', rss_del:'',
         ai_faq:true, ai_rss:false,
         faq_q:'', faq_a:'',
@@ -271,91 +244,149 @@ angebot → 102"></textarea></div>
         night_on:false, night_start:'22:00', night_end:'07:00', night_days:'',
         router_rule:''
       };
-      Object.keys(map).forEach(k=>{
-        const el=document.getElementById(k);
-        if(!el) return;
-        const v=(k in s)?s[k]:map[k];
-        if(el.type==='checkbox'){el.checked=!!v}else{el.value=v}
-      });
+      for(const [k,v] of Object.entries(def)){
+        const el=document.getElementById(k); if(!el) continue;
+        const cur = (k in s)? s[k] : v;
+        if(el.type==='checkbox'){ el.checked=!!cur } else { el.value=cur }
+      }
     })();
 
-    // FAQ staging → local only; send on Save
-    document.getElementById('faq_add').onclick = ()=>{
-      const s=load();
-      s.faq_add= { q:document.getElementById('faq_q').value.trim(), a:document.getElementById('faq_a').value.trim() };
-      saveLocal(s);
-      alert('FAQ zum Senden vorgemerkt. „Speichern“ drücken.');
-    };
-    document.getElementById('faq_del').onclick = ()=>{
-      const s=load();
-      s.faq_del= { q:document.getElementById('faq_q').value.trim() };
-      saveLocal(s);
-      alert('FAQ-Löschung vorgemerkt. „Speichern“ drücken.');
-    };
+    // Server-State laden (falls apiBase & user vorhanden)
+    async function loadState(){
+      if(!apiBase || !cid || !user) return;
+      try{
+        const u = `${apiBase}/miniapp/state?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(user.id)}`;
+        const r = await fetch(u, {headers:{"X-Telegram-Init-Data": tg.initData || ""}});
+        const j = await r.json();
+        if(j && !j.error){
+          // Welcome/Rules/Farewell
+          setOn('welcome_on', j.welcome?.on); setVal('welcome_text', j.welcome?.text||'');
+          setOn('rules_on', j.rules?.on);     setVal('rules_text', j.rules?.text||'');
+          setOn('farewell_on', j.farewell?.on); setVal('farewell_text', j.farewell?.text||'');
+
+          // Links
+          setOn('admins_only', j.links?.only_admin_links);
+          setOn('warning_on', j.links?.warning_enabled);
+          setVal('warning_text', j.links?.warning_text||'');
+          setOn('exceptions_on', j.links?.exceptions_enabled);
+
+          // RSS
+          // (feeds/Topic nur Info; Formular nutzt Add/Del)
+
+          // AI
+          setOn('ai_faq', j.ai?.faq);
+          setOn('ai_rss', j.ai?.rss);
+
+          // Mood
+          setVal('mood_topic', j.mood?.topic||'');
+          setVal('mood_question', j.mood?.question||'');
+
+          // Report
+          setOn('daily_stats', j.daily_stats);
+
+          saveLocal(collect()); // lokalen Stand aktualisieren
+        }
+      }catch(e){ console.warn('loadState failed', e); }
+    }
+    function setOn(id,v){ const el=document.getElementById(id); if(el) el.checked=!!v; }
+    function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=(v??""); }
+
+    // FAQ Staging (lokal)
+    document.getElementById('faq_add').onclick = ()=>{ const s=load(); s.faq_add={ q:val('faq_q'), a:val('faq_a') }; saveLocal(s); alert('FAQ zum Senden vorgemerkt. „Speichern“ drücken.'); };
+    document.getElementById('faq_del').onclick = ()=>{ const s=load(); s.faq_del={ q:val('faq_q') }; saveLocal(s); alert('FAQ-Löschung vorgemerkt. „Speichern“ drücken.'); };
+    function val(id){ const el=document.getElementById(id); return el? (el.type==='checkbox'? el.checked : (el.value||'').trim()) : undefined }
 
     function collect(){
-      const get = id=>{
-        const el=document.getElementById(id);
-        return el? (el.type==='checkbox'? el.checked : el.value.trim()) : undefined
-      };
       const payload = {
         cid, title,
+        welcome_on:val('welcome_on'), welcome_text:val('welcome_text'),
+        farewell_on:val('farewell_on'), farewell_text:val('farewell_text'),
+        rules_on:val('rules_on'), rules_text:val('rules_text'), clean_deleted:val('clean_deleted'),
 
-        // Welcome/Farewell/Rules
-        welcome_on:get('welcome_on'), welcome_text:get('welcome_text'),
-        farewell_on:get('farewell_on'), farewell_text:get('farewell_text'),
-        rules_on:get('rules_on'), rules_text:get('rules_text'), clean_deleted:get('clean_deleted'),
+        admins_only:val('admins_only'), warning_on:val('warning_on'), warning_text:val('warning_text'), exceptions_on:val('exceptions_on'),
+        whitelist:val('whitelist'), blacklist:val('blacklist'), topic_id:val('topic_id'),
+        spam_action:val('spam_action'), topic_limit:val('topic_limit'), quota_notify:val('quota_notify'),
 
-        // Spam global
-        admins_only:get('admins_only'),
-        warning_on:get('warning_on'),
-        warning_text:get('warning_text'),
-        exceptions_on:get('exceptions_on'),
+        rss_images:val('rss_images'), rss_add:val('rss_add'), rss_del:val('rss_del'),
+        ai_faq:val('ai_faq'), ai_rss:val('ai_rss'),
+        faq_add: (load().faq_add||null), faq_del:(load().faq_del||null),
 
-        // Spam topic override
-        whitelist:get('whitelist'),
-        blacklist:get('blacklist'),
-        topic_id:get('topic_id'),
-        spam_action:get('spam_action'),
-        topic_limit:get('topic_limit'),
-        quota_notify:get('quota_notify'),
+        daily_stats:val('daily_stats'),
 
-        // RSS / AI / FAQ / Stats / Mood
-        rss_images:get('rss_images'), rss_add:get('rss_add'), rss_del:get('rss_del'),
-        ai_faq:get('ai_faq'), ai_rss:get('ai_rss'),
-        faq_add: load().faq_add || null, faq_del: load().faq_del || null,
-        daily_stats:get('daily_stats'),
-        mood_topic:get('mood_topic'), mood_question:get('mood_question'),
+        mood_topic:val('mood_topic'), mood_question:val('mood_question'),
 
-        // Sprache / Nacht / Router
-        language:get('language'),
-        night: { on:get('night_on'), start:get('night_start'), end:get('night_end'), days:get('night_days') },
-        router_rule:get('router_rule'),
-
-        // housekeeping
+        language:val('language'),
+        night:{ on:val('night_on'), start:val('night_start'), end:val('night_end'), days:val('night_days') },
+        router_rule:val('router_rule'),
         t:Date.now(), by: user? user.id : null
       };
       saveLocal(payload);
       return payload;
     }
 
+    let saving=false;
     async function save(){
+      if(saving) return;
+      saving=true;
       const payload = collect();
-      if(tg){
-        try{
-          tg.HapticFeedback.impactOccurred('medium');
-          tg.sendData(JSON.stringify(payload)); // → update.message.web_app_data.data
-          tg.close();
-          return;
-        }catch(e){ console.error(e) }
+      try{
+        tg?.HapticFeedback?.impactOccurred?.('medium');
+        if(tg){
+          tg.sendData(JSON.stringify(payload)); // → bot speichert
+          // kurze Verzögerung, damit das Telegram-Event raus ist
+          setTimeout(()=>{ try{ tg.close(); }catch{} }, 80);
+        }else{
+          alert('Gespeichert (lokal). Öffne die Mini-App bitte aus Telegram, damit der Bot speichern kann.');
+        }
+      }catch(e){
+        console.error(e);
+        alert('Senden fehlgeschlagen – Daten lokal zwischengespeichert.');
+      }finally{
+        saving=false;
       }
-      alert('Gespeichert (lokal). In Telegram wird an den Bot gesendet.');
+    }
+
+    async function loadStats(){
+      const days = parseInt(document.getElementById('days').value||'14',10);
+      const out = document.getElementById('statsOut');
+      if(!apiBase || !cid || !user){ out.textContent='Keine API/UID/CID – Stats nicht verfügbar.'; return; }
+      out.textContent = 'Lade…';
+      try{
+        const u = `${apiBase}/miniapp/stats?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(user.id)}&days=${days}`;
+        const r = await fetch(u, {headers:{"X-Telegram-Init-Data": tg.initData || ""}});
+        const j = await r.json();
+        if(j?.error){ out.textContent = 'Fehler: '+j.error; return; }
+        const rows = (j.agg||[]);
+        let html = '';
+        html += `<div class="dim">Report aktiv: <b>${j.daily_stats_enabled?'Ja':'Nein'}</b></div>`;
+        if(rows.length){
+          html += `<table class="table"><thead><tr><th>Datum</th><th>Msgs</th><th>Active</th><th>Joins</th><th>Leaves</th><th>Kicks</th><th>p90 Reply (ms)</th><th>Spam</th></tr></thead><tbody>`;
+          for(const r of rows){
+            html += `<tr><td>${r.date}</td><td>${r.messages}</td><td>${r.active}</td><td>${r.joins}</td><td>${r.leaves}</td><td>${r.kicks}</td><td>${r.reply_p90_ms??'–'}</td><td>${r.spam_actions}</td></tr>`;
+          }
+          html += `</tbody></table>`;
+        }else{
+          html += `<div class="dim">Keine aggregierten Tagesdaten.</div>`;
+        }
+        const top = (j.top_responders||[]);
+        if(top.length){
+          html += `<h4>Top-Responder</h4><table class="table"><thead><tr><th>User-ID</th><th>Antworten</th><th>Ø-ms</th></tr></thead><tbody>`;
+          for(const t of top){ html += `<tr><td class="mono">${t.user_id}</td><td>${t.answers}</td><td>${t.avg_ms}</td></tr>`; }
+          html += `</tbody></table>`;
+        }
+        out.innerHTML = html;
+      }catch(e){
+        console.error(e); out.textContent='Fehler beim Laden.';
+      }
     }
 
     document.getElementById('saveBtn').onclick = save;
     document.getElementById('closeBtn').onclick = ()=> tg? tg.close() : window.close();
     document.getElementById('resetBtn').onclick = ()=>{ localStorage.removeItem(storeKey); location.reload() };
+    document.getElementById('loadStats').onclick = loadStats;
+
+    // beim Laden direkt State ziehen
+    loadState();
   </script>
 </body>
 </html>
-
