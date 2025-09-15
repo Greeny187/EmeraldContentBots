@@ -1,391 +1,402 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Emerald • Gruppen-Mini-App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="utf-8">
+  <title>Emerald Content – Mini-App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root{--bg:#0f1217;--card:#151a22;--muted:#97a0af;--text:#eaf0ff;--brand:#2ea6ff;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;--ring:#2b3340;--input:#0b0e12;--radius:16px}
-    *{box-sizing:border-box} html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial}
-    a{color:var(--brand);text-decoration:none}
-    .wrap{max-width:960px;margin:0 auto;padding:16px}
-    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
-    .title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-    .title h1{font-size:18px;margin:0}
-    .pill{padding:6px 10px;border-radius:999px;background:#0b0e12;border:1px solid var(--ring);color:var(--muted)}
-    .sub{color:var(--muted);font-size:13px}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
-    .tab{padding:8px 12px;border:1px solid var(--ring);border-radius:999px;background:#0b0e12;color:var(--muted);cursor:pointer}
-    .tab.active{background:var(--brand);color:white;border-color:var(--brand)}
-    .section{display:none}.section.active{display:block}
-    .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin:10px 0}
-    .row.single{grid-template-columns:1fr}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    textarea,.input,select{width:100%;background:var(--input);color:var(--text);border:1px solid var(--ring);border-radius:12px;padding:10px 12px;outline:none}
-    textarea{min-height:90px}
-    .hint{font-size:12px;color:var(--muted)}
-    .hr{height:1px;background:#222a34;margin:14px 0}
-    .switch{position:relative;display:inline-block;width:44px;height:26px}
-    .switch input{opacity:0;width:0;height:0}
-    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#3a414d;transition:.2s;border-radius:99px}
-    .slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s}
-    input:checked + .slider{background:var(--ok)} input:checked + .slider:before{transform:translateX(18px)}
-    .footer{margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center}
+    :root{
+      --bg:#0a0f14;
+      --panel:#0e141b;
+      --ring:#243041;
+      --text:#d7e0ea;
+      --muted:#9aa7b5;
+      --brand:#22c55e;
+      --danger:#ef4444;
+      --yellow:#f59e0b;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    h1{font-size:22px;margin:0 0 12px}
+    h2{font-size:16px;margin:10px 0}
+    .row{display:block;margin:10px 0}
+    .row.single{margin:14px 0}
+    .card{background:var(--panel);border:1px solid var(--ring);border-radius:14px;padding:12px}
+    .stack{display:flex;gap:8px;align-items:center}
+    .muted{color:var(--muted)}
+    .dim{opacity:.8}
     .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--ring);background:#0b0e12;color:var(--text);cursor:pointer}
-    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#031406}
     .btn.ghost{background:transparent}
-    .row .stack{display:flex;gap:8px;align-items:center}
-    .code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12px;color:var(--muted)}
+    .btn.warn{background:transparent;border-color:var(--danger);color:var(--danger)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:10px 0 6px}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--ring);background:#0b0e12;cursor:pointer}
+    .tab.active{background:var(--brand);border-color:var(--brand);color:#031406}
+    .section{display:none}
+    .section.active{display:block}
+    label.switch{display:inline-flex;align-items:center;gap:8px;user-select:none;cursor:pointer}
+    input[type="text"],input[type="url"],textarea,select{
+      width:100%;box-sizing:border-box;background:#0b0e12;border:1px solid var(--ring);color:var(--text);
+      border-radius:10px;padding:10px;outline:none
+    }
+    textarea{min-height:110px;resize:vertical}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .table{width:100%;border-collapse:collapse;margin-top:8px}
     .table th,.table td{border:1px solid #2a3240;padding:6px 8px;text-align:left;font-size:13px}
     .table th{background:#0b0e12}
-    .dim{opacity:.8}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .footer{margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center}
+    .hint{font-size:12px}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <div class="title">
-        <div>
-          <h1>Gruppen-Mini-App</h1>
-          <div class="sub" id="groupLine">–</div>
-        </div>
-        <span class="pill" id="userLine">–</span>
+    <h1>Emerald Content – Mini-App</h1>
+
+    <div class="toolbar">
+      <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
+      <button class="btn" id="closeBtn">Schließen</button>
+      <button class="btn primary" id="saveBtn">Speichern</button>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+
+    <!-- SECTIONS -->
+    <section id="sec-welcome" class="section card">
+      <h2>Begrüßung</h2>
+      <label class="switch row"><input type="checkbox" id="welcome_on" data-key="welcome.on"> Aktiv</label>
+      <div class="row">
+        <label>Text</label>
+        <textarea id="welcome_text" data-key="welcome.text" placeholder="Willkommenstext …"></textarea>
+        <div class="hint muted">Hinweis: Bilder für die Begrüßung werden weiterhin via Telegram gesendet. Hier siehst du nur die gespeicherte Vorschau.</div>
       </div>
+      <div id="welcome_preview_wrap" class="row" style="display:none">
+        <img id="welcome_preview" alt="Welcome Bild" style="max-width:100%;border-radius:12px">
+      </div>
+    </section>
 
-      <div class="tabs" id="tabs"></div>
+    <section id="sec-rules" class="section card">
+      <h2>Regeln</h2>
+      <label class="switch row"><input type="checkbox" id="rules_on" data-key="rules.on"> Aktiv</label>
+      <div class="row">
+        <label>Text</label>
+        <textarea id="rules_text" data-key="rules.text" placeholder="Regeltext …"></textarea>
+      </div>
+    </section>
 
-      <!-- Begrüßung / Abschied -->
-      <section class="section" id="sec-welcome">
-        <div class="row"><label>Begrüßung aktiv</label><label class="switch"><input id="welcome_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="row single"><textarea id="welcome_text" placeholder="Willkommen {user} 👋">Willkommen {user} 👋</textarea><div class="hint">Platzhalter: <span class="code">{user}</span></div></div>
-        <div class="hr"></div>
-        <div class="row"><label>Abschied aktiv</label><label class="switch"><input id="farewell_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="row single"><textarea id="farewell_text" placeholder="Schade {user}, bis bald!">Schade {user}, bis bald!</textarea></div>
-      </section>
+    <section id="sec-farewell" class="section card">
+      <h2>Verabschiedung</h2>
+      <label class="switch row"><input type="checkbox" id="farewell_on" data-key="farewell.on"> Aktiv</label>
+      <div class="row">
+        <label>Text</label>
+        <textarea id="farewell_text" data-key="farewell.text" placeholder="Verabschiedungstext …"></textarea>
+      </div>
+    </section>
 
-      <!-- Regeln -->
-      <section class="section" id="sec-rules">
-        <div class="row"><label>Regeln aktiv</label><label class="switch"><input id="rules_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="row single"><textarea id="rules_text" placeholder="Regeln …"></textarea></div>
-        <div class="hr"></div>
-        <div class="row"><label>Gelöschte bereinigen</label><label class="switch"><input id="clean_deleted" type="checkbox"><span class="slider"></span></label></div>
-      </section>
+    <section id="sec-spam" class="section card">
+      <h2>Spam</h2>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" id="spam_on" data-key="spam.on"> Spam-Filter aktiv</label>
+        <label class="switch"><input type="checkbox" id="spam_links" data-key="spam.block_links"> Links blockieren</label>
+        <label class="switch"><input type="checkbox" id="spam_media" data-key="spam.block_media"> Medien blockieren</label>
+        <label class="switch"><input type="checkbox" id="spam_invites" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
+      </div>
+      <div class="row">
+        <label>Policy-Topic (ID)</label>
+        <input type="text" id="spam_policy_topic" data-key="spam.policy_topic" placeholder="z.B. 123">
+      </div>
+    </section>
 
-      <!-- Spamfilter -->
-      <section class="section" id="sec-spam">
-        <div class="row"><label>Nur Admins dürfen Links</label><label class="switch"><input id="admins_only" type="checkbox"><span class="slider"></span></label></div>
-        <div class="row"><label>Warnhinweis anzeigen</label><label class="switch"><input id="warning_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="row single"><textarea id="warning_text" placeholder="⚠️ Nur Admins dürfen Links posten."></textarea></div>
-        <div class="row"><label>Ausnahmen erlauben</label><label class="switch"><input id="exceptions_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="hr"></div>
-        <div class="grid2">
-          <div><label>Whitelist (Domains, eine pro Zeile)</label><textarea id="whitelist" placeholder="beispiel.de&#10;*.schule.de"></textarea></div>
-          <div><label>Blacklist (Domains, eine pro Zeile)</label><textarea id="blacklist" placeholder="spam.tld&#10;kurz.link"></textarea></div>
-        </div>
-        <div class="row">
-          <div class="stack"><label for="topic_id">Für Topic-ID anwenden (optional):</label><input id="topic_id" class="input" placeholder="z. B. 123"></div>
-          <span class="hint">leer = ignorieren, 0 = globaler Override</span>
-        </div>
-        <div class="grid2">
-          <div>
-            <label>Aktion bei Verstoß</label>
-            <select id="spam_action" class="input">
-              <option value="">(unverändert)</option>
-              <option value="delete">Löschen</option>
-              <option value="mute">Stumm 60 Min</option>
-            </select>
+    <section id="sec-rss" class="section card">
+      <h2>RSS</h2>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" id="rss_on" data-key="rss.on"> RSS aktiv</label>
+        <label class="switch"><input type="checkbox" id="rss_images" data-key="rss.post_images"> Bilder posten</label>
+      </div>
+      <div class="row">
+        <label>Feed-URL</label>
+        <input type="url" id="rss_url" data-key="rss.url" placeholder="https://…">
+      </div>
+      <div class="row">
+        <label>Intervall (Minuten)</label>
+        <input type="text" id="rss_interval" data-key="rss.interval" placeholder="z.B. 10">
+      </div>
+    </section>
+
+    <section id="sec-ai" class="section card">
+      <h2>KI</h2>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" id="ai_on" data-key="ai.on"> KI-Features aktiv</label>
+        <label class="switch"><input type="checkbox" id="ai_auto_mod" data-key="ai.moderation"> Auto-Moderation</label>
+      </div>
+      <div class="row">
+        <label>FAQ Prompt / Wissensbasis</label>
+        <textarea id="ai_faq" data-key="ai.faq" placeholder="Frage-Antwort-Wissen …"></textarea>
+      </div>
+    </section>
+
+    <section id="sec-faq" class="section card">
+      <h2>FAQ</h2>
+      <div class="row">
+        <label>FAQ-Text</label>
+        <textarea id="faq_text" data-key="faq.text" placeholder="FAQ …"></textarea>
+      </div>
+    </section>
+
+    <section id="sec-stats" class="section card">
+      <h2>Report / Stats</h2>
+      <div class="row stack">
+        <button class="btn" id="loadStats">Neu laden</button>
+        <span class="muted">zeigt Tageskennzahlen (letzte 24–48h)</span>
+      </div>
+      <div id="statsOut" class="row mono"></div>
+    </section>
+
+    <section id="sec-mood" class="section card">
+      <h2>Mood</h2>
+      <label class="switch row"><input type="checkbox" id="mood_on" data-key="mood.on"> Mood-Posts aktiv</label>
+      <div class="row">
+        <label>Stimmungstext (Template)</label>
+        <textarea id="mood_text" data-key="mood.text" placeholder="Textvorlage …"></textarea>
+      </div>
+    </section>
+
+    <section id="sec-more" class="section card">
+      <h2>Mehr</h2>
+      <div class="row">
+        <div class="muted">Website: <a href="https://greeny187.github.io/EmeraldContentBots/" target="_blank">greeny187.github.io/GreenyManagementBots</a></div>
+        <div class="muted">Support: <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Telegram</a></div>
+      </div>
+    </section>
+
+    <section id="sec-pro" class="section card">
+      <h2>Pro</h2>
+      <div id="proInfo" class="row single"></div>
+      <div id="adBanner" class="row single" style="display:none">
+        <div class="card" style="padding:16px;border-radius:12px">
+          <b>Unterstütze das Projekt & werde Pro</b>
+          <p class="dim">Free-Nutzer sehen dieses Fenster. Mit Pro blendest du Werbung aus und schaltest erweiterte Funktionen (z. B. KI-Features, längere Statistiken) frei.</p>
+          <ul style="margin:0 0 8px 18px">
+            <li>Website: <a href="https://greeny187.github.io/EmeraldContentBots/" target="_blank">Infos</a></li>
+            <li>TON-Wallet: <code class="mono">UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></li>
+            <li>PayPal: <code class="mono">greeny187@outlook.de</code></li>
+            <li>Support: <a href="https://t.me/+DkUfIvjyej8zNGVi" target="_blank">Telegram</a></li>
+          </ul>
+          <div class="row stack">
+            <button class="btn" id="buyPro1">Jetzt Pro (1&nbsp;Monat)</button>
+            <button class="btn" id="buyPro12">Pro (12&nbsp;Monate)</button>
           </div>
-          <div><label>Tageslimit/Topic</label><input id="topic_limit" type="number" min="0" class="input" placeholder="0 = aus"></div>
-        </div>
-        <div class="row">
-          <label>Benachrichtigung</label>
-          <select id="quota_notify" class="input">
-            <option value="">(unverändert)</option>
-            <option value="off">Aus</option>
-            <option value="smart">Smart</option>
-            <option value="always">Immer</option>
-          </select>
-        </div>
-      </section>
-
-      <!-- RSS -->
-      <section class="section" id="sec-rss">
-        <div class="row"><label>Bilder in RSS-Beiträgen</label><label class="switch"><input id="rss_images" type="checkbox" checked><span class="slider"></span></label></div>
-        <div class="grid2">
-          <div><label>Feeds hinzufügen (eine URL pro Zeile)</label><textarea id="rss_add" placeholder="https://example.com/feed.xml&#10;https://…"></textarea></div>
-          <div><label>Feeds entfernen (eine URL pro Zeile)</label><textarea id="rss_del" placeholder="https://example.com/feed.xml"></textarea></div>
-        </div>
-      </section>
-
-      <!-- KI -->
-      <section class="section" id="sec-ai">
-        <div class="row"><label>FAQ-KI Fallback</label><label class="switch"><input id="ai_faq" type="checkbox" checked><span class="slider"></span></label></div>
-        <div class="row"><label>RSS-Zusammenfassung per KI</label><label class="switch"><input id="ai_rss" type="checkbox"><span class="slider"></span></label></div>
-      </section>
-
-      <!-- FAQ Verwaltung -->
-      <section class="section" id="sec-faq">
-        <div class="row single"><input id="faq_q" class="input" placeholder="Frage (Schlüssel)"></div>
-        <div class="row single"><textarea id="faq_a" placeholder="Antwort (HTML erlaubt)"></textarea></div>
-        <div class="row">
-          <button class="btn" id="faq_add">FAQ hinzufügen/ersetzen</button>
-          <button class="btn" id="faq_del">FAQ löschen</button>
-        </div>
-        <div class="hint">Bestehende FAQs werden nicht geladen – du kannst neue hinzufügen oder bekannte Schlüssel löschen.</div>
-      </section>
-
-      <!-- Statistiken / Report -->
-      <section class="section" id="sec-stats">
-        <div class="row">
-          <label>Tagesreport (DM an Admins)</label><label class="switch"><input id="daily_stats" type="checkbox"><span class="slider"></span></label>
-        </div>
-        <div class="row">
-          <div class="stack">
-            <label for="days">Zeitraum (Tage)</label>
-            <input id="days" type="number" class="input" value="14" min="1" max="60" style="width:100px">
-          </div>
-          <button class="btn" id="loadStats">Laden</button>
-        </div>
-        <div id="statsOut" class="mono dim">Keine Daten geladen.</div>
-      </section>
-
-      <!-- Mood -->
-      <section class="section" id="sec-mood">
-        <div class="row">
-          <div class="stack"><label for="mood_topic">Topic-ID</label><input id="mood_topic" class="input" placeholder="z. B. 123"></div>
-          <span class="hint">Pflicht für Foren-Gruppen</span>
-        </div>
-        <div class="row single"><textarea id="mood_question" placeholder="Tagesfrage…">Wie war dein Tag von 1–5?</textarea></div>
-      </section>
-
-      <!-- Mehr -->
-      <section class="section" id="sec-more">
-        <div class="row">
-          <label>Sprache</label>
-          <select id="language" class="input">
-            <option value="de" selected>Deutsch</option>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="ru">Русский</option>
-          </select>
-        </div>
-        <div class="hr"></div>
-        <div class="row"><label>Nachtmodus aktiv</label><label class="switch"><input id="night_on" type="checkbox"><span class="slider"></span></label></div>
-        <div class="grid2">
-          <div><label>Start (HH:MM)</label><input id="night_start" class="input" placeholder="22:00"></div>
-          <div><label>Ende (HH:MM)</label><input id="night_end" class="input" placeholder="07:00"></div>
-        </div>
-        <div class="row single"><input id="night_days" class="input" placeholder="Tage, z. B. 1,2,3,4,5 (Mo–Fr)"><div class="hint">1=Mo … 7=So, leer = täglich (Serverseitig derzeit ohne Wirkung)</div></div>
-        <div class="hr"></div>
-        <div class="row single"><textarea id="router_rule" placeholder="Router-Regel: Wenn Text enthält → Topic-ID, z. B.:
-#job → 101
-angebot → 102"></textarea></div>
-      </section>
-
-      <div class="footer">
-        <button id="closeBtn" class="btn ghost">Schließen</button>
-        <div style="display:flex;gap:8px">
-          <button id="resetBtn" class="btn">Zurücksetzen</button>
-          <button id="saveBtn" class="btn primary">Speichern</button>
+          <div class="hint muted">Hinweis: Diese Buttons senden den Kaufwunsch an den Bot (WebAppData). Die tatsächliche Bezahlung kannst du später mit Telegram Stars / TON / PayPal verknüpfen.</div>
         </div>
       </div>
+    </section>
+
+    <div class="footer">
+      <span class="muted hint">© Emerald Content</span>
+      <span id="out" class="muted hint"></span>
     </div>
   </div>
 
   <script>
-    const tg = window.Telegram?.WebApp || null;
-    if(!tg){ document.body.innerHTML='<div style="padding:20px;font:16px system-ui">❌ Diese Mini-App kann nur aus Telegram heraus geöffnet werden.</div>'; }
-
-    if(tg){
-      tg.expand(); tg.setHeaderColor('#0b0e12'); tg.setBackgroundColor('#0f1217'); tg.MainButton.hide();
-    }
+    const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
+    if (tg){ try{ tg.expand(); tg.enableClosingConfirmation(); }catch{} }
+    const storeKey = "emerald-miniapp-cache";
 
     // Tabs
-    const tabs = [['welcome','Begrüßung'],['rules','Regeln'],['spam','Spam'],['rss','RSS'],['ai','KI'],['faq','FAQ'],['stats','Report'],['mood','Mood'],['more','Mehr']];
-    const tabsEl = document.getElementById('tabs');
-    function selectTab(key){
-      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.key===key));
-      document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id==='sec-'+key));
+    const TABS = [
+      ['welcome','Begrüßung'],
+      ['rules','Regeln'],
+      ['farewell','Verabschiedung'],
+      ['spam','Spam'],
+      ['rss','RSS'],
+      ['ai','KI'],
+      ['faq','FAQ'],
+      ['stats','Report'],
+      ['mood','Mood'],
+      ['more','Mehr'],
+      ['pro','Pro']
+    ];
+
+    // Utilities
+    const qs = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
+    function getUrlParam(name, def=null){
+      const u = new URL(location.href);
+      return u.searchParams.get(name) ?? def;
     }
-    tabs.forEach(([key,label],i)=>{ const b=document.createElement('button'); b.className='tab'+(i===0?' active':''); b.dataset.key=key; b.textContent=label; b.onclick=()=>selectTab(key); tabsEl.appendChild(b); });
-    selectTab('welcome');
+    const cid = getUrlParam("cid","");
+    const API_BASE = ""; // relative zum Bot-Server
 
-    // Params & Kontext
-    const qp = new URLSearchParams(location.search);
-    const cid = qp.get('cid');
-    const apiBase = (qp.get('api')||'').replace(/\/+$/,''); // vom Bot mitgegeben
-    const title = decodeURIComponent(qp.get('title')||'').trim();
-    const user = tg?.initDataUnsafe?.user || null;
-    document.getElementById('groupLine').textContent = title ? `${title} (ID ${cid||'?'})` : (cid?`Gruppen-ID ${cid}`:'Keine Gruppe übergeben');
-    document.getElementById('userLine').textContent  = user ? `@${user.username||user.first_name}` : 'ohne Telegram-Kontext';
-
-    const storeKey = cid ? `miniapp:${cid}` : 'miniapp:demo';
-    function load(){ try{ return JSON.parse(localStorage.getItem(storeKey))||{} }catch{ return {} } }
-    function saveLocal(v){ localStorage.setItem(storeKey, JSON.stringify(v)) }
-
-    // Defaults setzen
-    (function init(){
-      const s = load();
-      const def = {
-        welcome_on:true, welcome_text:'Willkommen {user} 👋',
-        farewell_on:false, farewell_text:'Schade {user}, bis bald!',
-        rules_on:false, rules_text:'', clean_deleted:false,
-        admins_only:false, warning_on:false, warning_text:'', exceptions_on:false,
-        whitelist:'', blacklist:'', topic_id:'', spam_action:'', topic_limit:'', quota_notify:'',
-        rss_images:true, rss_add:'', rss_del:'',
-        ai_faq:true, ai_rss:false,
-        faq_q:'', faq_a:'',
-        daily_stats:false,
-        mood_topic:'', mood_question:'Wie war dein Tag von 1–5?',
-        language:'de',
-        night_on:false, night_start:'22:00', night_end:'07:00', night_days:'',
-        router_rule:''
-      };
-      for(const [k,v] of Object.entries(def)){
-        const el=document.getElementById(k); if(!el) continue;
-        const cur = (k in s)? s[k] : v;
-        if(el.type==='checkbox'){ el.checked=!!cur } else { el.value=cur }
+    // Tabs rendern
+    (function renderTabs(){
+      const c = document.getElementById("tabs");
+      c.innerHTML = "";
+      TABS.forEach(([key,label],i)=>{
+        const b = document.createElement("button");
+        b.className = "tab" + (i===0 ? " active":"");
+        b.textContent = label;
+        b.dataset.key = key;
+        b.onclick = ()=>{
+          qsa(".tab").forEach(x=>x.classList.remove("active"));
+          b.classList.add("active");
+          qsa(".section").forEach(x=>x.classList.remove("active"));
+          qs("#sec-"+key).classList.add("active");
+          localStorage.setItem("emerald-tab", key);
+        };
+        c.appendChild(b);
+      });
+      const last = localStorage.getItem("emerald-tab");
+      if (last){
+        const btn = qsa(".tab").find(x=>x.dataset.key===last);
+        if (btn) btn.click();
+        else qs(".tab").click();
+      } else {
+        qs(".tab").click();
       }
     })();
 
-    // Server-State laden (falls apiBase & user vorhanden)
-    async function loadState(){
-      if(!apiBase || !cid || !user) return;
-      try{
-        const u = `${apiBase}/miniapp/state?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(user.id)}`;
-        const r = await fetch(u, {headers:{"X-Telegram-Init-Data": tg.initData || ""}});
-        const j = await r.json();
-        if(j && !j.error){
-          // Welcome/Rules/Farewell
-          setOn('welcome_on', j.welcome?.on); setVal('welcome_text', j.welcome?.text||'');
-          setOn('rules_on', j.rules?.on);     setVal('rules_text', j.rules?.text||'');
-          setOn('farewell_on', j.farewell?.on); setVal('farewell_text', j.farewell?.text||'');
-
-          // Links
-          setOn('admins_only', j.links?.only_admin_links);
-          setOn('warning_on', j.links?.warning_enabled);
-          setVal('warning_text', j.links?.warning_text||'');
-          setOn('exceptions_on', j.links?.exceptions_enabled);
-
-          // RSS
-          // (feeds/Topic nur Info; Formular nutzt Add/Del)
-
-          // AI
-          setOn('ai_faq', j.ai?.faq);
-          setOn('ai_rss', j.ai?.rss);
-
-          // Mood
-          setVal('mood_topic', j.mood?.topic||'');
-          setVal('mood_question', j.mood?.question||'');
-
-          // Report
-          setOn('daily_stats', j.daily_stats);
-
-          saveLocal(collect()); // lokalen Stand aktualisieren
-        }
-      }catch(e){ console.warn('loadState failed', e); }
+    function setVal(keyPath, val){
+      const el = document.querySelector(`[data-key="${keyPath}"]`);
+      if (!el) return;
+      if (el.type === "checkbox") el.checked = !!val;
+      else el.value = (val ?? "");
     }
-    function setOn(id,v){ const el=document.getElementById(id); if(el) el.checked=!!v; }
-    function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=(v??""); }
-
-    // FAQ Staging (lokal)
-    document.getElementById('faq_add').onclick = ()=>{ const s=load(); s.faq_add={ q:val('faq_q'), a:val('faq_a') }; saveLocal(s); alert('FAQ zum Senden vorgemerkt. „Speichern“ drücken.'); };
-    document.getElementById('faq_del').onclick = ()=>{ const s=load(); s.faq_del={ q:val('faq_q') }; saveLocal(s); alert('FAQ-Löschung vorgemerkt. „Speichern“ drücken.'); };
-    function val(id){ const el=document.getElementById(id); return el? (el.type==='checkbox'? el.checked : (el.value||'').trim()) : undefined }
-
+    function getVal(el){
+      if (!el) return undefined;
+      if (el.type === "checkbox") return !!el.checked;
+      return el.value;
+    }
     function collect(){
-      const payload = {
-        cid, title,
-        welcome_on:val('welcome_on'), welcome_text:val('welcome_text'),
-        farewell_on:val('farewell_on'), farewell_text:val('farewell_text'),
-        rules_on:val('rules_on'), rules_text:val('rules_text'), clean_deleted:val('clean_deleted'),
-
-        admins_only:val('admins_only'), warning_on:val('warning_on'), warning_text:val('warning_text'), exceptions_on:val('exceptions_on'),
-        whitelist:val('whitelist'), blacklist:val('blacklist'), topic_id:val('topic_id'),
-        spam_action:val('spam_action'), topic_limit:val('topic_limit'), quota_notify:val('quota_notify'),
-
-        rss_images:val('rss_images'), rss_add:val('rss_add'), rss_del:val('rss_del'),
-        ai_faq:val('ai_faq'), ai_rss:val('ai_rss'),
-        faq_add: (load().faq_add||null), faq_del:(load().faq_del||null),
-
-        daily_stats:val('daily_stats'),
-
-        mood_topic:val('mood_topic'), mood_question:val('mood_question'),
-
-        language:val('language'),
-        night:{ on:val('night_on'), start:val('night_start'), end:val('night_end'), days:val('night_days') },
-        router_rule:val('router_rule'),
-        t:Date.now(), by: user? user.id : null
-      };
-      saveLocal(payload);
-      return payload;
+      // Sammelt alle Felder mit data-key="a.b.c" in ein verschachteltes Objekt
+      const out = {};
+      qsa("[data-key]").forEach(el=>{
+        const path = el.dataset.key.split(".");
+        let ref = out;
+        for (let i=0;i<path.length;i++){
+          const k = path[i];
+          if (i===path.length-1){
+            ref[k] = getVal(el);
+          } else {
+            if (!ref[k] || typeof ref[k] !== "object") ref[k] = {};
+            ref = ref[k];
+          }
+        }
+      });
+      return out;
     }
 
-    let saving=false;
-    async function save(){
-      if(saving) return;
-      saving=true;
-      const payload = collect();
+    async function loadState(){
+      const out = document.getElementById("out");
+      out.textContent = "Lade …";
       try{
-        tg?.HapticFeedback?.impactOccurred?.('medium');
-        if(tg){
-          tg.sendData(JSON.stringify(payload)); // → bot speichert
-          // kurze Verzögerung, damit das Telegram-Event raus ist
-          setTimeout(()=>{ try{ tg.close(); }catch{} }, 80);
-        }else{
-          alert('Gespeichert (lokal). Öffne die Mini-App bitte aus Telegram, damit der Bot speichern kann.');
+        const user = tg?.initDataUnsafe?.user;
+        const uid = user?.id || "";
+        const url = `${API_BASE}/miniapp/state` + (cid && uid ? `?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}` : "");
+        const r = await fetch(url, { method:"GET" });
+        const j = await r.json();
+
+        // Grunddaten auf Felder mappen (sofern vorhanden)
+        setVal("welcome.on", j.welcome?.on);
+        setVal("welcome.text", j.welcome?.text);
+        setVal("rules.on", j.rules?.on);
+        setVal("rules.text", j.rules?.text);
+        setVal("farewell.on", j.farewell?.on);
+        setVal("farewell.text", j.farewell?.text);
+
+        setVal("spam.on", j.spam?.on);
+        setVal("spam.block_links", j.spam?.block_links);
+        setVal("spam.block_media", j.spam?.block_media);
+        setVal("spam.block_invite_links", j.spam?.block_invite_links);
+        setVal("spam.policy_topic", j.spam?.policy_topic);
+
+        setVal("rss.on", j.rss?.on);
+        setVal("rss.post_images", j.rss?.post_images);
+        setVal("rss.url", j.rss?.url);
+        setVal("rss.interval", j.rss?.interval);
+
+        setVal("ai.on", j.ai?.on);
+        setVal("ai.moderation", j.ai?.moderation);
+        setVal("ai.faq", j.ai?.faq);
+
+        setVal("faq.text", j.faq?.text);
+        setVal("mood.on", j.mood?.on);
+        setVal("mood.text", j.mood?.text);
+
+        // Welcome Preview (sofern Foto hinterlegt)
+        if (j.welcome?.photo && j.welcome?.photo_id && cid && uid){
+          const src = `${API_BASE}/miniapp/file?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}&file_id=${encodeURIComponent(j.welcome.photo_id)}`;
+          const img = document.getElementById("welcome_preview");
+          const wrap = document.getElementById("welcome_preview_wrap");
+          if (img && wrap){ img.src = src; wrap.style.display = ""; }
         }
+
+        // Subscription / Pro
+        const sub = j.subscription || {active:false, tier:"free", valid_until:null};
+        const info = document.getElementById("proInfo");
+        if (info){
+          info.innerHTML = sub.active
+           ? (sub.valid_until ? `✅ <b>PRO</b> aktiv bis <span class="mono">${new Date(sub.valid_until).toLocaleString()}</span>` : `✅ <b>PRO</b> aktiv`)
+           : `❌ <b>Free</b> – einige Funktionen sind eingeschränkt`;
+        }
+        const ad = document.getElementById("adBanner");
+        if (ad) ad.style.display = sub.active ? "none" : "";
+
+        // Buy Buttons → sendData
+        const sendBuy = m => {
+          const payload = collect();
+          payload.pro_months = m;
+          if (tg) tg.sendData(JSON.stringify(payload));
+        };
+        document.getElementById("buyPro1")?.addEventListener("click", ()=>sendBuy(1));
+        document.getElementById("buyPro12")?.addEventListener("click", ()=>sendBuy(12));
+
+        out.textContent = "Bereit.";
       }catch(e){
         console.error(e);
-        alert('Senden fehlgeschlagen – Daten lokal zwischengespeichert.');
-      }finally{
-        saving=false;
+        out.textContent = "Fehler beim Laden.";
       }
     }
 
     async function loadStats(){
-      const days = parseInt(document.getElementById('days').value||'14',10);
-      const out = document.getElementById('statsOut');
-      if(!apiBase || !cid || !user){ out.textContent='Keine API/UID/CID – Stats nicht verfügbar.'; return; }
-      out.textContent = 'Lade…';
+      const out = document.getElementById("statsOut");
+      out.textContent = "Lade …";
       try{
-        const u = `${apiBase}/miniapp/stats?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(user.id)}&days=${days}`;
-        const r = await fetch(u, {headers:{"X-Telegram-Init-Data": tg.initData || ""}});
+        const user = tg?.initDataUnsafe?.user;
+        const uid = user?.id || "";
+        const url = `${API_BASE}/miniapp/stats` + (cid && uid ? `?cid=${encodeURIComponent(cid)}&uid=${encodeURIComponent(uid)}` : "");
+        const r = await fetch(url, { method:"GET" });
         const j = await r.json();
-        if(j?.error){ out.textContent = 'Fehler: '+j.error; return; }
-        const rows = (j.agg||[]);
-        let html = '';
-        html += `<div class="dim">Report aktiv: <b>${j.daily_stats_enabled?'Ja':'Nein'}</b></div>`;
-        if(rows.length){
-          html += `<table class="table"><thead><tr><th>Datum</th><th>Msgs</th><th>Active</th><th>Joins</th><th>Leaves</th><th>Kicks</th><th>p90 Reply (ms)</th><th>Spam</th></tr></thead><tbody>`;
-          for(const r of rows){
-            html += `<tr><td>${r.date}</td><td>${r.messages}</td><td>${r.active}</td><td>${r.joins}</td><td>${r.leaves}</td><td>${r.kicks}</td><td>${r.reply_p90_ms??'–'}</td><td>${r.spam_actions}</td></tr>`;
-          }
-          html += `</tbody></table>`;
-        }else{
-          html += `<div class="dim">Keine aggregierten Tagesdaten.</div>`;
-        }
-        const top = (j.top_responders||[]);
-        if(top.length){
-          html += `<h4>Top-Responder</h4><table class="table"><thead><tr><th>User-ID</th><th>Antworten</th><th>Ø-ms</th></tr></thead><tbody>`;
-          for(const t of top){ html += `<tr><td class="mono">${t.user_id}</td><td>${t.answers}</td><td>${t.avg_ms}</td></tr>`; }
-          html += `</tbody></table>`;
-        }
-        out.innerHTML = html;
+        out.textContent = JSON.stringify(j, null, 2);
       }catch(e){
-        console.error(e); out.textContent='Fehler beim Laden.';
+        console.error(e);
+        out.textContent = "Fehler beim Laden der Statistiken.";
       }
     }
 
-    document.getElementById('saveBtn').onclick = save;
-    document.getElementById('closeBtn').onclick = ()=> tg? tg.close() : window.close();
-    document.getElementById('resetBtn').onclick = ()=>{ localStorage.removeItem(storeKey); location.reload() };
-    document.getElementById('loadStats').onclick = loadStats;
+    function save(){
+      const payload = collect();
+      try{
+        if (tg){
+          tg.HapticFeedback?.impactOccurred?.("medium");
+          tg.sendData(JSON.stringify(payload));
+          document.getElementById("out").textContent = "Gesendet.";
+        }else{
+          alert("Bitte die Mini-App innerhalb von Telegram öffnen.");
+        }
+      }catch(e){
+        console.error(e);
+        document.getElementById("out").textContent = "Fehler beim Senden.";
+      }
+    }
 
-    // beim Laden direkt State ziehen
+    document.getElementById("saveBtn").onclick = save;
+    document.getElementById("closeBtn").onclick = ()=> tg ? tg.close() : window.close();
+    document.getElementById("resetBtn").onclick = ()=>{ localStorage.removeItem("emerald-tab"); location.reload() };
+    document.getElementById("loadStats").onclick = loadStats;
+
+    // Initial laden
     loadState();
   </script>
 </body>
