@@ -416,6 +416,26 @@ angebot → 102"></textarea></div>
 
     // beim Laden direkt State ziehen
     loadState();
+
+    function renderRssList(feeds) {
+      const box = document.getElementById('rssList');
+      if (!feeds || !feeds.length) {
+        box.innerHTML = "<p>Keine Feeds gespeichert.</p>";
+        return;
+      }
+      box.innerHTML = feeds.map(f => `
+        <div class="row">
+          <span class="mono">${f.url}</span>
+          <small>Topic: ${f.topic || 0}</small>
+          <button onclick="deleteRss('${encodeURIComponent(f.url)}')">Löschen</button>
+        </div>`).join("");
+    }
+    function deleteRss(encUrl) {
+      // bestehende Sendelogik wiederverwenden; MiniApp schließt sich danach – ok
+      document.getElementById('rss_del').value = decodeURIComponent(encUrl);
+      save(); // sendet web_app_data
+    }
+
   </script>
 </body>
 </html>
