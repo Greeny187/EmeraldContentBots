@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Emerald Content – Mini‑App</title>
+  <title>Emerald Content – Mini-App</title>
   <style>
     :root{
       --bg:#0b1220; --panel:#0f172a; --ring:#1f2937; --text:#e5e7eb; --muted:#94a3b8;
@@ -16,52 +16,55 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
-    .wrap{max-width:980px;margin:0 auto;padding:16px}
-    .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-start;margin:4px 0 14px}
-    .title{font-weight:700;font-size:20px;letter-spacing:.2px}
-    .btn{border:1px solid var(--ring);background:transparent;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer}
-    .btn.primary{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
-    .btn.ghost{opacity:.9}
-    .btn.small{padding:6px 9px;border-radius:10px}
-    .btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .wrap{max-width:980px;margin:0 auto;padding:16px 16px 80px}
+    .titlebar{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+    .title{font-weight:800;font-size:22px;letter-spacing:.2px}
+    .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+    .pill{border:1px solid var(--ring);background:#0000;color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .pill.active{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:760px){.grid{grid-template-columns:1fr}}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
     label{display:block;font-weight:600;margin:6px 0 6px;color:var(--muted)}
     input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{
       width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px
     }
     textarea{min-height:92px;resize:vertical}
-    .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
-    .pill{border:1px solid var(--ring);background:#0000;color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
-    .pill.active{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
-    section{display:none}
-    section.active{display:block}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .hint{font-size:12px;color:var(--muted)}
-    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
+    .switch{display:inline-flex;align-items:center;gap:6px}
+    .switch input{accent-color:var(--brand)}
+    .sep{height:1px;background:var(--ring);margin:10px 0}
     .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
     .item{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--ring);border-radius:12px;padding:8px 10px;background:#00000008}
     .item .left{display:flex;flex-direction:column;gap:4px;min-width:0}
     .item .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .switch{display:inline-flex;align-items:center;gap:6px}
-    .switch input{accent-color:var(--brand)}
-    .sep{height:1px;background:var(--ring);margin:10px 0}
-    .danger-text{color:var(--danger)}
-    footer{margin-top:12px;display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted)}
+    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
+
+    /* Footerbar mit Buttons unten */
+    .footerbar{
+      position:sticky; bottom:0; left:0; right:0;
+      background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.08)) , var(--bg);
+      border-top:1px solid var(--ring);
+      padding:10px 16px; display:flex; align-items:center; gap:12px;
+      backdrop-filter:saturate(120%) blur(6px);
+    }
+    .footerbar .right{margin-left:auto; display:flex; gap:8px}
+    .btn{border:1px solid var(--ring);background:transparent;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
+    .btn.ghost{opacity:.9}
+    .btn.small{padding:6px 9px;border-radius:10px}
+    .btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    /* Errors */
+    .input-error{border-color:var(--danger)!important; box-shadow:0 0 0 2px rgba(239,68,68,.2)}
+    .err{color:var(--danger); font-size:12px; margin:4px 2px 0}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="toolbar">
-      <div class="title">Emerald Content – Mini‑App</div>
-      <span style="flex:1"></span>
-      <button class="btn ghost" id="themeBtn" title="Hell/Dunkel umschalten">🌓</button>
-      <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
-      <button class="btn ghost" id="closeBtn">Schließen</button>
-      <button class="btn primary" id="saveBtn">Speichern</button>
-    </div>
+    <div class="titlebar"><div class="title">Mini-App</div></div>
 
     <div class="pillbar" id="tabs">
       <button class="pill active" data-tab="welcome">Begrüßung</button>
@@ -70,7 +73,7 @@
       <button class="pill" data-tab="spam">Spam</button>
       <button class="pill" data-tab="rss">RSS</button>
       <button class="pill" data-tab="ai">KI</button>
-      <button class="pill" data-tab="aimod">KI‑Moderation</button>
+      <button class="pill" data-tab="aimod">KI-Moderation</button>
       <button class="pill" data-tab="faq">FAQ</button>
       <button class="pill" data-tab="report">Report</button>
       <button class="pill" data-tab="mood">Mood</button>
@@ -111,16 +114,17 @@
     <!-- SPAM -->
     <section class="card" id="sec-spam">
       <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="spam.on"> Spam‑Filter aktiv</label>
+        <label class="switch"><input type="checkbox" data-key="spam.on"> Spam-Filter aktiv</label>
         <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (nur Admins)</label>
         <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
         <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
       </div>
       <div class="grid">
-        <label>Policy‑Topic (ID)
-          <input type="text" data-key="spam.policy_topic" placeholder="z.B. 123" />
+        <label>Policy-Topic (ID)
+          <input type="text" data-key="spam.policy_topic" data-validate="int" placeholder="z.B. 123" />
+          <div class="err" hidden id="err_spamtopic"></div>
         </label>
-        <label>Spam‑Aktion
+        <label>Spam-Aktion
           <select data-key="spam.action" id="spam_action">
             <option value="">—</option>
             <option value="delete">Löschen</option>
@@ -130,10 +134,10 @@
         </label>
       </div>
       <div class="grid">
-        <label>Whitelist‑Domains (eine pro Zeile)
+        <label>Whitelist-Domains (eine pro Zeile)
           <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
         </label>
-        <label>Blacklist‑Domains (eine pro Zeile)
+        <label>Blacklist-Domains (eine pro Zeile)
           <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
         </label>
       </div>
@@ -141,7 +145,7 @@
         <label>Tägliches Limit pro Nutzer
           <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
         </label>
-        <label>Quota‑Notify
+        <label>Quota-Notify
           <select data-key="spam.quota_notify" id="spam_quota">
             <option value="">—</option>
             <option value="off">Aus</option>
@@ -155,11 +159,13 @@
     <!-- RSS -->
     <section class="card" id="sec-rss">
       <div class="grid">
-        <label>RSS‑Feed URL
-          <input type="text" id="rss_url" placeholder="https://example.com/feed.xml"/>
+        <label>RSS-Feed URL
+          <input type="text" id="rss_url" data-validate="url" placeholder="https://example.com/feed.xml"/>
+          <div class="err" hidden id="err_rssurl"></div>
         </label>
         <label>Topic (ID)
-          <input type="text" id="rss_topic" placeholder="0 = Standard"/>
+          <input type="text" id="rss_topic" data-validate="int" placeholder="0 = Standard"/>
+          <div class="err" hidden id="err_rsstopic"></div>
         </label>
       </div>
       <div class="row">
@@ -172,23 +178,23 @@
       <div class="hint">Bestehende Feeds unten verwalten.</div>
     </section>
 
-    <!-- KI (Assistent/FAQ Umschalter) -->
+    <!-- KI -->
     <section class="card" id="sec-ai">
       <div class="row">
         <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
       </div>
-      <label>FAQ‑Hinweis / Prompt (optional)</label>
+      <label>FAQ-Hinweis / Prompt (optional)</label>
       <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
     </section>
 
-    <!-- KI‑Moderation -->
+    <!-- KI-Moderation -->
     <section class="card" id="sec-aimod">
       <div class="grid">
         <label class="switch"><input type="checkbox" data-key="ai_mod.enabled"> Aktiviert</label>
-        <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow‑Mode (nur loggen)</label>
+        <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow-Mode (nur loggen)</label>
       </div>
       <div class="grid">
-        <label>Primär‑Aktion
+        <label>Primär-Aktion
           <select data-key="ai_mod.action_primary">
             <option value="">—</option>
             <option value="delete">Löschen</option>
@@ -196,15 +202,15 @@
             <option value="mute">Stummschalten</option>
           </select>
         </label>
-        <label>Mute‑Minuten
+        <label>Mute-Minuten
           <input type="number" data-key="ai_mod.mute_minutes" min="0" placeholder="0 = aus" />
         </label>
       </div>
       <div class="grid">
         <label>Warntext
-          <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI‑Moderation)."/>
+          <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI-Moderation)."/>
         </label>
-        <label>Appeal‑URL
+        <label>Appeal-URL
           <input type="text" data-key="ai_mod.appeal_url" placeholder="https://…"/>
         </label>
       </div>
@@ -218,26 +224,26 @@
       </div>
       <div class="grid">
         <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_admins"> Admins ausnehmen</label>
-        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic‑Owner ausnehmen</label>
+        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic-Owner ausnehmen</label>
       </div>
       <div class="sep"></div>
       <div class="grid">
-        <label>Toxicity‑Schwelle
+        <label>Toxicity-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.toxicity" placeholder="0.90" />
         </label>
-        <label>Hate‑Schwelle
+        <label>Hate-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.hate" placeholder="0.85" />
         </label>
-        <label>Sexual‑Schwelle
+        <label>Sexual-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.sexual" placeholder="0.90" />
         </label>
-        <label>Harassment‑Schwelle
+        <label>Harassment-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.harassment" placeholder="0.90" />
         </label>
-        <label>Self‑Harm‑Schwelle
+        <label>Self-Harm-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.selfharm" placeholder="0.95" />
         </label>
-        <label>Violence‑Schwelle
+        <label>Violence-Schwelle
           <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.violence" placeholder="0.90" />
         </label>
       </div>
@@ -274,7 +280,8 @@
           <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung heute?" />
         </label>
         <label>Topic (ID)
-          <input type="text" data-key="mood.topic" placeholder="0 = Standard" />
+          <input type="text" data-key="mood.topic" data-validate="int" placeholder="0 = Standard" />
+          <div class="err" hidden id="err_moodtopic"></div>
         </label>
       </div>
     </section>
@@ -284,19 +291,21 @@
       <div class="grid">
         <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
         <label>Start (HH:MM)
-          <input type="text" data-key="night.start" placeholder="22:00" />
+          <input type="text" data-key="night.start" data-validate="time" placeholder="22:00" />
+          <div class="err" hidden id="err_nstart"></div>
         </label>
         <label>Ende (HH:MM)
-          <input type="text" data-key="night.end" placeholder="07:00" />
+          <input type="text" data-key="night.end" data-validate="time" placeholder="07:00" />
+          <div class="err" hidden id="err_nend"></div>
         </label>
       </div>
       <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht‑Admin‑Nachrichten löschen</label>
+        <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht-Admin-Nachrichten löschen</label>
         <label class="switch"><input type="checkbox" data-key="night.warn_once"> Einmalige Warnung anzeigen</label>
         <label>Zeitzone
           <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
         </label>
-        <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard‑Mode</label>
+        <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard-Mode</label>
       </div>
       <div class="grid">
         <label>Temporär bis (Override)
@@ -308,8 +317,9 @@
     <!-- TOPIC ROUTER -->
     <section class="card" id="sec-router">
       <div class="grid">
-        <label>Ziel‑Topic (ID)
-          <input type="text" id="router_target" placeholder="Topic ID" />
+        <label>Ziel-Topic (ID)
+          <input type="text" id="router_target" data-validate="int" placeholder="Topic ID" />
+          <div class="err" hidden id="err_rtarget"></div>
         </label>
         <label>Keywords (Komma getrennt)
           <input type="text" id="router_keywords" placeholder="hilfe, frage, support" />
@@ -345,17 +355,24 @@
     <!-- PRO -->
     <section class="card" id="sec-pro">
       <div class="row">
-        <label>Pro‑Monate kaufen/verlängern
-          <input type="number" id="pro_months" min="1" placeholder="z.B. 1" />
+        <label>Pro-Monate kaufen/verlängern
+          <input type="number" id="pro_months" data-validate="int" min="1" placeholder="z.B. 1" />
         </label>
         <button class="btn small" id="pro_buy">Abo setzen</button>
       </div>
     </section>
 
-    <footer>
-      <div id="out" class="hint">Bereit.</div>
-      <div class="hint">© Emerald Content</div>
-    </footer>
+  </div>
+
+  <!-- Footerbar unten -->
+  <div class="footerbar">
+    <div id="out" class="hint">Bereit.</div>
+    <div class="right">
+      <button class="btn ghost" id="themeBtn" title="Hell/Dunkel">🌓</button>
+      <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
+      <button class="btn ghost" id="closeBtn">Schließen</button>
+      <button class="btn primary" id="saveBtn" disabled>Speichern</button>
+    </div>
   </div>
 
   <script>
@@ -389,13 +406,53 @@
       qs('#sec-'+p.dataset.tab).classList.add('active');
     }));
 
-    // Events
+    // Buttons
     qs('#closeBtn').onclick=()=>{ try{ tg.close(); }catch{ window.close(); } };
     qs('#resetBtn').onclick=()=>loadState();
     qs('#saveBtn').onclick=()=>sendPayload();
 
+    // Live-Validierung
+    function validTime(val){
+      const m=/^([01]?\d|2[0-3]):([0-5]\d)$/.exec((val||"").trim());
+      return !!m;
+    }
+    function validInt(val){
+      const s=(val??"").toString().trim();
+      return s==="" || /^-?\d+$/.test(s);
+    }
+    function validUrl(val){
+      try{ const u=new URL(val); return !!u.protocol && !!u.host; }catch{ return false; }
+    }
+    function showErr(id,msg){ const el=qs('#'+id); if(!el) return; if(msg){ el.textContent=msg; el.hidden=false; } else { el.hidden=true; el.textContent=''; } }
+    function mark(el, bad){ el.classList.toggle('input-error', !!bad); }
+    function validateAll(){
+      let ok=true;
+
+      // Times
+      const ns=qa('[data-key="night.start"]')[0]; const ne=qa('[data-key="night.end"]')[0];
+      if(ns){ const v=ns.value; const bad=!validTime(v); mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
+      if(ne){ const v=ne.value; const bad=!validTime(v); mark(ne,bad); showErr('err_nend', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
+
+      // Int-Felder
+      [['spam.policy_topic','err_spamtopic'],
+       ['mood.topic','err_moodtopic']].forEach(([k,err])=>{
+         const el=qa(`[data-key="${k}"]`)[0]; if(!el) return;
+         const bad=!validInt(el.value); mark(el,bad); showErr(err, bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad;
+       });
+      const rtopic=qs('#rss_topic'); if(rtopic){ const bad=!validInt(rtopic.value); mark(rtopic,bad); showErr('err_rsstopic', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
+      const rtarget=qs('#router_target'); if(rtarget){ const bad=!validInt(rtarget.value); mark(rtarget,bad); showErr('err_rtarget', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
+
+      // URL
+      const rurl=qs('#rss_url'); if(rurl && rurl.value.trim()){ const bad=!validUrl(rurl.value.trim()); mark(rurl,bad); showErr('err_rssurl', bad?'Ungültige URL':'' ); ok=ok && !bad; } else { showErr('err_rssurl',''); mark(rurl,false); }
+
+      qs('#saveBtn').disabled = !ok;
+      return ok;
+    }
+    qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
+
     // RSS Ops
     qs('#rss_add').onclick=()=>{
+      if(!validateAll()) return;
       const url = qs('#rss_url').value.trim();
       if(!url) return;
       const topic = parseInt(qs('#rss_topic').value.trim()||'0');
@@ -412,6 +469,7 @@
 
     // Router Ops
     qs('#router_add').onclick=()=>{
+      if(!validateAll()) return;
       const target = parseInt(qs('#router_target').value.trim()||'0');
       if(!target) return;
       const kw = qs('#router_keywords').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -421,11 +479,12 @@
 
     // Pro
     qs('#pro_buy').onclick=()=>{
+      if(!validateAll()) return;
       const months = parseInt(qs('#pro_months').value||'0');
       if(months>0) sendPayload({ pro_months: months });
     };
 
-    // Collect → nested object per data-key path
+    // Collect nested
     function setVal(path, val){
       const el = qa(`[data-key="${path}"]`)[0];
       if(!el) return;
@@ -437,13 +496,10 @@
         const path = el.getAttribute('data-key');
         const parts = path.split('.');
         let cur = out;
-        for(let i=0;i<parts.length-1;i++){
-          if(!(parts[i] in cur)) cur[parts[i]]={};
-          cur=cur[parts[i]];
-        }
+        for(let i=0;i<parts.length-1;i++){ if(!(parts[i] in cur)) cur[parts[i]]={}; cur=cur[parts[i]]; }
         const leaf = parts[parts.length-1];
         let val = (el.type==='checkbox') ? !!el.checked : el.value;
-        if(el.type==='number') val = el.value===''? '': (Number(el.value));
+        if(el.type==='number') val = el.value===''? '' : (Number(el.value));
         cur[leaf]=val;
       });
       return out;
@@ -501,7 +557,7 @@
         setVal('welcome.text', j.welcome?.text);
         setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
         setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
-        // Spam (inkl. Fallbacks)
+        // Spam
         setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
         setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
         setVal('spam.block_media', j.spam?.block_media ?? false);
@@ -550,24 +606,36 @@
         // More
         setVal('language', j.language||'');
         qs('#out').textContent='Bereit.';
-      }catch(e){
-        console.error(e); qs('#out').textContent='Fehler beim Laden.';
-      }
+      }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
+      validateAll();
     }
 
-    function sendPayload(extra={}){
+    // Save: Telegram sendData ODER HTTP-Fallback
+    async function sendPayload(extra={}){
+      if(!validateAll()) return;
       const out = collect();
       Object.assign(out, { cid, uid }, extra);
       if (tg && tg.sendData){
         try{ tg.HapticFeedback?.impactOccurred?.('medium'); }catch{}
         tg.sendData(JSON.stringify(out));
-        qs('#out').textContent = 'Gesendet.';
+        qs('#out').textContent = 'Gesendet (Telegram).';
+      } else if(API_BASE){
+        try{
+          const res = await fetch(`${API_BASE}/miniapp/apply?cid=${cid}&uid=${uid}`, {
+            method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(out)
+          });
+          const txt = await res.text();
+          qs('#out').textContent = res.ok ? (txt || '✅ Einstellungen gespeichert.') : (`⚠️ ${txt||'Fehler beim Speichern.'}`);
+        }catch(e){
+          console.error(e);
+          qs('#out').textContent = 'Verbindungsfehler.';
+        }
       } else {
         qs('#out').textContent = 'Nicht in Telegram geöffnet – Speichern nicht möglich.';
-        console.warn('Mini‑App nicht in Telegram geöffnet.');
       }
     }
 
+    // Init
     loadState();
   </script>
 </body>
