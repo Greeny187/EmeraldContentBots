@@ -382,6 +382,7 @@
     const qs=(s,el=document)=>el.querySelector(s);
     const qa=(s,el=document)=>Array.from(el.querySelectorAll(s));
     const getUrlParam=(k, def=null)=> new URL(location.href).searchParams.get(k) ?? def;
+    const FORCE_HTTP = new URL(location.href).searchParams.get('forceHttp') === '1';
 
     // Telegram Context
     const tg = window.Telegram?.WebApp || null;
