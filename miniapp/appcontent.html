@@ -43,6 +43,10 @@
     .hint{font-size:12px;color:var(--muted)}
     .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
 
+    /* Bildvorschau */
+    .imgprev{display:block;max-width:180px;max-height:120px;border:1px solid var(--ring);border-radius:12px;object-fit:cover;background:#00000010}
+    .row.gap-6{gap:16px}
+
     /* Footerbar mit Buttons unten */
     .footerbar{
       position:sticky; bottom:0; left:0; right:0;
@@ -90,6 +94,17 @@
       <div class="row">
         <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
       </div>
+      <div class="row gap-6" style="margin-top:8px"></div>
+        <div>
+          <label>Bild (optional)</label>
+          <div class="row">
+            <img id="welcome_img_prev" class="imgprev" alt="Welcome Bild"/>
+            <input type="file" id="welcome_img" accept="image/*"/>
+            <button class="btn small" id="welcome_img_clear" type="button">Löschen</button>
+          </div>
+          <div class="hint">Wird mit der Begrüßung gepostet.</div>
+        </div>
+      </div>
       <label>Text</label>
       <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
       <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
@@ -100,6 +115,17 @@
       <div class="row">
         <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
       </div>
+      <div class="row gap-6" style="margin-top:8px">
+        <div>
+          <label>Bild (optional)</label>
+          <div class="row">
+            <img id="rules_img_prev" class="imgprev" alt="Regeln Bild"/>
+            <input type="file" id="rules_img" accept="image/*"/>
+            <button class="btn small" id="rules_img_clear" type="button">Löschen</button>
+          </div>
+          <div class="hint">Wird zusammen mit dem Regeltext gepostet.</div>
+        </div>
+      </div>
       <label>Text</label>
       <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
     </section>
@@ -108,6 +134,17 @@
     <section class="card" id="sec-farewell">
       <div class="row">
         <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
+      </div>
+      <div class="row gap-6" style="margin-top:8px">
+        <div>
+          <label>Bild (optional)</label>
+          <div class="row">
+            <img id="farewell_img_prev" class="imgprev" alt="Farewell Bild"/>
+            <input type="file" id="farewell_img" accept="image/*"/>
+            <button class="btn small" id="farewell_img_clear" type="button">Löschen</button>
+          </div>
+          <div class="hint">Wird bei der Verabschiedung gepostet.</div>
+        </div>
       </div>
       <label>Text</label>
       <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
@@ -270,9 +307,27 @@
 
     <!-- REPORT -->
     <section class="card" id="sec-report">
-      <div class="row">
-        <label class="switch"><input type="checkbox" data-key="daily_stats"> Täglichen Report per PM senden</label>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" data-key="report.enabled"> Täglichen Report aktiv</label>
+        <div>
+          <label>Ziel</label>
+          <div class="row">
+            <label class="switch"><input type="radio" name="report_dest" id="report_dest_dm" value="dm"> Per DM</label>
+            <label class="switch"><input type="radio" name="report_dest" id="report_dest_topic" value="topic"> In Topic</label>
+          </div>
+          <div class="hint">Wähle „In Topic“ und gib unten die Topic-ID deiner Gruppe (z. B. „General“) an.</div>
+        </div>
+        <label>Topic (ID)
+          <input type="text" data-key="report.topic" data-validate="int" placeholder="0 = Standard; sonst ID von „General“"/>
+          <div class="err" hidden id="err_reporttopic"></div>
+        </label>
       </div>
+      <div class="row">
+        <button class="btn small" id="report_send_now" type="button">Report jetzt posten</button>
+      </div>
+      <div class="sep"></div>
+      <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
+      <div id="reportStats" class="list"></div>
     </section>
 
     <!-- MOOD -->
@@ -285,6 +340,9 @@
           <input type="text" data-key="mood.topic" data-validate="int" placeholder="0 = Standard" />
           <div class="err" hidden id="err_moodtopic"></div>
         </label>
+      </div>
+      <div class="row">
+        <button class="btn small" id="mood_send_now" type="button">Mood-Frage jetzt senden</button>
       </div>
     </section>
 
@@ -456,6 +514,67 @@
     }
     qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
 
+    // --- Image Upload Handling (Welcome/Rules/Farewell) ---
+    const IMG_PREV = { welcome: qs('#welcome_img_prev'), rules: qs('#rules_img_prev'), farewell: qs('#farewell_img_prev') };
+    const IMG_INPUT = { welcome: qs('#welcome_img'), rules: qs('#rules_img'), farewell: qs('#farewell_img') };
+    const IMG_CLEAR_BTN = { welcome: qs('#welcome_img_clear'), rules: qs('#rules_img_clear'), farewell: qs('#farewell_img_clear') };
+    const IMG_UPLOADS = { welcome:null, rules:null, farewell:null };  // base64
+    const PREV_IMAGES = { welcome:null, rules:null, farewell:null };  // bestehende URLs aus DB
+    const CLEAR_FLAGS = { welcome:false, rules:false, farewell:false };
+
+    function readAsDataURL(file){
+      return new Promise((resolve,reject)=>{
+        const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
+      });
+    }
+    function setPreview(which, url){
+      if(!IMG_PREV[which]) return;
+      if(url){ IMG_PREV[which].src=url; IMG_PREV[which].style.visibility='visible'; }
+      else { IMG_PREV[which].removeAttribute('src'); IMG_PREV[which].style.visibility='hidden'; }
+    }
+    Object.keys(IMG_INPUT).forEach(k=>{
+      const inp=IMG_INPUT[k]; if(!inp) return;
+      inp.addEventListener('change', async ()=>{
+        const f=inp.files?.[0]; if(!f) return;
+        const dataUrl=await readAsDataURL(f);
+        IMG_UPLOADS[k]=dataUrl; CLEAR_FLAGS[k]=false; setPreview(k, dataUrl); validateAll();
+      });
+    });
+    Object.keys(IMG_CLEAR_BTN).forEach(k=>{
+      const btn=IMG_CLEAR_BTN[k]; if(!btn) return;
+      btn.addEventListener('click', ()=>{
+        IMG_UPLOADS[k]=null; CLEAR_FLAGS[k]=true; if(IMG_INPUT[k]) IMG_INPUT[k].value="";
+        setPreview(k,null);
+      });
+    });
+
+    // --- Report: helper + Vorschau ---
+    function getReportDest(){ return qs('#report_dest_topic')?.checked ? 'topic' : 'dm'; }
+    function renderReportStats(stats){
+      const box=qs('#reportStats'); if(!box) return; box.innerHTML='';
+      if(!stats || (Array.isArray(stats)&&stats.length===0)){ box.innerHTML='<div class="hint">Keine Daten vorhanden.</div>'; return; }
+      if(Array.isArray(stats)){
+        stats.forEach(s=>{
+          const item=document.createElement('div'); item.className='item';
+          const left=document.createElement('div'); left.className='left';
+          left.innerHTML=`<div class="title">${s.name??s.metric??'Wert'}</div><div class="hint">${s.value??s.count??''}</div>`;
+          item.append(left); box.append(item);
+        });
+      } else if(typeof stats==='object'){
+        Object.entries(stats).forEach(([k,v])=>{
+          const item=document.createElement('div'); item.className='item';
+          const left=document.createElement('div'); left.className='left';
+          left.innerHTML=`<div class="title">${k}</div><div class="hint">${v}</div>`;
+          item.append(left); box.append(item);
+        });
+      }
+    }
+    qs('#report_send_now')?.addEventListener('click', ()=>{
+      const topic = parseInt((qa('[data-key="report.topic"]')[0]?.value||'0'));
+      sendPayload({ report_send_now: { dest:getReportDest(), topic:isNaN(topic)?0:topic } });
+    });
+    qs('#mood_send_now')?.addEventListener('click', ()=>{ sendPayload({ mood_send_now: true }); });
+
     // RSS Ops
     qs('#rss_add').onclick=()=>{
       if(!validateAll()) return;
@@ -569,8 +688,14 @@
         // Welcome/Rules/Farewell
         setVal('welcome.on', j.welcome?.on);
         setVal('welcome.text', j.welcome?.text);
+        setPreview('welcome',  j.welcome?.image_url || j.welcome?.image);
+        PREV_IMAGES.welcome = j.welcome?.image_url || j.welcome?.image || null;
         setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
+        setPreview('rules',    j.rules?.image_url   || j.rules?.image);
+        PREV_IMAGES.rules   = j.rules?.image_url   || j.rules?.image   || null;
         setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
+        setPreview('farewell', j.farewell?.image_url|| j.farewell?.image);
+        PREV_IMAGES.farewell= j.farewell?.image_url|| j.farewell?.image|| null;
         // Spam
         setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
         setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
@@ -608,6 +733,13 @@
         // FAQ & Router
         renderFaq(j.faqs||[]);
         renderRouter(j.router_rules||[]);
+        // Report
+        const rep = j.report || {};
+        setVal('report.enabled', rep.enabled ?? (!!j.daily_stats));
+        if(qs('#report_dest_dm'))    qs('#report_dest_dm').checked    = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'dm';
+        if(qs('#report_dest_topic')) qs('#report_dest_topic').checked = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'topic';
+        setVal('report.topic', rep.topic ?? 0);
+        renderReportStats(rep.stats || j.stats || []);
         // Mood
         setVal('mood.question', j.mood?.question);
         setVal('mood.topic', j.mood?.topic);
@@ -628,7 +760,12 @@
     async function sendPayload(extra={}){
       if(!validateAll()) return;
       const out = collect();
-      Object.assign(out, { cid, uid }, extra);
+      const imgExtra = {};
+      ['welcome','rules','farewell'].forEach(k=>{
+        if(IMG_UPLOADS[k]) imgExtra[`${k}_image_upload`] = IMG_UPLOADS[k];
+        else if(CLEAR_FLAGS[k] && PREV_IMAGES[k]) imgExtra[`${k}_image_del`] = true;
+      });
+      Object.assign(out, { cid, uid }, { report: { dest: (typeof getReportDest==='function'? getReportDest() : 'dm') } }, imgExtra, extra);
       if (tg && tg.sendData){
         try{ tg.HapticFeedback?.impactOccurred?.('medium'); }catch{}
         tg.sendData(JSON.stringify(out));
