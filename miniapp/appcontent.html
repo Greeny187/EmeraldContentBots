@@ -94,7 +94,7 @@
       <div class="row">
         <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
       </div>
-      <div class="row gap-6" style="margin-top:8px"></div>
+      <div class="row gap-6" style="margin-top:8px">
         <div>
           <label>Bild (optional)</label>
           <div class="row">
@@ -105,7 +105,7 @@
           <div class="hint">Wird mit der Begrüßung gepostet.</div>
         </div>
       </div>
-      <label>Text</label>
+<label>Text</label>
       <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
       <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
     </section>
@@ -466,7 +466,7 @@
     qa('#tabs .pill').forEach(p=>p.addEventListener('click',()=>{
       qa('#tabs .pill').forEach(x=>x.classList.remove('active'));
       p.classList.add('active');
-      qa('section').forEach(s=>s.classList.remove('active'));
+      qa('.card').forEach(s=>s.classList.remove('active'));
       qs('#sec-'+p.dataset.tab).classList.add('active');
     }));
 
@@ -499,6 +499,7 @@
 
       // Int-Felder
       [['spam.policy_topic','err_spamtopic'],
+       ['report.topic','err_reporttopic'],
        ['mood.topic','err_moodtopic']].forEach(([k,err])=>{
          const el=qa(`[data-key="${k}"]`)[0]; if(!el) return;
          const bad=!validInt(el.value); mark(el,bad); showErr(err, bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad;
