@@ -63,11 +63,11 @@
     .input-error{border-color:var(--danger)!important; box-shadow:0 0 0 2px rgba(239,68,68,.2)}
     .err{color:var(--danger); font-size:12px; margin:4px 2px 0}
   </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <div class="wrap">
     <div class="titlebar"><div class="title">Mini-App</div></div>
-
     <div class="pillbar" id="tabs">
       <button class="pill active" data-tab="welcome">Begrüßung</button>
       <button class="pill" data-tab="rules">Regeln</button>
@@ -385,9 +385,12 @@
 
     // Telegram Context
     const tg = window.Telegram?.WebApp || null;
+    tg?.ready?.();                                // <<< neu
+    const INIT_DATA = tg?.initData || "";         // <<< neu
+
     const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
     const cid = parseInt(getUrlParam("cid")||0);
-    const API_BASE = getUrlParam("api","") || ""; // z.B. /miniapp
+    const API_BASE = getUrlParam("api","") || ""; // z.B. leer lassen (empfohlen)
 
     // Theme
     const themeKey = "emerald-theme";
@@ -552,7 +555,15 @@
     async function loadState(){
       qs('#out').textContent='Lade …';
       try{
-        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}`);
+        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}`, {
+          method: "GET",
+          mode: "cors",
+          credentials: "omit",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
+          }
+        });
         const j = await res.json();
         // Welcome/Rules/Farewell
         setVal('welcome.on', j.welcome?.on);
@@ -623,8 +634,13 @@
         qs('#out').textContent = 'Gesendet (Telegram).';
       } else if(API_BASE){
         try{
-          const res = await fetch(`${API_BASE}/miniapp/apply?cid=${cid}&uid=${uid}`, {
-            method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(out)
+          const res = await fetch(`${API_BASE}/miniapp/apply?cid=${cid}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
+            },
+            body: JSON.stringify(out)
           });
           const txt = await res.text();
           qs('#out').textContent = res.ok ? (txt || '✅ Einstellungen gespeichert.') : (`⚠️ ${txt||'Fehler beim Speichern.'}`);
