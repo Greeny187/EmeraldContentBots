@@ -1,0 +1,212 @@
+
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Emerald Crossposter (Multi-Tenant)</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{--bg:#0b0f10;--card:#11181c;--fg:#e6f1ff;--muted:#9fb3c8;--acc:#2dd4bf;--red:#ef4444}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
+    header{padding:16px 20px;border-bottom:1px solid #1f2a2e} h1{margin:0;font-size:18px;letter-spacing:.3px}
+    main{max-width:900px;margin:0 auto;padding:20px;display:grid;gap:16px}
+    .card{background:var(--card);border:1px solid #1f2a2e;border-radius:14px;padding:16px}
+    .row{display:grid;gap:12px} .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{width:100%;background:#0d1418;border:1px solid #223038;color:var(--fg);border-radius:10px;padding:10px}
+    button{background:var(--acc);color:#061316;border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    button.ghost{background:#0d1418;color:var(--fg);border:1px solid #223038}
+    .pill{font-size:11px;color:var(--muted)} .list{display:grid;gap:10px}
+    .item{display:flex;align-items:center;justify-content:space-between;background:#0d1418;border:1px solid #223038;border-radius:10px;padding:10px}
+    .muted{color:var(--muted)} .danger{color:var(--red)} .inline{display:flex;gap:8px;align-items:center}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Emerald Crossposter <span class="pill">v0.1 • Multi‑Tenant</span></h1>
+</header>
+<main>
+  <section class="card">
+    <div class="row">
+      <div class="grid-2">
+        <div>
+          <label>Mandant</label>
+          <select id="tenant"></select>
+        </div>
+        <div>
+          <label>Aktiv</label>
+          <select id="active"><option value="true" selected>Ja</option><option value="false">Nein</option></select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Quell‑Chat ID</label>
+          <input id="source_chat_id" type="text" placeholder="-100…"/>
+        </div>
+        <div>
+          <label>Ziele (TG Chat IDs, Kommagetrennt)</label>
+          <input id="destinations" type="text" placeholder="-1001111,-1002222"/>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div><label>Prefix</label><input id="prefix" type="text" placeholder="[News] "/></div>
+        <div><label>Suffix</label><input id="suffix" type="text" placeholder="\n#emerald"/></div>
+      </div>
+      <div class="inline">
+        <input id="plain_text" type="checkbox"/> <label for="plain_text">Plain‑Text (Markdown entfernen)</label>
+      </div>
+      <div class="grid-2">
+        <div><label>Hashtag‑Whitelist</label><input id="wl" type="text" placeholder="news,update"/></div>
+        <div><label>Hashtag‑Blacklist</label><input id="bl" type="text" placeholder="internal"/></div>
+      </div>
+      <div class="inline">
+        <button id="btn_preview" class="ghost">Vorschau</button>
+        <button id="btn_save">Speichern</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div class="inline" style="justify-content:space-between">
+        <strong>Deine Routen</strong>
+        <button id="btn_reload" class="ghost">Neu laden</button>
+      </div>
+      <div id="routes" class="list"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <strong>Statistik</strong>
+      <pre id="stats" class="muted">–</pre>
+    </div>
+  </section>
+</main>
+
+<script>
+  const tg = window.Telegram?.WebApp; tg?.ready();
+  const API_BASE = "/miniapi"; // auf Produktionspfad mappen
+
+  function initHeaders(){
+    const initData = tg?.initData || '';
+    return { 'Content-Type':'application/json', 'X-Telegram-Init-Data': initData };
+  }
+  function parseCSV(v){ return (v||'').split(',').map(s=>s.trim()).filter(Boolean) }
+
+  const $tenant = document.getElementById('tenant');
+  const $act = document.getElementById('active');
+  const $src = document.getElementById('source_chat_id');
+  const $dst = document.getElementById('destinations');
+  const $pre = document.getElementById('prefix');
+  const $suf = document.getElementById('suffix');
+  const $pt  = document.getElementById('plain_text');
+  const $wl  = document.getElementById('wl');
+  const $bl  = document.getElementById('bl');
+  const $routes = document.getElementById('routes');
+  const $stats  = document.getElementById('stats');
+
+  async function api(path, opts={}){
+    const res = await fetch(API_BASE + path, { ...opts, headers: { ...(opts.headers||{}), ...initHeaders() } });
+    if(!res.ok){ throw new Error((await res.text()) || res.statusText); }
+    return res.json();
+  }
+
+  async function loadTenants(){
+    $tenant.innerHTML = '<option>Lade…</option>';
+    const list = await api('/tenants');
+    if(!list.length){
+      $tenant.innerHTML = '<option value="">Kein Mandant</option>';
+      return;
+    }
+    $tenant.innerHTML = '';
+    list.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `${t.name} (#${t.id})`;
+      $tenant.appendChild(opt);
+    });
+  }
+
+  async function loadRoutes(){
+    const tid = $tenant.value;
+    if(!tid){ $routes.innerHTML = '<span class="muted">Bitte Mandant wählen.</span>'; return; }
+    $routes.innerHTML = 'Lade…';
+    try{
+      const list = await api('/routes?tenant_id=' + encodeURIComponent(tid));
+      if(!list.length){ $routes.innerHTML = '<span class="muted">Keine Routen vorhanden.</span>'; }
+      else{
+        $routes.innerHTML = '';
+        list.forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          const dests = r.destinations.map(d=>d.type==='telegram'?`TG:${d.chat_id}`:d.type).join(', ');
+          div.innerHTML = `
+            <div>
+              <div><strong>#${r.id}</strong> – Mandant: <code>${r.tenant_id}</code> · Quelle: <code>${r.source_chat_id}</code></div>
+              <div class="muted">Ziele: ${dests} · Aktiv: ${r.active ? 'Ja' : 'Nein'}</div>
+            </div>
+            <div class="inline">
+              <button data-id="${r.id}" class="ghost btn-del">Löschen</button>
+            </div>`;
+          $routes.appendChild(div);
+        });
+        document.querySelectorAll('.btn-del').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            if(!confirm('Route #' + id + ' löschen?')) return;
+            await api('/routes/' + id + '?tenant_id=' + encodeURIComponent(tid), { method:'DELETE' });
+            await loadRoutes();
+          });
+        });
+      }
+    }catch(e){
+      $routes.innerHTML = '<span class="danger">' + String(e).slice(0,200) + '</span>';
+    }
+    try{
+      const s = await api('/stats?tenant_id=' + encodeURIComponent($tenant.value));
+      $stats.textContent = JSON.stringify(s, null, 2);
+    }catch(e){ $stats.textContent = '–'; }
+  }
+
+  document.getElementById('btn_preview').addEventListener('click', ()=>{
+    const sample = 'Beispieltext für Crossposting. #news #update';
+    const txt = ($pre.value||'') + sample + ($suf.value||'');
+    alert('Vorschau (Text):\n\n' + txt);
+  });
+
+  document.getElementById('btn_save').addEventListener('click', async ()=>{
+    try{
+      const tid = Number($tenant.value);
+      if(!tid){ alert('Bitte Mandant auswählen.'); return; }
+      const destIds = parseCSV($dst.value).map(x=>({type:'telegram', chat_id: Number(x)}));
+      const payload = {
+        tenant_id: tid,
+        source_chat_id: Number($src.value),
+        destinations: destIds,
+        transform: { prefix: $pre.value||'', suffix:$suf.value||'', plain_text: $pt.checked },
+        filters: {
+          hashtags_whitelist: parseCSV($wl.value),
+          hashtags_blacklist: parseCSV($bl.value)
+        },
+        active: $act.value === 'true'
+      };
+      await api('/routes', { method:'POST', body: JSON.stringify(payload) });
+      await loadRoutes();
+      tg?.showPopup({title:'Gespeichert',message:'Route wurde angelegt.',buttons:[{type:'ok'}]});
+    }catch(e){
+      tg?.showPopup({title:'Fehler',message:String(e).slice(0,400),buttons:[{type:'ok'}]});
+    }
+  });
+
+  document.getElementById('btn_reload').addEventListener('click', loadRoutes);
+  $tenant.addEventListener('change', loadRoutes);
+
+  (async function init(){
+    await loadTenants();
+    await loadRoutes();
+  })();
+</script>
+</body>
+</html>
