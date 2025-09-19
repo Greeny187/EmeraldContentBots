@@ -758,37 +758,35 @@
     }
 
     // Save: Telegram sendData ODER HTTP-Fallback
-    async function sendPayload(extra={}){
-      if(!validateAll()) return;
-      const out = collect();
-      const imgExtra = {};
-      ['welcome','rules','farewell'].forEach(k=>{
-        if(IMG_UPLOADS[k]) imgExtra[`${k}_image_upload`] = IMG_UPLOADS[k];
-        else if(CLEAR_FLAGS[k] && PREV_IMAGES[k]) imgExtra[`${k}_image_del`] = true;
-      });
-      Object.assign(out, { cid, uid }, { report: { dest: (typeof getReportDest==='function'? getReportDest() : 'dm') } }, imgExtra, extra);
-      if (tg && tg.sendData){
-        try{ tg.HapticFeedback?.impactOccurred?.('medium'); }catch{}
+    async function sendPayload(extra = {}) {
+      const tg = window.Telegram?.WebApp; tg?.ready?.();
+      const INIT_DATA = tg?.initData || "";         // Signatur aus Telegram-WebView
+      const out = collect();                         // dein bestehendes Sammeln
+      Object.assign(out, extra);
+
+      // 1) Telegram (lassen wir drin, wenn du willst):
+      if (tg && tg.sendData) {
         tg.sendData(JSON.stringify(out));
-        qs('#out').textContent = 'Gesendet (Telegram).';
-      } else if(API_BASE){
-        try{
-          const res = await fetch(`${API_BASE}/miniapp/apply?cid=${cid}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
-            },
-            body: JSON.stringify(out)
-          });
-          const txt = await res.text();
-          qs('#out').textContent = res.ok ? (txt || '✅ Einstellungen gespeichert.') : (`⚠️ ${txt||'Fehler beim Speichern.'}`);
-        }catch(e){
-          console.error(e);
-          qs('#out').textContent = 'Verbindungsfehler.';
-        }
-      } else {
-        qs('#out').textContent = 'Nicht in Telegram geöffnet – Speichern nicht möglich.';
+      }
+
+      // 2) IMMER zusätzlich HTTP-POST (direkter DB-Write):
+      const API_BASE = new URLSearchParams(location.search).get("api")
+        || "https://emeraldcontent-aac379fc581e.herokuapp.com"; // deine Heroku-Base
+      const cid = new URLSearchParams(location.search).get("cid");
+
+      try {
+        const res = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Telegram-Init-Data": INIT_DATA
+          },
+          body: JSON.stringify(out)
+        });
+        const txt = await res.text();
+        console.log("[apply]", res.status, txt);
+      } catch (e) {
+        console.error("[apply] network error", e);
       }
     }
 
