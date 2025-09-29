@@ -411,7 +411,10 @@
         </label>
       </div>
     </section>
-
+    <div class="card">
+      <h3>Gelöschte Accounts</h3>
+      <button onclick="sendPayload({clean_delete_now:true})">Jetzt aufräumen</button>
+    </div>
     <!-- PRO -->
     <section class="card" id="sec-pro">
       <div class="row">
@@ -528,10 +531,13 @@
         const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
       });
     }
-    function setPreview(which, url){
-      if(!IMG_PREV[which]) return;
-      if(url){ IMG_PREV[which].src=url; IMG_PREV[which].style.visibility='visible'; }
-      else { IMG_PREV[which].removeAttribute('src'); IMG_PREV[which].style.visibility='hidden'; }
+    function setPreview(imgEl, url) {
+      if (!url) { imgEl.removeAttribute('src'); return; }
+      if (url.startsWith('/miniapp/file')) {
+        const glue = url.includes('?') ? '&' : '?';
+        url = `${url}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
+      }
+      imgEl.src = url;
     }
     Object.keys(IMG_INPUT).forEach(k=>{
       const inp=IMG_INPUT[k]; if(!inp) return;
