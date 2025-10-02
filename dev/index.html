@@ -3,16 +3,128 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevDashboard</title>
-  <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
+  <title>Emerald DevDashboard</title>
   <style>
     body { font-family: system-ui, sans-serif; background:#0b1020; color:#cbd5e1; margin:20px; }
     .card { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:16px; margin:12px 0; }
-    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    .row  { display:flex; gap:12px; flex-wrap:wrap; }
     button { background:#10b98122; border:1px solid #10b98160; color:#e5e7eb; border-radius:8px; padding:8px 12px; cursor:pointer; }
     pre { white-space: pre-wrap; word-break: break-word; }
   </style>
+
+  <!-- Telegram-Widget wird dynamisch eingefügt, wir brauchen nur die URL als Fallback -->
+  <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
+
+  <script>
+    // ==== KONFIGURATION (bitte Botnamen prüfen!) ====
+    const API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash";
+    const BOT_USERNAME = "EmeraldContentBot"; // exakt wie bei @BotFather, ohne @
+    console.log("[DevDash] API_BASE =", API_BASE, "BOT_USERNAME =", BOT_USERNAME);
+
+    // Globale Fehlerhilfe (falls nochmal Syntax/Runtime-Probleme auftauchen)
+    window.addEventListener("error", e => console.error("[DevDash] window.error:", e.message, e.filename, e.lineno));
+
+    // ====== Token-Helpers ======
+    const tokenKey = "emerald_token";
+    const setToken = t => localStorage.setItem(tokenKey, t);
+    const getToken = () => localStorage.getItem(tokenKey);
+    const authHeaders = () => {
+      const t = getToken();
+      return t
+        ? { "Authorization":"Bearer " + t, "Content-Type":"application/json" }
+        : { "Content-Type":"application/json" };
+    };
+
+    // ====== GLOBALER CALLBACK (muss an window hängen!) ======
+    window.onTelegramAuth = async function(user){
+      try {
+        console.log("[DevDash] onTelegramAuth payload:", user);
+        const res = await fetch(API_BASE + "/auth/telegram", {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(user)
+        });
+        if (!res.ok) {
+          const t = await res.text();
+          console.error("[DevDash] /auth/telegram failed:", res.status, t);
+          alert("Login fehlgeschlagen: " + t);
+          return;
+        }
+        const data = await res.json();
+        console.log("[DevDash] login ok:", data);
+        setToken(data.access_token);
+        document.getElementById("login").style.display = "none";
+        await bootAfterLogin();
+      } catch (err) {
+        console.error("[DevDash] auth error:", err);
+        alert("Netzwerkfehler beim Login: " + (err?.message || err));
+      }
+    };
+
+    // ====== UI-Boot ======
+    async function loadBots(){
+      const res  = await fetch(API_BASE + "/bots", { headers: authHeaders() });
+      const bots = await res.json();
+      document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
+    }
+
+    async function bootAfterLogin(){
+      document.getElementById("meCard").style.display = "";
+      document.getElementById("overviewCard").style.display = "";
+      document.getElementById("botsCard").style.display = "";
+
+      const me = await (await fetch(API_BASE + "/me", { headers: authHeaders() })).json();
+      document.getElementById("me").textContent = JSON.stringify(me, null, 2);
+
+      const ov = await (await fetch(API_BASE + "/metrics/overview", { headers: authHeaders() })).json();
+      document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
+
+      await loadBots();
+      document.getElementById("btnReloadBots").onclick = loadBots;
+      document.getElementById("btnAddBot").onclick = async () => {
+        const name = prompt("Bot Name?");
+        if (!name) return;
+        const slug = prompt("Slug (unique)?");
+        if (!slug) return;
+        const description = prompt("Beschreibung (optional)") || null;
+        const res = await fetch(API_BASE + "/bots", {
+          method:"POST", headers: authHeaders(),
+          body: JSON.stringify({ name, slug, description, is_active:true })
+        });
+        if (!res.ok) { alert(await res.text()); return; }
+        await loadBots();
+      };
+    }
+
+    // ====== Login-Button dynamisch einfügen (nachdem onTelegramAuth existiert) ======
+    function mountLogin(){
+      const slot = document.getElementById("tgSlot");
+      slot.innerHTML = ""; // Sicherheitshalber leeren
+      const s = document.createElement("script");
+      s.src = "https://telegram.org/js/telegram-widget.js?22";
+      s.async = true;
+      s.setAttribute("data-telegram-login", BOT_USERNAME);
+      s.setAttribute("data-size", "large");
+      s.setAttribute("data-userpic", "true");
+      s.setAttribute("data-request-access", "write");
+      s.setAttribute("data-onauth", "onTelegramAuth"); // <- globaler Name
+      slot.appendChild(s);
+      console.log("[DevDash] mounted Telegram login");
+    }
+
+    // ====== Autologin wenn Token vorhanden ======
+    function boot(){
+      mountLogin();
+      if (getToken()) {
+        document.getElementById("login").style.display = "none";
+        bootAfterLogin().catch(e => console.error("[DevDash] bootAfterLogin error:", e));
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", boot);
+  </script>
 </head>
+
 <body>
   <h1>Emerald DevDashboard</h1>
 
@@ -24,12 +136,12 @@
 
   <div class="card" id="meCard" style="display:none">
     <h3>Angemeldet</h3>
-    <div id="me"></div>
+    <pre id="me"></pre>
   </div>
 
   <div class="card" id="overviewCard" style="display:none">
     <h3>Overview</h3>
-    <div id="overview"></div>
+    <pre id="overview"></pre>
   </div>
 
   <div class="card" id="botsCard" style="display:none">
@@ -40,105 +152,5 @@
     </div>
     <pre id="bots"></pre>
   </div>
-
-  <script>
-    // ==== KONFIGURATION ====
-    const API_BASE = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash";
-    const BOT_USERNAME = "EmeraldContentBot"; // exakt wie bei @BotFather, ohne @
-    console.log("[DevDash] API_BASE =", API_BASE, "BOT_USERNAME =", BOT_USERNAME);
-
-    // ==== GLOBALER CALLBACK für Telegram-Widget ====
-    window.onTelegramAuth = async function(user){
-      try {
-        console.log("[DevDash] onTelegramAuth payload:", user);
-        const res = await fetch(API_BASE + "/auth/telegram", {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(user)
-        });
-        if (!res.ok) {
-          const t = await res.text();
-          console.error("[DevDash] /auth/telegram failed:", res.status, t);
-          alert("Login fehlgeschlagen: " + t);
-          return;
-        }
-        const data = await res.json();
-        console.log("[DevDash] login ok:", data);
-        localStorage.setItem("emerald_token", data.access_token);
-        document.getElementById("login").style.display = "none";
-        await bootAfterLogin();
-      } catch (err) {
-        console.error("[DevDash] auth error:", err);
-        alert("Netzwerkfehler beim Login: " + (err?.message || err));
-      }
-    };
-  </script>
-  <script>
-    // Telegram Login Button einfügen (nachdem window.onTelegramAuth existiert)
-    (function mountLogin(){
-      const s = document.createElement("script");
-      s.src = "https://telegram.org/js/telegram-widget.js?22";
-      s.async = true;
-      s.setAttribute("data-telegram-login", BOT_USERNAME);
-      s.setAttribute("data-size", "large");
-      s.setAttribute("data-userpic", "true");
-      s.setAttribute("data-request-access", "write");
-      s.setAttribute("data-onauth", "onTelegramAuth");
-      document.getElementById("tgSlot").appendChild(s);
-    })();
-  </script>
-  <script
-    const tokenKey = "emerald_token";
-    function setToken(t){ localStorage.setItem(tokenKey, t); }
-    function getToken(){ return localStorage.getItem(tokenKey); }
-    function authHeaders(){ const t=getToken(); return t? {Authorization: "Bearer " + t, "Content-Type":"application/json"} : {"Content-Type":"application/json"}; }
-
-    async function onTelegramAuth(user){
-      const res = await fetch(API_BASE + "/auth/telegram", {
-        method:"POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(user)
-      });
-      if(!res.ok){ alert("Login fehlgeschlagen: " + await res.text()); return; }
-      const data = await res.json();
-      setToken(data.access_token);
-      document.getElementById("login").style.display="none";
-      bootAfterLogin();
-    }
-
-    async function bootAfterLogin(){
-      document.getElementById("meCard").style.display="";
-      document.getElementById("overviewCard").style.display="";
-      document.getElementById("botsCard").style.display="";
-
-      const me = await (await fetch(API_BASE + "/me", {headers: authHeaders()})).json();
-      document.getElementById("me").textContent = JSON.stringify(me, null, 2);
-
-      const ov = await (await fetch(API_BASE + "/metrics/overview", {headers: authHeaders()})).json();
-      document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
-
-      await loadBots();
-      document.getElementById("btnReloadBots").onclick = loadBots;
-      document.getElementById("btnAddBot").onclick = async () => {
-        const name = prompt("Bot Name?");
-        if(!name) return;
-        const slug = prompt("Slug (unique)?");
-        if(!slug) return;
-        const description = prompt("Beschreibung (optional)") || null;
-        const res = await fetch(API_BASE + "/bots", {
-          method:"POST", headers: authHeaders(),
-          body: JSON.stringify({name, slug, description, is_active:true})
-        });
-        if(!res.ok){ alert(await res.text()); return; }
-        await loadBots();
-      };
-    async function loadBots(){
-      const res = await fetch(API_BASE + "/bots", {headers: authHeaders()});
-      const bots = await res.json();
-      document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
-    }
-    // Token vorhanden? Dann direkt weiter
-    if(getToken()){ document.getElementById("login").style.display="none"; bootAfterLogin(); }
-  </script>
 </body>
 </html>
