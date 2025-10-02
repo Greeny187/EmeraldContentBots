@@ -42,12 +42,39 @@
   </div>
 
   <script>
-    // ==== KONFIGURATION HIER ANPASSEN ====
-    const API_BASE = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // <- API deiner bestehenden App
-    const BOT_USERNAME = "EmeraldContentBot"; // <- Telegram-Botname ohne @
-    // =====================================
+    // ==== KONFIGURATION ====
+    const API_BASE = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash";
+    const BOT_USERNAME = "EmeraldContentBot"; // exakt wie bei @BotFather, ohne @
+    console.log("[DevDash] API_BASE =", API_BASE, "BOT_USERNAME =", BOT_USERNAME);
 
-    // Telegram Login Button einfügen
+    // ==== GLOBALER CALLBACK für Telegram-Widget ====
+    window.onTelegramAuth = async function(user){
+      try {
+        console.log("[DevDash] onTelegramAuth payload:", user);
+        const res = await fetch(API_BASE + "/auth/telegram", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(user)
+        });
+        if (!res.ok) {
+          const t = await res.text();
+          console.error("[DevDash] /auth/telegram failed:", res.status, t);
+          alert("Login fehlgeschlagen: " + t);
+          return;
+        }
+        const data = await res.json();
+        console.log("[DevDash] login ok:", data);
+        localStorage.setItem("emerald_token", data.access_token);
+        document.getElementById("login").style.display = "none";
+        await bootAfterLogin();
+      } catch (err) {
+        console.error("[DevDash] auth error:", err);
+        alert("Netzwerkfehler beim Login: " + (err?.message || err));
+      }
+    };
+  </script>
+  <script>
+    // Telegram Login Button einfügen (nachdem window.onTelegramAuth existiert)
     (function mountLogin(){
       const s = document.createElement("script");
       s.src = "https://telegram.org/js/telegram-widget.js?22";
@@ -59,7 +86,8 @@
       s.setAttribute("data-onauth", "onTelegramAuth");
       document.getElementById("tgSlot").appendChild(s);
     })();
-
+  </script>
+  <script
     const tokenKey = "emerald_token";
     function setToken(t){ localStorage.setItem(tokenKey, t); }
     function getToken(){ return localStorage.getItem(tokenKey); }
@@ -104,43 +132,13 @@
         if(!res.ok){ alert(await res.text()); return; }
         await loadBots();
       };
-    }
-
     async function loadBots(){
       const res = await fetch(API_BASE + "/bots", {headers: authHeaders()});
       const bots = await res.json();
       document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
     }
-
     // Token vorhanden? Dann direkt weiter
     if(getToken()){ document.getElementById("login").style.display="none"; bootAfterLogin(); }
   </script>
-  <script>
-    async function onTelegramAuth(user){
-      try {
-        console.log("[DevDash] onTelegramAuth payload:", user);
-        const res = await fetch(API_BASE + "/auth/telegram", {
-          method:"POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(user),
-          // credentials NICHT setzen, wir senden keinen Cookie
-        });
-        if(!res.ok){
-          const t = await res.text();
-          console.error("[DevDash] /auth/telegram failed:", res.status, t);
-          alert("Login fehlgeschlagen: " + t);
-          return;
-        }
-        const data = await res.json();
-        console.log("[DevDash] login ok:", data);
-        localStorage.setItem("emerald_token", data.access_token);
-        document.getElementById("login").style.display="none";
-        await bootAfterLogin();
-      } catch (err) {
-        console.error("[DevDash] auth error:", err);
-        alert("Netzwerkfehler beim Login: " + (err && err.message ? err.message : err));
-      }
-    }
-    </script>
 </body>
 </html>
