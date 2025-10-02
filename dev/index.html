@@ -115,5 +115,32 @@
     // Token vorhanden? Dann direkt weiter
     if(getToken()){ document.getElementById("login").style.display="none"; bootAfterLogin(); }
   </script>
+  <script>
+    async function onTelegramAuth(user){
+      try {
+        console.log("[DevDash] onTelegramAuth payload:", user);
+        const res = await fetch(API_BASE + "/auth/telegram", {
+          method:"POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(user),
+          // credentials NICHT setzen, wir senden keinen Cookie
+        });
+        if(!res.ok){
+          const t = await res.text();
+          console.error("[DevDash] /auth/telegram failed:", res.status, t);
+          alert("Login fehlgeschlagen: " + t);
+          return;
+        }
+        const data = await res.json();
+        console.log("[DevDash] login ok:", data);
+        localStorage.setItem("emerald_token", data.access_token);
+        document.getElementById("login").style.display="none";
+        await bootAfterLogin();
+      } catch (err) {
+        console.error("[DevDash] auth error:", err);
+        alert("Netzwerkfehler beim Login: " + (err && err.message ? err.message : err));
+      }
+    }
+    </script>
 </body>
 </html>
