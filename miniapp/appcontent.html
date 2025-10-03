@@ -410,7 +410,7 @@
           </select>
         </label>
       </div>
-      <div class="card" id="sec-more">
+      <div class="card">
         <h3>Gelöschte Accounts</h3>
         <div class="grid">
           <label class="switch">
@@ -484,10 +484,7 @@
     const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
     const cid = parseInt(getUrlParam("cid")||0);
     const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
-    const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
-      headers: { "X-Telegram-Init-Data": INIT_DATA }
-    });
+    const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`; // Fallback nur für Browser-Tests
 
     // Theme
     const themeKey = "emerald-theme";
@@ -626,22 +623,6 @@
       });
     });
 
-    Object.keys(IMG_INPUT).forEach(k=>{
-      const inp=IMG_INPUT[k]; if(!inp) return;
-      inp.addEventListener('change', async ()=>{
-        const f=inp.files?.[0]; if(!f) return;
-        const dataUrl=await readAsDataURL(f);
-        IMG_UPLOADS[k]=dataUrl; CLEAR_FLAGS[k]=false; setPreview(k, dataUrl); validateAll();
-      });
-    });
-    Object.keys(IMG_CLEAR_BTN).forEach(k=>{
-      const btn=IMG_CLEAR_BTN[k]; if(!btn) return;
-      btn.addEventListener('click', ()=>{
-        IMG_UPLOADS[k]=null; CLEAR_FLAGS[k]=true; if(IMG_INPUT[k]) IMG_INPUT[k].value="";
-        setPreview(k,null);
-      });
-    });
-
     // --- Report: helper + Vorschau ---
     function getReportDest(){ return qs('#report_dest_topic')?.checked ? 'topic' : 'dm'; }
     function renderReportStats(stats){
@@ -769,7 +750,7 @@
     async function loadState(){
       qs('#out').textContent='Lade …';
       try{
-        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}`, {
+        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
           method: "GET",
           mode: "cors",
           credentials: "omit",
