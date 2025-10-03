@@ -8,19 +8,27 @@ from jwt_tools import create_token, decode_token
 from telegram_auth import verify_telegram_auth
 import logging
 
-app=FastAPI(title="Emerald DevDash API",version="0.2-min")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Add CORS middleware
+app = FastAPI(title="Emerald DevDash API",version="0.2-min")
+
+# Add CORS middleware at the top after FastAPI initialization
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your frontend URL in production
+    allow_origins=["*"],  # In production, replace with your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Headers: {dict(request.headers)}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
 
 class TelegramAuthPayload(BaseModel):
   id:int; auth_date:int; hash:str

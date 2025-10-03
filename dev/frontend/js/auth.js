@@ -14,50 +14,30 @@
 })();
 
 async function handleTelegramAuth(user) {
+    console.log('Telegram auth data:', user);
     try {
-        const response = await fetch('/api/auth/telegram', {
+        const response = await fetch(`${API_BASE}/auth/telegram`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(user),
-            credentials: 'include'  // Important for cookies
+            credentials: 'include'
         });
+        
+        console.log('Auth response status:', response.status);
+        const data = await response.json();
+        console.log('Auth response data:', data);
 
         if (!response.ok) {
-            throw new Error('Auth failed');
+            throw new Error(data.detail || 'Authentication failed');
         }
 
-        const data = await response.json();
-        
-        // Store auth data
+        // Store auth data and redirect
         localStorage.setItem('auth_token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Redirect to dashboard with token
-        window.location.href = `/dashboard?token=${data.access_token}`;
+        window.location.href = '/dashboard';
     } catch (error) {
         console.error('Authentication error:', error);
+        alert('Login failed: ' + error.message);
     }
 }
-
-// Check auth status on page load
-window.onload = async () => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-        try {
-            const response = await fetch('/api/auth/check', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user');
-                window.location.href = '/login';
-            }
-        } catch (error) {
-            console.error('Auth check failed:', error);
-        }
-    }
-};
