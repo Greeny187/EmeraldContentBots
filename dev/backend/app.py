@@ -6,12 +6,21 @@ from pydantic import BaseModel
 from db import fetch, fetchrow, execute
 from jwt_tools import create_token, decode_token
 from telegram_auth import verify_telegram_auth
+import logging
 
 app=FastAPI(title="Emerald DevDash API",version="0.2-min")
 
-allowed=[o.strip() for o in os.getenv("ALLOWED_ORIGINS","").split(",") if o.strip()]
-if not allowed: allowed=["http://localhost:5500"]
-app.add_middleware(CORSMiddleware, allow_origins=allowed, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace with your frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class TelegramAuthPayload(BaseModel):
   id:int; auth_date:int; hash:str
@@ -31,6 +40,7 @@ async def healthz(): return {"status":"ok","time":int(time.time())}
 
 @app.post("/auth/telegram", response_model=TokenResponse)
 async def auth_telegram(payload:TelegramAuthPayload):
+  logger.info(f"Telegram auth attempt for user: {payload.username}")
   user=verify_telegram_auth(payload.dict())
   await execute("""insert into dashboard_users(telegram_id,username,first_name,last_name,photo_url)
                  values($1,$2,$3,$4,$5)
@@ -40,6 +50,7 @@ async def auth_telegram(payload:TelegramAuthPayload):
   row=await fetchrow("select role,tier from dashboard_users where telegram_id=$1", user["id"])
   role=row["role"] if row else "dev"; tier=row["tier"] if row else "pro"
   tok=create_token({"sub":str(user["id"]), "tg":user, "role":role, "tier":tier})
+  logger.info(f"Auth successful for user: {payload.username}")
   return TokenResponse(access_token=tok)
 
 @app.get("/me")
@@ -120,3 +131,19 @@ async def upsert_flag(f:Flag, current=Depends(get_current_user)):
   row=await fetchrow("insert into dashboard_feature_flags(key,value,description) values($1,$2,$3) on conflict(key) do update set value=$2, description=$3 returning key,value,description",
                      f.key,f.value,f.description)
   return dict(row)
+
+async def get_token(authorization: Optional[str] = Header(None)) -> str:
+    """Extract bearer token from Authorization header"""
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return None
+    return authorization.split(" ", 1)[1]
+
+@app.get("/auth/check")
+async def check_auth(token: str = Depends(get_token)):
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        decode_token(token)  # Verify token is valid
+        return {"authenticated": True}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))

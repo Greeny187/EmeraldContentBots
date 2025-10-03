@@ -13,20 +13,51 @@
   slot.appendChild(script);
 })();
 
-async function onTelegramAuth(user) {
-  const payload = {
-    id: user.id,
-    username: user.username,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    photo_url: user.photo_url,
-    auth_date: user.auth_date,
-    hash: user.hash
-  };
-  const data = await API.post("/auth/telegram", payload);
-  API.setToken(data.access_token);
-  document.getElementById("loginCard").classList.add("hidden");
-  await window.App.initAfterLogin();
+async function handleTelegramAuth(user) {
+    try {
+        const response = await fetch('/api/auth/telegram', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+            credentials: 'include'  // Important for cookies
+        });
+
+        if (!response.ok) {
+            throw new Error('Auth failed');
+        }
+
+        const data = await response.json();
+        
+        // Store auth data
+        localStorage.setItem('auth_token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Redirect to dashboard with token
+        window.location.href = `/dashboard?token=${data.access_token}`;
+    } catch (error) {
+        console.error('Authentication error:', error);
+    }
 }
 
-API.loadToken();
+// Check auth status on page load
+window.onload = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        try {
+            const response = await fetch('/api/auth/check', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error('Auth check failed:', error);
+        }
+    }
+};
