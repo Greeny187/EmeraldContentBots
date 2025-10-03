@@ -105,7 +105,7 @@
           <div class="hint">Wird mit der Begrüßung gepostet.</div>
         </div>
       </div>
-<label>Text</label>
+      <label>Text</label>
       <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
       <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
     </section>
@@ -410,10 +410,42 @@
           </select>
         </label>
       </div>
-
-      <div class="sep"></div>
-      <h3>Gelöschte Accounts</h3>
-      <button class="btn danger" onclick="sendPayload({clean_delete_now:true})">Jetzt aufräumen</button>
+      <div class="card" id="sec-more">
+        <h3>Gelöschte Accounts</h3>
+        <div class="grid">
+          <label class="switch">
+            <input type="checkbox" id="clean_enabled"> Scheduler aktiv
+          </label>
+          <label>Uhrzeit <input type="time" id="clean_time" value="03:00"></label>
+          <label>Wochentag (optional)
+            <select id="clean_weekday">
+              <option value="">Täglich</option>
+              <option value="0">Montag</option><option value="1">Dienstag</option>
+              <option value="2">Mittwoch</option><option value="3">Donnerstag</option>
+              <option value="4">Freitag</option><option value="5">Samstag</option>
+              <option value="6">Sonntag</option>
+            </select>
+          </label>
+          <label class="switch"><input type="checkbox" id="clean_demote"> Admins demoten</label>
+          <label class="switch"><input type="checkbox" id="clean_notify" checked> Ergebnis melden</label>
+        </div>
+        <div class="row">
+          <button class="btn" onclick="sendPayload({ clean_delete_now: true })">Jetzt aufräumen</button>
+          <button class="btn primary" onclick="saveCleanScheduler()">Scheduler speichern</button>
+        </div>
+      </div>
+      <script>
+        function saveCleanScheduler(){
+          const wd = document.getElementById('clean_weekday').value;
+          sendPayload({ clean_deleted: {
+            enabled: document.getElementById('clean_enabled').checked,
+            time: document.getElementById('clean_time').value || "03:00",
+            weekday: wd === "" ? null : parseInt(wd,10),
+            demote: document.getElementById('clean_demote').checked,
+            notify: document.getElementById('clean_notify').checked
+          }});
+        }
+      </script>
     </section>
     
     <!-- PRO -->
@@ -818,6 +850,14 @@
         // More
         setVal('language', j.language||'');
         qs('#out').textContent='Bereit.';
+        if (j.clean_deleted){
+          qs('#clean_enabled').checked = !!j.clean_deleted.enabled;
+          qs('#clean_time').value = (j.clean_deleted.time || "03:00");
+          const wd = (j.clean_deleted.weekday == null ? "" : String(j.clean_deleted.weekday));
+          qs('#clean_weekday').value = wd;
+          qs('#clean_demote').checked = !!j.clean_deleted.demote;
+          qs('#clean_notify').checked = !!j.clean_deleted.notify;
+        }
       }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
       validateAll();
     }
