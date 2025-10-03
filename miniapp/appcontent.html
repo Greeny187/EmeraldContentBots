@@ -506,14 +506,17 @@
       qs('#sec-'+p.dataset.tab).classList.add('active');
     }));
 
+
     // Buttons
-    qs('#closeBtn').onclick=()=>{ try{ tg.close(); }catch{ window.close(); } };
-    qs('#resetBtn').onclick=()=>loadState();
-    qs('#saveBtn').onclick=()=>sendPayload();
+    qs('#closeBtn').onclick = ()=>{ try{ tg.close(); }catch{ window.close(); } };
+    qs('#resetBtn').onclick = ()=> loadState();
+    qs('#saveBtn').onclick  = ()=> sendPayload();
 
     // Live-Validierung
     function validTime(val){
-      const m=/^([01]?\d|2[0-3]):([0-5]\d)$/.exec((val||"").trim());
+      const s = (val||'').trim();
+      if (s==='') return true;                 // <- leer erlaubt
+      const m=/^([01]?\d|2[0-3]):([0-5]\d)$/.exec(s);
       return !!m;
     }
     function validInt(val){
@@ -524,39 +527,40 @@
       try{ const u=new URL(val); return !!u.protocol && !!u.host; }catch{ return false; }
     }
     function showErr(id,msg){ const el=qs('#'+id); if(!el) return; if(msg){ el.textContent=msg; el.hidden=false; } else { el.hidden=true; el.textContent=''; } }
-    function mark(el, bad){ el.classList.toggle('input-error', !!bad); }
+    function mark(el, bad){ if(!el) return; el.classList.toggle('input-error', !!bad); }
+
     function validateAll(){
       let ok=true;
 
-      // Times
-      const ns=qa('[data-key="night.start"]')[0]; const ne=qa('[data-key="night.end"]')[0];
-      if(ns){
-         const v=(ns.value||'').trim();
-         const bad = v!=='' && !validTime(v);
-         mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad;
-      }
-      if(ne){
-           const v=(ne.value||'').trim();
-          const bad = v!=='' && !validTime(v);
-          mark(ne,bad); showErr('err_nend', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad;
-      }
+      // Times (leer erlaubt)
+      const ns=qa('[data-key="night.start"]')[0];
+      const ne=qa('[data-key="night.end"]')[0];
+      if(ns){ const bad=!validTime(ns.value); mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
+      if(ne){ const bad=!validTime(ne.value); mark(ne,bad); showErr('err_nend',   bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
+
       // Int-Felder
       [['spam.policy_topic','err_spamtopic'],
-       ['report.topic','err_reporttopic'],
-       ['mood.topic','err_moodtopic']].forEach(([k,err])=>{
-         const el=qa(`[data-key="${k}"]`)[0]; if(!el) return;
-         const bad=!validInt(el.value); mark(el,bad); showErr(err, bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad;
-       });
+      ['report.topic','err_reporttopic'],
+      ['mood.topic','err_moodtopic']].forEach(([k,err])=>{
+        const el=qa(`[data-key="${k}"]`)[0]; if(!el) return;
+        const bad=!validInt(el.value); mark(el,bad); showErr(err, bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad;
+      });
       const rtopic=qs('#rss_topic'); if(rtopic){ const bad=!validInt(rtopic.value); mark(rtopic,bad); showErr('err_rsstopic', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
       const rtarget=qs('#router_target'); if(rtarget){ const bad=!validInt(rtarget.value); mark(rtarget,bad); showErr('err_rtarget', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
 
       // URL
-      const rurl=qs('#rss_url'); if(rurl && rurl.value.trim()){ const bad=!validUrl(rurl.value.trim()); mark(rurl,bad); showErr('err_rssurl', bad?'Ungültige URL':'' ); ok=ok && !bad; } else { showErr('err_rssurl',''); mark(rurl,false); }
+      const rurl=qs('#rss_url');
+      if(rurl && rurl.value.trim()){
+        const bad=!validUrl(rurl.value.trim()); mark(rurl,bad); showErr('err_rssurl', bad?'Ungültige URL':'' ); ok=ok && !bad;
+      } else { showErr('err_rssurl',''); mark(rurl,false); }
 
       qs('#saveBtn').disabled = !ok;
       return ok;
     }
-    qa('input:not([type="file"]),textarea,select').forEach(el=>el.addEventListener('input', validateAll));;
+
+    // WICHTIG: Event-Listener einmalig – inkl. file-Inputs
+    qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
+
 
     // --- Image Upload Handling (Welcome/Rules/Farewell) ---
     const IMG_PREV  = {
@@ -854,21 +858,18 @@
     // Save: Telegram sendData ODER HTTP-Fallback
     async function sendPayload(extra = {}) {
       const tg = window.Telegram?.WebApp; tg?.ready?.();
-      const INIT_DATA = tg?.initData || "";         // Signatur aus Telegram-WebView
-      const out = collect();                         // dein bestehendes Sammeln
+      const INIT_DATA = tg?.initData || "";
+      const out = collect();
       Object.assign(out, extra);
 
-      // Bilder in den Payload legen
+      // Bilder in den Payload legen (nur falls neu gewählt oder explizit gelöscht)
       ['welcome','rules','farewell'].forEach(k=>{
         out[k] = out[k] || {};
         if (IMG_UPLOADS[k]) {
-          // Neues Bild ausgewählt → Base64 mitsenden
-          out[k].img_base64 = IMG_UPLOADS[k];
+          out[k].img_base64 = IMG_UPLOADS[k];   // neues Bild
         } else if (CLEAR_FLAGS[k]) {
-          // Explizit „Bild löschen“ gedrückt
-          out[k].img_base64 = "";
+          out[k].img_base64 = "";               // Bild löschen
         }
-        // Falls weder neues Bild noch Löschung: nichts setzen → Backend-Fallback übernimmt (siehe 2B)
       });
 
       // 1) Telegram (lassen wir drin, wenn du willst):
