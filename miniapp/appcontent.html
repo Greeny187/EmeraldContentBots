@@ -411,7 +411,7 @@
         </label>
       </div>
     </section>
-    <div class="card">
+    <div class="card" id="sec-more">
       <h3>Gelöschte Accounts</h3>
       <button onclick="sendPayload({clean_delete_now:true})">Jetzt aufräumen</button>
     </div>
@@ -437,7 +437,6 @@
       <button class="btn primary" id="saveBtn" disabled>Speichern</button>
     </div>
   </div>
-
   <script>
     // --- Helpers ---
     const qs=(s,el=document)=>el.querySelector(s);
@@ -452,7 +451,11 @@
 
     const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
     const cid = parseInt(getUrlParam("cid")||0);
-    const API_BASE = getUrlParam("api","") || ""; // z.B. leer lassen (empfohlen)
+    const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
+    const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+      headers: { "X-Telegram-Init-Data": INIT_DATA }
+    });
 
     // Theme
     const themeKey = "emerald-theme";
@@ -519,7 +522,6 @@
     qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
 
     // --- Image Upload Handling (Welcome/Rules/Farewell) ---
-    const IMG_PREV = { welcome: qs('#welcome_img_prev'), rules: qs('#rules_img_prev'), farewell: qs('#farewell_img_prev') };
     const IMG_INPUT = { welcome: qs('#welcome_img'), rules: qs('#rules_img'), farewell: qs('#farewell_img') };
     const IMG_CLEAR_BTN = { welcome: qs('#welcome_img_clear'), rules: qs('#rules_img_clear'), farewell: qs('#farewell_img_clear') };
     const IMG_UPLOADS = { welcome:null, rules:null, farewell:null };  // base64
@@ -531,14 +533,20 @@
         const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
       });
     }
-    function setPreview(imgEl, url) {
-      if (!url) { imgEl.removeAttribute('src'); return; }
-      if (url.startsWith('/miniapp/file')) {
-        const glue = url.includes('?') ? '&' : '?';
-        url = `${url}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
-      }
-      imgEl.src = url;
+    function authUrl(u) {
+      if (!u || !u.includes('/miniapp/file')) return u;
+      const glue = u.includes('?') ? '&' : '?';
+      if (INIT_DATA) return `${u}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
+      return `${u}${glue}uid=${encodeURIComponent(uid)}`; // Browser-Fallback
     }
+    function setPreview(imgElOrKey, url) {
+      const imgEl = typeof imgElOrKey==='string' ? IMG_PREV[imgElOrKey] : imgElOrKey;
+      if (!imgEl) return;
+      if (!url) { imgEl.removeAttribute('src'); imgEl.dataset.hasImage='0'; return; }
+      imgEl.src = authUrl(url);
+      imgEl.dataset.hasImage='1';
+    }
+    
     Object.keys(IMG_INPUT).forEach(k=>{
       const inp=IMG_INPUT[k]; if(!inp) return;
       inp.addEventListener('change', async ()=>{
