@@ -42,6 +42,7 @@
     .item .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .hint{font-size:12px;color:var(--muted)}
     .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
+    .subsec{margin-top:10px;padding:10px;border:1px dashed var(--ring);border-radius:12px}
 
     /* Bildvorschau */
     .imgprev{display:block;max-width:180px;max-height:120px;border:1px solid var(--ring);border-radius:12px;object-fit:cover;background:#00000010}
@@ -410,7 +411,7 @@
           </select>
         </label>
       </div>
-      <div class="card">
+      <<div class="subsec">
         <h3>Gelöschte Accounts</h3>
         <div class="grid">
           <label class="switch">
@@ -501,7 +502,7 @@
     qa('#tabs .pill').forEach(p=>p.addEventListener('click',()=>{
       qa('#tabs .pill').forEach(x=>x.classList.remove('active'));
       p.classList.add('active');
-      qa('.card').forEach(s=>s.classList.remove('active'));
+      qa('section.card').forEach(s=>s.classList.remove('active'));
       qs('#sec-'+p.dataset.tab).classList.add('active');
     }));
 
@@ -849,6 +850,19 @@
       const INIT_DATA = tg?.initData || "";         // Signatur aus Telegram-WebView
       const out = collect();                         // dein bestehendes Sammeln
       Object.assign(out, extra);
+
+      // Bilder in den Payload legen
+      ['welcome','rules','farewell'].forEach(k=>{
+        out[k] = out[k] || {};
+        if (IMG_UPLOADS[k]) {
+          // Neues Bild ausgewählt → Base64 mitsenden
+          out[k].img_base64 = IMG_UPLOADS[k];
+        } else if (CLEAR_FLAGS[k]) {
+          // Explizit „Bild löschen“ gedrückt
+          out[k].img_base64 = "";
+        }
+        // Falls weder neues Bild noch Löschung: nichts setzen → Backend-Fallback übernimmt (siehe 2B)
+      });
 
       // 1) Telegram (lassen wir drin, wenn du willst):
       if (tg && tg.sendData) {
