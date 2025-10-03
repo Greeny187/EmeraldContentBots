@@ -116,15 +116,26 @@
       © Emerald Ökosystem · DevDashboard
     </footer>
   </div>
-
-  <script>
-    window.__CONFIG__ = {
-      API_BASE: "https://<DEINE-HEROKU-APP>.herokuapp.com/devdash",
-      BOT_USERNAME: "DeinBotOhneAt"
-    };
-  </script>
   <script src="./js/api.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/app.js"></script>
+  <script>
+    // Example in your frontend code
+    const response = await fetch(`${API_BASE}/auth/telegram`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+        credentials: 'include'
+    });
+    if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('auth_token', data.access_token);
+        window.location.href = '/dashboard'; // Ensure this path is correct
+    } else {
+        console.error('Authentication failed:', await response.text());
+    }
+  </script>
 </body>
 </html>
