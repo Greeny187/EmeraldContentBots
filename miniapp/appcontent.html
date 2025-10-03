@@ -410,11 +410,10 @@
           </select>
         </label>
       </div>
-    </section>
-    <div class="card" id="sec-more">
+      <div class="sep"></div>
       <h3>Gelöschte Accounts</h3>
-      <button onclick="sendPayload({clean_delete_now:true})">Jetzt aufräumen</button>
-    </div>
+      <button class="btn danger" onclick="sendPayload({clean_delete_now:true})">Jetzt aufräumen</button>
+    </section>
     <!-- PRO -->
     <section class="card" id="sec-pro">
       <div class="row">
@@ -522,31 +521,78 @@
     qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
 
     // --- Image Upload Handling (Welcome/Rules/Farewell) ---
-    const IMG_INPUT = { welcome: qs('#welcome_img'), rules: qs('#rules_img'), farewell: qs('#farewell_img') };
-    const IMG_CLEAR_BTN = { welcome: qs('#welcome_img_clear'), rules: qs('#rules_img_clear'), farewell: qs('#farewell_img_clear') };
-    const IMG_UPLOADS = { welcome:null, rules:null, farewell:null };  // base64
-    const PREV_IMAGES = { welcome:null, rules:null, farewell:null };  // bestehende URLs aus DB
-    const CLEAR_FLAGS = { welcome:false, rules:false, farewell:false };
+    const IMG_PREV  = {
+      welcome:  qs('#welcome_img_prev'),
+      rules:    qs('#rules_img_prev'),
+      farewell: qs('#farewell_img_prev')
+    };
+    const IMG_INPUT = {
+      welcome:  qs('#welcome_img'),
+      rules:    qs('#rules_img'),
+      farewell: qs('#farewell_img')
+    };
+    const IMG_CLEAR_BTN = {
+      welcome:  qs('#welcome_img_clear'),
+      rules:    qs('#rules_img_clear'),
+      farewell: qs('#farewell_img_clear')
+    };
+    const IMG_UPLOADS = { welcome:null, rules:null, farewell:null };   // base64 für POST
+    const PREV_IMAGES = { welcome:null, rules:null, farewell:null };   // vorhandene URLs aus DB
+    const CLEAR_FLAGS = { welcome:false, rules:false, farewell:false }; // explizit löschen
 
     function readAsDataURL(file){
       return new Promise((resolve,reject)=>{
-        const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
+        const r=new FileReader();
+        r.onload = ()=>resolve(r.result);
+        r.onerror= reject;
+        r.readAsDataURL(file);
       });
     }
-    function authUrl(u) {
-      if (!u || !u.includes('/miniapp/file')) return u;
+
+    // Auth-Parameter an /miniapp/file hängen (Telegram init_data oder Browser-Fallback uid)
+    function authUrl(u){
+      if(!u || !u.includes('/miniapp/file')) return u;
       const glue = u.includes('?') ? '&' : '?';
       if (INIT_DATA) return `${u}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
-      return `${u}${glue}uid=${encodeURIComponent(uid)}`; // Browser-Fallback
+      return `${u}${glue}uid=${encodeURIComponent(uid)}`;
     }
-    function setPreview(imgElOrKey, url) {
-      const imgEl = typeof imgElOrKey==='string' ? IMG_PREV[imgElOrKey] : imgElOrKey;
+
+    // WICHTIG: akzeptiert KEY ("welcome") ODER direkt ein <img>-Element
+    function setPreview(keyOrEl, url){
+      const imgEl = (typeof keyOrEl === 'string') ? IMG_PREV[keyOrEl] : keyOrEl;
       if (!imgEl) return;
-      if (!url) { imgEl.removeAttribute('src'); imgEl.dataset.hasImage='0'; return; }
+      if (!url) {
+        imgEl.removeAttribute('src');
+        imgEl.dataset.hasImage = '0';
+        return;
+      }
       imgEl.src = authUrl(url);
-      imgEl.dataset.hasImage='1';
+      imgEl.dataset.hasImage = '1';
     }
-    
+
+    // Upload-Change-Handler (bleibt wie gehabt – nutzt IMG_INPUT/IMG_CLEAR_BTN/CLEAR_FLAGS)
+    Object.entries(IMG_INPUT).forEach(([key, input])=>{
+      if (!input) return;
+      input.addEventListener('change', async (ev)=>{
+        const f = ev.target.files?.[0];
+        if(!f){ IMG_UPLOADS[key]=null; setPreview(key, PREV_IMAGES[key]); return; }
+        const b64 = await readAsDataURL(f);
+        IMG_UPLOADS[key] = b64;
+        setPreview(key, b64);
+        CLEAR_FLAGS[key] = false;
+        validateAll();
+      });
+    });
+    Object.entries(IMG_CLEAR_BTN).forEach(([key, btn])=>{
+      if (!btn) return;
+      btn.addEventListener('click', ()=>{
+        IMG_UPLOADS[key]=null;
+        CLEAR_FLAGS[key]=true;
+        setPreview(key, null);
+        validateAll();
+      });
+    });
+
     Object.keys(IMG_INPUT).forEach(k=>{
       const inp=IMG_INPUT[k]; if(!inp) return;
       inp.addEventListener('change', async ()=>{
@@ -807,7 +853,6 @@
         console.error("[apply] network error", e);
       }
     }
-
     // Init
     loadState();
   </script>
