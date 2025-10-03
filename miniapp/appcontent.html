@@ -691,6 +691,10 @@
             "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
           }
         });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`HTTP ${res.status}: ${t}`);
+      }
         const j = await res.json();
         // Welcome/Rules/Farewell
         setVal('welcome.on', j.welcome?.on);
