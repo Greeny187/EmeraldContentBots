@@ -530,9 +530,16 @@
 
       // Times
       const ns=qa('[data-key="night.start"]')[0]; const ne=qa('[data-key="night.end"]')[0];
-      if(ns){ const v=ns.value; const bad=!validTime(v); mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
-      if(ne){ const v=ne.value; const bad=!validTime(v); mark(ne,bad); showErr('err_nend', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
-
+      if(ns){
+         const v=(ns.value||'').trim();
+         const bad = v!=='' && !validTime(v);
+         mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad;
+      }
+      if(ne){
+           const v=(ne.value||'').trim();
+          const bad = v!=='' && !validTime(v);
+          mark(ne,bad); showErr('err_nend', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad;
+      }
       // Int-Felder
       [['spam.policy_topic','err_spamtopic'],
        ['report.topic','err_reporttopic'],
@@ -549,7 +556,7 @@
       qs('#saveBtn').disabled = !ok;
       return ok;
     }
-    qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
+    qa('input:not([type="file"]),textarea,select').forEach(el=>el.addEventListener('input', validateAll));;
 
     // --- Image Upload Handling (Welcome/Rules/Farewell) ---
     const IMG_PREV  = {
