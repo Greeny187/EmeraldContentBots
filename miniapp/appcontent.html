@@ -83,6 +83,7 @@
       <button class="pill" data-tab="aimod">KI-Moderation</button>
       <button class="pill" data-tab="faq">FAQ</button>
       <button class="pill" data-tab="report">Report</button>
+      <button class="pill" data-tab="stats">Statistik</button>
       <button class="pill" data-tab="mood">Mood</button>
       <button class="pill" data-tab="night">Nachtmodus</button>
       <button class="pill" data-tab="router">Router</button>
@@ -329,6 +330,21 @@
       <div class="sep"></div>
       <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
       <div id="reportStats" class="list"></div>
+      <section class="card" id="sec-stats">
+        <h3>📊 Statistik</h3>
+        <div class="grid">
+          <label>Zeitraum
+            <select id="stats_days">
+              <option value="7">7 Tage</option>
+              <option value="14" selected>14 Tage</option>
+              <option value="30">30 Tage</option>
+              <option value="60">60 Tage</option>
+            </select>
+          </label>
+          <button class="btn" id="stats_reload">Aktualisieren</button>
+        </div>
+        <div class="list" id="statsAgg"></div>
+        <div class="list" id="statsTop"></div>
     </section>
 
     <!-- MOOD -->
@@ -771,10 +787,10 @@
             "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
           }
         });
-      if (!res.ok) {
-        const t = await res.text();
-        throw new Error(`HTTP ${res.status}: ${t}`);
-      }
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`HTTP ${res.status}: ${t}`);
+        }
         const j = await res.json();
         // Welcome/Rules/Farewell
         setVal('welcome.on', j.welcome?.on);
@@ -831,6 +847,7 @@
         if(qs('#report_dest_topic')) qs('#report_dest_topic').checked = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'topic';
         setVal('report.topic', rep.topic ?? 0);
         renderReportStats(rep.stats || j.stats || []);
+        
         // Mood
         setVal('mood.question', j.mood?.question);
         setVal('mood.topic', j.mood?.topic);
@@ -851,38 +868,183 @@
           qs('#clean_demote').checked = !!j.clean_deleted.demote;
           qs('#clean_notify').checked = !!j.clean_deleted.notify;
         }
+
+        // lade aggregierte Statistik separat (auslagerung)
+        await loadStats();
       }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
       validateAll();
     }
 
-    // Save: Telegram sendData ODER HTTP-Fallback
+    // Statistik laden (wird separat aufgerufen)
+    async function loadStats(){
+      qs('#out').textContent='Lade …';
+      try{
+        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+          method: "GET",
+          mode: "cors",
+          credentials: "omit",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
+          }
+        });
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`HTTP ${res.status}: ${t}`);
+        }
+        const j = await res.json();
+        // Welcome/Rules/Farewell
+        setVal('welcome.on', j.welcome?.on);
+        setVal('welcome.text', j.welcome?.text);
+        setPreview('welcome',  j.welcome?.image_url || j.welcome?.image);
+        PREV_IMAGES.welcome = j.welcome?.image_url || j.welcome?.image || null;
+        setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
+        setPreview('rules',    j.rules?.image_url   || j.rules?.image);
+        PREV_IMAGES.rules   = j.rules?.image_url   || j.rules?.image   || null;
+        setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
+        setPreview('farewell', j.farewell?.image_url|| j.farewell?.image);
+        PREV_IMAGES.farewell= j.farewell?.image_url|| j.farewell?.image|| null;
+        // Spam
+        setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
+        setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
+        setVal('spam.block_media', j.spam?.block_media ?? false);
+        setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false);
+        setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
+        if(Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value=(j.spam.whitelist||[]).join('\n');
+        if(Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value=(j.spam.blacklist||[]).join('\n');
+        setVal('spam.action', j.spam?.action ?? '');
+        setVal('spam.per_user_daily_limit', j.spam?.per_user_daily_limit ?? 0);
+        setVal('spam.quota_notify', j.spam?.quota_notify ?? '');
+        // RSS
+        renderRss(j.rss?.feeds||[]);
+        // AI
+        setVal('ai.on', j.ai?.on ?? (j.ai?.faq || j.ai?.rss));
+        setVal('ai.faq', j.ai?.faq ?? '');
+        // AIMOD
+        const am = j.aimod||{};
+        setVal('ai_mod.enabled', am.enabled);
+        setVal('ai_mod.shadow_mode', am.shadow_mode);
+        setVal('ai_mod.action_primary', am.action_primary);
+        setVal('ai_mod.mute_minutes', am.mute_minutes);
+        setVal('ai_mod.warn_text', am.warn_text);
+        setVal('ai_mod.appeal_url', am.appeal_url);
+        setVal('ai_mod.max_per_min', am.max_calls_per_min);
+        setVal('ai_mod.cooldown_s', am.cooldown_s);
+        setVal('ai_mod.exempt_admins', am.exempt_admins);
+        setVal('ai_mod.exempt_topic_owner', am.exempt_topic_owner);
+        setVal('ai_mod.toxicity', am.toxicity ?? am.tox_thresh);
+        setVal('ai_mod.hate', am.hate ?? am.hate_thresh);
+        setVal('ai_mod.sexual', am.sexual ?? am.sex_thresh);
+        setVal('ai_mod.harassment', am.harassment ?? am.harass_thresh);
+        setVal('ai_mod.selfharm', am.selfharm ?? am.selfharm_thresh);
+        setVal('ai_mod.violence', am.violence ?? am.violence_thresh);
+        // FAQ & Router
+        renderFaq(j.faqs||[]);
+        renderRouter(j.router_rules||[]);
+        // Report
+        const rep = j.report || {};
+        setVal('report.enabled', rep.enabled ?? (!!j.daily_stats));
+        if(qs('#report_dest_dm'))    qs('#report_dest_dm').checked    = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'dm';
+        if(qs('#report_dest_topic')) qs('#report_dest_topic').checked = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'topic';
+        setVal('report.topic', rep.topic ?? 0);
+        renderReportStats(rep.stats || j.stats || []);
+        
+        // Mood
+        setVal('mood.question', j.mood?.question);
+        setVal('mood.topic', j.mood?.topic);
+        // Night
+        const n=j.night||{}; setVal('night.on', n.enabled); setVal('night.start', n.start||'22:00'); setVal('night.end', n.end||'07:00');
+        setVal('night.delete_non_admin_msgs', n.delete_non_admin_msgs);
+        setVal('night.warn_once', n.warn_once);
+        setVal('night.timezone', n.timezone||'Europe/Berlin');
+        setVal('night.hard_mode', n.hard_mode);
+        // More
+        setVal('language', j.language||'');
+        qs('#out').textContent='Bereit.';
+        if (j.clean_deleted){
+          qs('#clean_enabled').checked = !!j.clean_deleted.enabled;
+          qs('#clean_time').value = (j.clean_deleted.time || "03:00");
+          const wd = (j.clean_deleted.weekday == null ? "" : String(j.clean_deleted.weekday));
+          qs('#clean_weekday').value = wd;
+          qs('#clean_demote').checked = !!j.clean_deleted.demote;
+          qs('#clean_notify').checked = !!j.clean_deleted.notify;
+        }
+
+        // lade aggregierte Statistik separat (auslagerung)
+        await loadStats();
+      }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
+      validateAll();
+    }
+
+    // Statistik laden (wird separat aufgerufen)
+    async function loadStats(){
+      try{
+        const days = parseInt(qs('#stats_days')?.value||'14');
+        const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, {
+          headers:{'X-Telegram-Init-Data':INIT_DATA}
+        });
+        if(!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        // Agg
+        const aggBox = qs('#statsAgg'); aggBox.innerHTML = '<div class="title">Tageswerte</div>';
+        (data.agg||[]).forEach(r=>{
+          const it = document.createElement('div'); it.className='item';
+          it.innerHTML = `<div class="left"><div class="title">${r.date}</div>
+            <div class="hint">Msgs: ${r.messages} · Aktiv: ${r.active} · Joins: ${r.joins} · Spam: ${r.spam_actions} · p90: ${r.reply_p90_ms??'–'}ms</div></div>`;
+          aggBox.append(it);
+        });
+        // Top
+        const topBox = qs('#statsTop'); topBox.innerHTML = '<div class="title">Top-Responder</div>';
+        (data.top_responders||[]).forEach(t=>{
+          const it = document.createElement('div'); it.className='item';
+          const s = Math.round((t.avg_ms||0)/1000);
+          it.innerHTML = `<div class="left"><div class="title">User ${t.user_id}</div>
+            <div class="hint">${t.answers} Antworten · Ø ${s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`}</div></div>`;
+          topBox.append(it);
+        });
+      }catch(e){
+        console.error(e);
+        qs('#statsAgg').innerHTML='<div class="hint">Fehler beim Laden</div>';
+      }
+    }
+
+    qs('#stats_reload')?.addEventListener('click', loadStats);
+    qs('#stats_days')?.addEventListener('change', loadStats);
+        
+    // kleines Helferlein
+    function ok(msg){ const out=qs('#out'); out.textContent=msg||'✅ Gespeichert'; out.style.opacity=1; setTimeout(()=>out.style.opacity=0, 2200); }
+    function err(msg){ const out=qs('#out'); out.textContent=msg||'⚠️ Fehler beim Speichern'; out.style.opacity=1; }
+
+    // EINHEITLICHES Speichern mit Bild-Upload + Feedback
     async function sendPayload(extra = {}) {
       const tg = window.Telegram?.WebApp; tg?.ready?.();
-      const INIT_DATA = tg?.initData || "";
-      const out = collect();
-      Object.assign(out, extra);
+      const out = Object.assign({}, collect(), extra);
 
-      // Bilder in den Payload legen (nur falls neu gewählt oder explizit gelöscht)
+      // Bilder in den Payload legen (nur wenn gewählt / Clear-Flag gesetzt)
+      out.images = out.images || {};
       ['welcome','rules','farewell'].forEach(k=>{
-        out[k] = out[k] || {};
-        if (IMG_UPLOADS[k]) {
-          out[k].img_base64 = IMG_UPLOADS[k];   // neues Bild
-        } else if (CLEAR_FLAGS[k]) {
-          out[k].img_base64 = "";               // Bild löschen
+        if (CLEAR_FLAGS[k]===true) {
+          // explizit löschen
+          out[k] = out[k] || {};
+          out[k].img_base64 = "";
+        } else if (IMG_UPLOADS[k]) {
+          out[k] = out[k] || {};
+          out[k].img_base64 = IMG_UPLOADS[k];
         }
       });
 
-      // 1) Telegram (lassen wir drin, wenn du willst):
-      if (tg && tg.sendData) {
-        tg.sendData(JSON.stringify(out));
-      }
+      // UI: disable active button
+      const btn = document.activeElement;
+      if (btn && btn.tagName==='BUTTON') { btn.disabled = true; btn.dataset._old = btn.textContent; btn.textContent='Speichere…'; }
+      qs('#out').textContent='Speichere …';
 
-      // 2) IMMER zusätzlich HTTP-POST (direkter DB-Write):
-      const API_BASE = new URLSearchParams(location.search).get("api")
-        || "https://emeraldcontent-aac379fc581e.herokuapp.com"; // deine Heroku-Base
-      const cid = new URLSearchParams(location.search).get("cid");
+      try{
+        // 1) Telegram sendData (optional)
+        if (tg && tg.sendData) {
+          try { tg.sendData(JSON.stringify(out)); } catch(e){ /* no-op */ }
+        }
 
-      try {
+        // 2) Always POST to server
         const res = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
           method: "POST",
           headers: {
@@ -891,12 +1053,23 @@
           },
           body: JSON.stringify(out)
         });
-        const txt = await res.text();
-        console.log("[apply]", res.status, txt);
-      } catch (e) {
-        console.error("[apply] network error", e);
+
+        const text = await res.text();
+        if(!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
+
+        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch {}
+        ok('✅ Gespeichert');
+        await loadState();  // neu laden, damit Listen/Previews aktuell sind
+      }catch(e){
+        console.error(e);
+        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error'); } catch {}
+        err(e.message || 'Fehler beim Speichern');
+      }finally{
+        const b = document.querySelector('button[disabled][data-_old]');
+        if (b){ b.disabled=false; b.textContent=b.dataset._old; delete b.dataset._old; }
       }
     }
+
     // Init
     loadState();
   </script>
