@@ -330,21 +330,24 @@
       <div class="sep"></div>
       <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
       <div id="reportStats" class="list"></div>
-      <section class="card" id="sec-stats">
-        <h3>📊 Statistik</h3>
-        <div class="grid">
-          <label>Zeitraum
-            <select id="stats_days">
-              <option value="7">7 Tage</option>
-              <option value="14" selected>14 Tage</option>
-              <option value="30">30 Tage</option>
-              <option value="60">60 Tage</option>
-            </select>
-          </label>
-          <button class="btn" id="stats_reload">Aktualisieren</button>
-        </div>
-        <div class="list" id="statsAgg"></div>
-        <div class="list" id="statsTop"></div>
+    </section>
+
+    <!-- STATS -->
+    <section class="card" id="sec-stats">
+      <h3>📊 Statistik</h3>
+      <div class="grid">
+        <label>Zeitraum
+          <select id="stats_days">
+            <option value="7">7 Tage</option>
+            <option value="14" selected>14 Tage</option>
+            <option value="30">30 Tage</option>
+            <option value="60">60 Tage</option>
+          </select>
+        </label>
+        <button class="btn" id="stats_reload">Aktualisieren</button>
+      </div>
+      <div class="list" id="statsAgg"></div>
+      <div class="list" id="statsTop"></div>
     </section>
 
     <!-- MOOD -->
@@ -520,6 +523,7 @@
       p.classList.add('active');
       qa('section.card').forEach(s=>s.classList.remove('active'));
       qs('#sec-'+p.dataset.tab).classList.add('active');
+      if (p.dataset.tab === 'stats') { loadStats(); }
     }));
 
 
@@ -607,6 +611,20 @@
       });
     }
 
+    // NEU: Bild vor Upload komprimieren (verhindert zu große JSON-Bodies → "Failed to fetch")
+    async function compressImage(file, maxSide=1280, quality=0.82){
+      const data = await readAsDataURL(file);
+      const img = new Image(); img.src = data; await new Promise(r=>{ img.onload=r; img.onerror=r; });
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, maxSide / Math.max(w, h));
+      const cw = Math.max(1, Math.round(w*scale));
+      const ch = Math.max(1, Math.round(h*scale));
+      const canvas = document.createElement('canvas'); canvas.width=cw; canvas.height=ch;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, cw, ch);
+      return canvas.toDataURL('image/jpeg', quality);
+    }
+
+
     // Auth-Parameter an /miniapp/file hängen (Telegram init_data oder Browser-Fallback uid)
     function authUrl(u){
       if(!u || !u.includes('/miniapp/file')) return u;
@@ -634,7 +652,7 @@
       input.addEventListener('change', async (ev)=>{
         const f = ev.target.files?.[0];
         if(!f){ IMG_UPLOADS[key]=null; setPreview(key, PREV_IMAGES[key]); return; }
-        const b64 = await readAsDataURL(f);
+        const b64 = await compressImage(f, 1280, 0.82);
         IMG_UPLOADS[key] = b64;
         setPreview(key, b64);
         CLEAR_FLAGS[key] = false;
@@ -877,107 +895,6 @@
 
     // Statistik laden (wird separat aufgerufen)
     async function loadStats(){
-      qs('#out').textContent='Lade …';
-      try{
-        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
-          method: "GET",
-          mode: "cors",
-          credentials: "omit",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
-          }
-        });
-        if (!res.ok) {
-          const t = await res.text();
-          throw new Error(`HTTP ${res.status}: ${t}`);
-        }
-        const j = await res.json();
-        // Welcome/Rules/Farewell
-        setVal('welcome.on', j.welcome?.on);
-        setVal('welcome.text', j.welcome?.text);
-        setPreview('welcome',  j.welcome?.image_url || j.welcome?.image);
-        PREV_IMAGES.welcome = j.welcome?.image_url || j.welcome?.image || null;
-        setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
-        setPreview('rules',    j.rules?.image_url   || j.rules?.image);
-        PREV_IMAGES.rules   = j.rules?.image_url   || j.rules?.image   || null;
-        setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
-        setPreview('farewell', j.farewell?.image_url|| j.farewell?.image);
-        PREV_IMAGES.farewell= j.farewell?.image_url|| j.farewell?.image|| null;
-        // Spam
-        setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
-        setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
-        setVal('spam.block_media', j.spam?.block_media ?? false);
-        setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false);
-        setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
-        if(Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value=(j.spam.whitelist||[]).join('\n');
-        if(Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value=(j.spam.blacklist||[]).join('\n');
-        setVal('spam.action', j.spam?.action ?? '');
-        setVal('spam.per_user_daily_limit', j.spam?.per_user_daily_limit ?? 0);
-        setVal('spam.quota_notify', j.spam?.quota_notify ?? '');
-        // RSS
-        renderRss(j.rss?.feeds||[]);
-        // AI
-        setVal('ai.on', j.ai?.on ?? (j.ai?.faq || j.ai?.rss));
-        setVal('ai.faq', j.ai?.faq ?? '');
-        // AIMOD
-        const am = j.aimod||{};
-        setVal('ai_mod.enabled', am.enabled);
-        setVal('ai_mod.shadow_mode', am.shadow_mode);
-        setVal('ai_mod.action_primary', am.action_primary);
-        setVal('ai_mod.mute_minutes', am.mute_minutes);
-        setVal('ai_mod.warn_text', am.warn_text);
-        setVal('ai_mod.appeal_url', am.appeal_url);
-        setVal('ai_mod.max_per_min', am.max_calls_per_min);
-        setVal('ai_mod.cooldown_s', am.cooldown_s);
-        setVal('ai_mod.exempt_admins', am.exempt_admins);
-        setVal('ai_mod.exempt_topic_owner', am.exempt_topic_owner);
-        setVal('ai_mod.toxicity', am.toxicity ?? am.tox_thresh);
-        setVal('ai_mod.hate', am.hate ?? am.hate_thresh);
-        setVal('ai_mod.sexual', am.sexual ?? am.sex_thresh);
-        setVal('ai_mod.harassment', am.harassment ?? am.harass_thresh);
-        setVal('ai_mod.selfharm', am.selfharm ?? am.selfharm_thresh);
-        setVal('ai_mod.violence', am.violence ?? am.violence_thresh);
-        // FAQ & Router
-        renderFaq(j.faqs||[]);
-        renderRouter(j.router_rules||[]);
-        // Report
-        const rep = j.report || {};
-        setVal('report.enabled', rep.enabled ?? (!!j.daily_stats));
-        if(qs('#report_dest_dm'))    qs('#report_dest_dm').checked    = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'dm';
-        if(qs('#report_dest_topic')) qs('#report_dest_topic').checked = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'topic';
-        setVal('report.topic', rep.topic ?? 0);
-        renderReportStats(rep.stats || j.stats || []);
-        
-        // Mood
-        setVal('mood.question', j.mood?.question);
-        setVal('mood.topic', j.mood?.topic);
-        // Night
-        const n=j.night||{}; setVal('night.on', n.enabled); setVal('night.start', n.start||'22:00'); setVal('night.end', n.end||'07:00');
-        setVal('night.delete_non_admin_msgs', n.delete_non_admin_msgs);
-        setVal('night.warn_once', n.warn_once);
-        setVal('night.timezone', n.timezone||'Europe/Berlin');
-        setVal('night.hard_mode', n.hard_mode);
-        // More
-        setVal('language', j.language||'');
-        qs('#out').textContent='Bereit.';
-        if (j.clean_deleted){
-          qs('#clean_enabled').checked = !!j.clean_deleted.enabled;
-          qs('#clean_time').value = (j.clean_deleted.time || "03:00");
-          const wd = (j.clean_deleted.weekday == null ? "" : String(j.clean_deleted.weekday));
-          qs('#clean_weekday').value = wd;
-          qs('#clean_demote').checked = !!j.clean_deleted.demote;
-          qs('#clean_notify').checked = !!j.clean_deleted.notify;
-        }
-
-        // lade aggregierte Statistik separat (auslagerung)
-        await loadStats();
-      }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
-      validateAll();
-    }
-
-    // Statistik laden (wird separat aufgerufen)
-    async function loadStats(){
       try{
         const days = parseInt(qs('#stats_days')?.value||'14');
         const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, {
@@ -1045,7 +962,7 @@
         }
 
         // 2) Always POST to server
-        const res = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
+        const bulk = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1054,16 +971,34 @@
           body: JSON.stringify(out)
         });
 
-        const text = await res.text();
-        if(!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
+        if(!bulk.ok){
+          const text = await bulk.text();
+          throw new Error(`HTTP ${bulk.status}: ${text}`);
+        }
 
         try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch {}
         ok('✅ Gespeichert');
         await loadState();  // neu laden, damit Listen/Previews aktuell sind
       }catch(e){
-        console.error(e);
-        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error'); } catch {}
-        err(e.message || 'Fehler beim Speichern');
+        console.warn('[apply] bulk failed, fallback in Teile', e);
+        // Fallback: erst ohne Bilder, dann Bilder einzeln
+        const {welcome, rules, farewell, ...rest} = out;
+        await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
+          method:"POST", headers:{"Content-Type":"application/json","X-Telegram-Init-Data":INIT_DATA},
+          body: JSON.stringify(rest)
+        });
+        for (const [k, block] of Object.entries({welcome, rules, farewell})) {
+          if (!block) continue;
+          const hasImg = Object.prototype.hasOwnProperty.call(block,'img_base64');
+          if (!hasImg) continue;
+          await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
+            method:"POST", headers:{"Content-Type":"application/json","X-Telegram-Init-Data":INIT_DATA},
+            body: JSON.stringify({ [k]: block })
+          });
+        }
+        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch {}
+        ok('✅ Gespeichert');
+        await loadState();
       }finally{
         const b = document.querySelector('button[disabled][data-_old]');
         if (b){ b.disabled=false; b.textContent=b.dataset._old; delete b.dataset._old; }
