@@ -453,9 +453,16 @@ body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
 .news-card.near .near-head{
   display:flex; align-items:center; gap:10px; margin-bottom:6px;
 }
-.logo-near{
-  width: 64px; height: auto; flex: 0 0 auto; color: #FFFFFF;
-}
+/* Offizielles NEAR-Logo: Umschaltung je Theme */
+.logo-near{ height:auto; vertical-align:middle; }
+.logo-near--dark{  display:none; }  /* Standard: light */
+.logo-near--light{ display:inline-block; }
+
+.dark .logo-near--dark{  display:inline-block; }
+.dark .logo-near--light{ display:none; }
+
+/* (Deine bestehende .news-card.near/.pinned-Optik kann bleiben) */
+
 body.light .logo-near{ color:#121417; }
 
 /* Gepinnt = optisch hervorheben */
