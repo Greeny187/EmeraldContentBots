@@ -442,3 +442,25 @@ body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
 .news-date{ font-size:.85rem; color: var(--muted); margin-bottom:6px; }
 .news-card h4{ margin:4px 0 8px; }
 .news-card ul{ margin:0; padding-left:18px; }
+
+/* ============== NEAR Integration Card ============== */
+.news-card.near{
+  border-color: rgba(16,199,160,.55);
+  background:
+    linear-gradient(0deg, rgba(16,199,160,.06), rgba(16,199,160,.06)),
+    rgba(255,255,255,.02);
+}
+.news-card.near .near-head{
+  display:flex; align-items:center; gap:10px; margin-bottom:6px;
+}
+.logo-near{
+  width: 64px; height: auto; flex: 0 0 auto; color: #FFFFFF;
+}
+body.light .logo-near{ color:#121417; }
+
+/* Gepinnt = optisch hervorheben */
+.news-card.pinned{
+  position: relative;
+  box-shadow: 0 12px 28px rgba(16,199,160,.16);
+  border-width: 2px;
+}
