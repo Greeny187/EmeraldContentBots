@@ -290,16 +290,15 @@
           <li>
             💎 <strong>NEAR:</strong>
             <code id="near-addr">pay.emeraldcontent.near</code>
-            <button class="copy-btn" data-copy-target="#near-addr" aria-label="NEAR-Adresse kopieren">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
-            <span class="sr-only">Kopieren</span>
+            <button class="copy-btn" data-copy-target="#near-addr" aria-label="NEAR kopieren">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+              <span class="sr-only">Kopieren</span>
             </button>
           </li>
           <li>
             📩 <strong>PayPal:</strong>
             <a href="mailto:Emerald@mail.de" id="paypal-mail">Emerald@mail.de</a>
-            <!-- PayPal -->
-            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal E-Mail kopieren">
+            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal kopieren">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
               <span class="sr-only">Kopieren</span>
             </button>
@@ -361,32 +360,16 @@
     })();
     // Copy-Buttons (unterstützt data-copy-target und data-copy-text)
     document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.copy-btn');
-      if (!btn) return;
-
-      const targetSel = btn.getAttribute('data-copy-target');
-      const directText = btn.getAttribute('data-copy-text');
-      let text = directText || '';
-
-      if (targetSel) {
-        const el = document.querySelector(targetSel);
-        if (el) text = (el.textContent || el.value || '').trim();
-      }
-
+      const btn = e.target.closest('.copy-btn'); if (!btn) return;
+      const sel = btn.getAttribute('data-copy-target');
+      const direct = btn.getAttribute('data-copy-text');
+      let text = direct || (sel && (document.querySelector(sel)?.textContent||'').trim()) || '';
       if (!text) return;
-
-      try {
-        await navigator.clipboard.writeText(text);
-        // neu:
-        btn.classList.add('copied');
-        btn.setAttribute('aria-label', 'Kopiert');
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          btn.setAttribute('aria-label', 'Kopieren');
-        }, 1200);
-      } catch (err) {
-        console.error('Kopieren fehlgeschlagen', err);
-      }
+      try { await navigator.clipboard.writeText(text);
+        btn.classList.add('copied'); btn.setAttribute('aria-label','Kopiert');
+        setTimeout(()=>{ btn.classList.remove('copied'); btn.setAttribute('aria-label','Kopieren'); }, 1200);
+      } catch {}
+    });
   </script>
 </body>
 </html>
