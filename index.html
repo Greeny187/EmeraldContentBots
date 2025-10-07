@@ -231,9 +231,14 @@
         <article class="news-card near pinned">
           <div class="news-date">07.10.2025</div>
           <div class="near-head">
-            <!-- Offizielles NEAR-Logo: zwei Varianten, Theme-aware -->
-            <img class="logo-near logo-near--dark"  src="./assets/near-logo-dark.svg"  alt="NEAR Protocol" width="120" height="32" />
-            <img class="logo-near logo-near--light" src="./assets/near-logo-light.svg" alt="NEAR Protocol" width="120" height="32" />
+            <!-- Offizielles NEAR-Logo (lokal bevorzugt, offizieller Fallback aus dem Press Center) -->
+              <img
+                class="logo-near-img"
+                src="./assets/near-logo-black.svg"
+                alt="NEAR Protocol logo"
+                width="120" height="32"
+                onerror="this.onerror=null; this.src='https://pages.near.org/wp-content/themes/near-21/assets/img/relaunch/logo_near.svg'; this.classList.add('logo-near--fallback');"
+              />
             <h4>NEAR Protocol Integration – angekündigt</h4>
           </div>
           <ul>
@@ -243,6 +248,10 @@
             <li><strong>Rollout:</strong> Start im Content Bot → später Suite-weit</li>
           </ul>
           <p class="muted small">Kickoff: Q4 2025 · Erstes Ziel: bequeme Pro-Freischaltung + transparente Verifikation.</p>
+          <p class="muted small">
+            Brand-Quelle: <a href="https://pages.near.org/about/brand/" target="_blank" rel="noopener noreferrer">NEAR Brand</a> ·
+            <a href="https://pages.near.org/about/press-center/" target="_blank" rel="noopener noreferrer">Press Center</a>
+          </p>
         </article>
         <article class="news-card">
           <div class="news-date">05.09.2025</div>
@@ -281,12 +290,19 @@
           <li>
             💎 <strong>NEAR:</strong>
             <code id="near-addr">pay.emeraldcontent.near</code>
-            <button class="copy-btn" data-copy-target="#near-addr" aria-label="NEAR-Adresse kopieren">Kopieren</button>
+            <button class="copy-btn" data-copy-target="#near-addr" aria-label="NEAR-Adresse kopieren">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+            <span class="sr-only">Kopieren</span>
+            </button>
           </li>
           <li>
             📩 <strong>PayPal:</strong>
             <a href="mailto:Emerald@mail.de" id="paypal-mail">Emerald@mail.de</a>
-            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal E-Mail kopieren">Kopieren</button>
+            <!-- PayPal -->
+            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal E-Mail kopieren">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+              <span class="sr-only">Kopieren</span>
+            </button>
           </li>
         </ul>
       </div>
@@ -325,7 +341,10 @@
         if (!Array.isArray(items) || !items.length) return;
 
         const grid = document.getElementById('news-grid');
-        grid.innerHTML = ''; // Fallback-News entfernen
+        // nur nicht-gepinnte Karten entfernen
+        [...grid.children].forEach(el => {
+          if (!el.classList.contains('pinned')) el.remove();
+        });
 
         items.forEach(n => {
           const card = document.createElement('article');
