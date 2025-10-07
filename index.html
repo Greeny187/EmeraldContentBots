@@ -377,14 +377,16 @@
 
       try {
         await navigator.clipboard.writeText(text);
-        const old = btn.textContent;
-        btn.textContent = 'Kopiert ✅';
-        setTimeout(() => (btn.textContent = old), 1400);
-      } catch {
-        btn.textContent = 'Fehler 😕';
-        setTimeout(() => (btn.textContent = 'Kopieren'), 1400);
+        // neu:
+        btn.classList.add('copied');
+        btn.setAttribute('aria-label', 'Kopiert');
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.setAttribute('aria-label', 'Kopieren');
+        }, 1200);
+      } catch (err) {
+        console.error('Kopieren fehlgeschlagen', err);
       }
-    });
   </script>
 </body>
 </html>
