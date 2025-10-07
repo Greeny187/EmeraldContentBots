@@ -174,7 +174,7 @@
             </tr>
           </tbody>
         </table>
-        <p class="muted small">Zahlungsoptionen vorbereitet: Telegram Stars, PayPal, Coinbase Commerce.</p>
+        <p class="muted small">Zahlungsoptionen vorbereitet: NEAR, Telegram Stars, PayPal, Coinbase Commerce.</p>
       </div>
     </section>
 
@@ -228,22 +228,21 @@
     <section class="content news" id="news">
       <h3>Aktuelles</h3>
       <div class="news-grid" id="news-grid">
-        <!-- Fallback-Items (werden durch JSON-Loader ergänzt/ersetzt) -->
         <article class="news-card near pinned">
           <div class="news-date">07.10.2025</div>
           <div class="near-head">
-            <!-- Offizielles NEAR-Logo, theme-aware per .light/.dark -->
-            <img class="logo-near logo-near--dark"  src="./assets/near-logo-dark.svg"  alt="NEAR Protocol logo" width="120" height="32" />
-            <img class="logo-near logo-near--light" src="./assets/near-logo-light.svg" alt="NEAR Protocol logo" width="120" height="32" />
+            <!-- Offizielles NEAR-Logo: zwei Varianten, Theme-aware -->
+            <img class="logo-near logo-near--dark"  src="./assets/near-logo-dark.svg"  alt="NEAR Protocol" width="120" height="32" />
+            <img class="logo-near logo-near--light" src="./assets/near-logo-light.svg" alt="NEAR Protocol" width="120" height="32" />
             <h4>NEAR Protocol Integration – angekündigt</h4>
           </div>
           <ul>
             <li><strong>Pro-Abo via NEAR</strong> (optional) – Krypto-freundliche Zahlungsoption</li>
             <li><strong>On-Chain Verifizierung</strong> des Pro-Status (Wallet-basiert)</li>
             <li><strong>Key/Wallet-Setup</strong> vorbereitet (Seed-Phrase-Support)</li>
-            <li><strong>Rollout:</strong> Start im Content Bot → spätere Suite-Weiternutzung</li>
+            <li><strong>Rollout:</strong> Start im Content Bot → später Suite-weit</li>
           </ul>
-          <p class="muted small">Kickoff: Q4 2025 · Erstes Ziel: Bequeme Pro-Freischaltung + transparente Verifikation.</p>
+          <p class="muted small">Kickoff: Q4 2025 · Erstes Ziel: bequeme Pro-Freischaltung + transparente Verifikation.</p>
         </article>
         <article class="news-card">
           <div class="news-date">05.09.2025</div>
@@ -275,13 +274,20 @@
         </article>
       </div>
     </section>
-
     <footer>
       <div class="donation">
         <p>💚 Du möchtest das Projekt unterstützen?</p>
         <ul>
-          <li>📩 <strong>PayPal:</strong> <a href="mailto:Emerald@mail.de">Emerald@mail.de</a></li>
-          <li>💎 <strong>TON:</strong> <code>UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L</code></li>
+          <li>
+            💎 <strong>NEAR:</strong>
+            <code id="near-addr">pay.emeraldcontent.near</code>
+            <button class="copy-btn" data-copy-target="#near-addr" aria-label="NEAR-Adresse kopieren">Kopieren</button>
+          </li>
+          <li>
+            📩 <strong>PayPal:</strong>
+            <a href="mailto:Emerald@mail.de" id="paypal-mail">Emerald@mail.de</a>
+            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal E-Mail kopieren">Kopieren</button>
+          </li>
         </ul>
       </div>
       <p>&copy; 2025 Emerald Content</p>
@@ -334,6 +340,32 @@
         });
       } catch(e) { /* stiller Fallback */ }
     })();
+    // Copy-Buttons (unterstützt data-copy-target und data-copy-text)
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+
+      const targetSel = btn.getAttribute('data-copy-target');
+      const directText = btn.getAttribute('data-copy-text');
+      let text = directText || '';
+
+      if (targetSel) {
+        const el = document.querySelector(targetSel);
+        if (el) text = (el.textContent || el.value || '').trim();
+      }
+
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const old = btn.textContent;
+        btn.textContent = 'Kopiert ✅';
+        setTimeout(() => (btn.textContent = old), 1400);
+      } catch {
+        btn.textContent = 'Fehler 😕';
+        setTimeout(() => (btn.textContent = 'Kopieren'), 1400);
+      }
+    });
   </script>
 </body>
 </html>

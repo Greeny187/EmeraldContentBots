@@ -443,7 +443,26 @@ body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
 .news-card h4{ margin:4px 0 8px; }
 .news-card ul{ margin:0; padding-left:18px; }
 
-/* ============== NEAR Integration Card ============== */
+/* Gepinnt = optisch hervorheben */
+.news-card.pinned{
+  position: relative;
+  box-shadow: 0 12px 28px rgba(16,199,160,.16);
+  border-width: 2px;
+}
+/* Copy-Buttons */
+.copy-btn{
+  margin-left:10px; padding:4px 8px; font-size:.9rem; cursor:pointer;
+  border:1px solid var(--border); border-radius:8px;
+  background: rgba(255,255,255,.04); color: inherit;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.copy-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(16,199,160,.45);
+  box-shadow: 0 8px 18px rgba(16,199,160,.12);
+}
+
+/* NEAR Teaser + Logo */
 .news-card.near{
   border-color: rgba(16,199,160,.55);
   background:
@@ -453,17 +472,15 @@ body.light .header-button.secondary{color:#0C1424;border-color:rgba(0,0,0,.4)}
 .news-card.near .near-head{
   display:flex; align-items:center; gap:10px; margin-bottom:6px;
 }
-/* Offizielles NEAR-Logo: Umschaltung je Theme */
-.logo-near{ height:auto; vertical-align:middle; }
-.logo-near--dark{  display:none; }  /* Standard: light */
-.logo-near--light{ display:inline-block; }
+.logo-near{ height:auto; vertical-align:middle }
 
-.dark .logo-near--dark{  display:inline-block; }
-.dark .logo-near--light{ display:none; }
+/* Sichtbarkeit: default = dunkles Theme → zeige die "dark"-Variante (weiße Wortmarke) */
+.logo-near--dark{  display:inline-block; }
+.logo-near--light{ display:none; }
 
-/* (Deine bestehende .news-card.near/.pinned-Optik kann bleiben) */
-
-body.light .logo-near{ color:#121417; }
+/* Im Light-Mode die schwarze Wortmarke zeigen */
+body.light .logo-near--dark{  display:none; }
+body.light .logo-near--light{ display:inline-block; }
 
 /* Gepinnt = optisch hervorheben */
 .news-card.pinned{
