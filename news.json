@@ -1,15 +1,5 @@
 [
   {
-    "date": "2025-10-07",
-    "title": "NEAR Protocol Integration – angekündigt",
-    "points": [
-      "Pro-Abo via NEAR (optional)",
-      "On-Chain Verifizierung des Pro-Status",
-      "Key/Wallet-Setup mit Seed-Phrase-Support",
-      "Start im Content Bot, später Suite-weit"
-    ]
-  },
-  {
     "date": "2025-09-05",
     "title": "Content Bot v0.91 – Stabilitäts-Release",
     "points": [
