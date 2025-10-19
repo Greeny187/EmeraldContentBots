@@ -17,45 +17,47 @@
   <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
 
   <script>
-    // ---- Konfiguration ----
+    // ---- Config ----
     window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // MIT /devdash
-    window.BOT_USERNAME = "EmeraldContentBot";  // exakt wie bei BotFather, ohne @
+    window.BOT_USERNAME = "EmeraldContentBot"; // exakt wie im BotFather, ohne @
     window.NEAR_NETWORK = "mainnet";
 
     const tokenKey = "emerald_token";
 
-    // Wird HOISTED (keine TDZ-Probleme)
+    // 1) authHeaders als Function Declaration (hoisted, keine TDZ-Probleme)
     function authHeaders(){
       const t = localStorage.getItem(tokenKey);
       return t
-        ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
-        : { "Content-Type":"application/json" };
+        ? { "Authorization": "Bearer "+t, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
     }
-    // erst NACH der Definition exportieren:
-    window.authHeaders = authHeaders;
+    window.authHeaders = authHeaders; // erst NACH der Definition exportieren
 
-    // Telegram Login Callback – MUSS VOR dem Widget-Script definiert sein
+    // 2) Telegram-Callback: hier sehr laut debuggen
     window.onTelegramAuth = async function(user){
       try {
-        const res = await fetch(window.API_BASE + "/auth/telegram", {
-          method:"POST",
-          headers: {"Content-Type":"application/json"},
+        console.log("[TG] callback payload:", user);
+        const r = await fetch(window.API_BASE + "/auth/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(user)
         });
-        if(!res.ok){
-          alert("Login fehlgeschlagen: " + await res.text());
-          return;
-        }
-        const data = await res.json();
+        const txt = await r.text();
+        console.log("[TG] /auth/telegram ->", r.status, txt);
+
+        if (!r.ok) { alert("Login-Fehler: " + txt); return; }
+
+        const data = JSON.parse(txt);
         localStorage.setItem(tokenKey, data.access_token);
-        document.getElementById("login").style.display = "none";
-        await bootAfterLogin();
+        document.getElementById("login")?.style?.setProperty("display","none");
+        await bootAfterLogin?.();
       } catch (e) {
+        console.error("[TG] exception", e);
         alert("Netzwerkfehler beim Login: " + (e?.message||e));
       }
     };
 
-    // Widget-Mount (fügt das Telegram-Script dynamisch ein)
+    // 3) Widget-Mount (Callback muss JETZT schon existieren)
     function mountLogin(){
       const slot = document.getElementById("tgSlot");
       slot.innerHTML = "";
@@ -66,18 +68,15 @@
       s.setAttribute("data-size", "large");
       s.setAttribute("data-userpic", "true");
       s.setAttribute("data-request-access", "write");
-      s.setAttribute("data-onauth", "onTelegramAuth");
+      s.setAttribute("data-onauth", "onTelegramAuth");  // exakt der Funktionsname (global)
       slot.appendChild(s);
     }
 
     function getToken(){ return localStorage.getItem(tokenKey); }
 
     function boot(){
-      mountLogin(); // Widget IMMER einhängen
-      if (getToken()) {
-        document.getElementById("login").style.display = "none";
-        bootAfterLogin();
-      }
+      mountLogin(); // Script ins DOM hängen => Button erscheint
+      if (getToken()) { document.getElementById("login").style.display = "none"; bootAfterLogin?.(); }
     }
     document.addEventListener("DOMContentLoaded", boot);
   </script>
