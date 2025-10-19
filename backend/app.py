@@ -19,14 +19,17 @@ logger = logging.getLogger(__name__)
 NEAR_RPC_URL = os.getenv("NEAR_RPC_URL", "https://rpc.mainnet.near.org")
 app = FastAPI(title="Emerald DevDash API",version="0.2-min")
 
-# Add CORS middleware at the top after FastAPI initialization
+_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
+allow_all = "*" in _origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your frontend domain
+    allow_origins=["*"] if allow_all else _origins,  # z.B. ["https://greeny187.github.io"]
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET","POST","PUT","DELETE","OPTIONS"],
+    allow_headers=["*"],  # enthält Content-Type, Authorization etc.
 )
+
 
 @app.middleware("http")
 async def log_requests(request, call_next):
