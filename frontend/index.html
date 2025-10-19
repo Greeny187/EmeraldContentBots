@@ -12,9 +12,11 @@
     pre { white-space: pre-wrap; word-break: break-word; }
     .pill { padding:2px 8px; border:1px solid #374151; border-radius:999px; font-size:12px; }
     input { background:#0b1020; color:#cbd5e1; border:1px solid #1f2937; border-radius:8px; padding:6px 8px; }
-    h4 { margin: 8px 0; }
+    h4 { margin: 8px 0; }    
   </style>
   <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
   <script>
     // ===== GLOBAL CONFIG (edit these) =====
@@ -126,49 +128,93 @@
   <!-- Wallet Selector (ESM) -->
   <link rel="stylesheet" href="https://unpkg.com/@near-wallet-selector/modal-ui@8.3.1/styles.css" />
   <script type="module">
-  // CDNs mit sauberen CORS-Headern
-  import { setupWalletSelector } from "https://esm.sh/@near-wallet-selector/core@8.3.1?target=es2020";
-  import { setupModal }         from "https://esm.sh/@near-wallet-selector/modal-ui@8.3.1?target=es2020";
-  import { setupMeteorWallet }  from "https://esm.sh/@near-wallet-selector/meteor-wallet@8.3.1?target=es2020";
-  import { setupMyNearWallet }  from "https://esm.sh/@near-wallet-selector/my-near-wallet@8.3.1?target=es2020";
+  // 1) Erst versuchen wir esm.sh OHNE harte Version (manche Builds sind nicht gecached):
+  const sources = [
+    "https://esm.sh/@near-wallet-selector/core?target=es2020&bundle",
+    "https://esm.sh/@near-wallet-selector/modal-ui?target=es2020&bundle",
+    "https://esm.sh/@near-wallet-selector/meteor-wallet?target=es2020&bundle",
+    "https://esm.sh/@near-wallet-selector/my-near-wallet?target=es2020&bundle",
+  ];
 
-  window.__near = { selector:null, modal:null };
+  // 2) Fallback auf jsDelivr (falls esm.sh 404 liefert). jsDelivr benötigt ?module:
+  const fallbacks = [
+    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/core/dist/index.js?module",
+    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui/dist/index.js?module",
+    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/meteor-wallet/dist/index.js?module",
+    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/my-near-wallet/dist/index.js?module",
+  ];
 
-  window.nearInit = async function(){
-    const selector = await setupWalletSelector({
-      network: window.NEAR_NETWORK,
-      modules: [ setupMeteorWallet(), setupMyNearWallet() ],
-    });
-    const modal = setupModal(selector, { contractId: "example.near" });
-    window.__near.selector = selector;
-    window.__near.modal = modal;
-    await window.nearRefreshUi();
-  };
-
-  async function findSignedIn(){
-    if (!window.__near.selector) return null;
-    const wallet = await window.__near.selector.wallet();
-    const accs = await wallet.getAccounts();
-    return accs?.[0]?.accountId || null;
+  async function importAll(arr) {
+    return Promise.all(arr.map(u => import(u)));
   }
 
-  window.nearConnect = () => window.__near?.modal?.show();
-  window.nearDisconnect = async () => {
-    const w = await window.__near.selector.wallet();
-    try { await w.signOut(); } catch {}
-    await window.nearRefreshUi();
-  };
+  async function bootSelector() {
+    try {
+      var [
+        core, modalUi, meteor, mynear
+      ] = await importAll(sources);
+    } catch (e1) {
+      console.warn("esm.sh Import fehlgeschlagen, versuche jsDelivr…", e1);
+      try {
+        [core, modalUi, meteor, mynear] = await importAll(fallbacks);
+      } catch (e2) {
+        console.warn("jsDelivr auch fehlgeschlagen – NEAR-Connect wird vorübergehend deaktiviert.", e2);
+        // Soft-Disable: UI bleibt benutzbar; Wallet-Übersicht kommt serverseitig.
+        window.nearInit = async function(){
+          document.getElementById("nearConnected").textContent = "nicht verbunden";
+          document.getElementById("nearAccount").textContent   = "—";
+        };
+        window.nearConnect = ()=>alert("NEAR-Connect ist vorübergehend deaktiviert (CDN-Import).");
+        window.nearDisconnect = ()=>{};
+        return;
+      }
+    }
 
-  window.nearRefreshUi = async () => {
-    const acc = await findSignedIn();
-    document.getElementById("nearAccount").textContent   = acc || "—";
-    document.getElementById("nearConnected").textContent = acc ? "verbunden" : "nicht verbunden";
-    document.getElementById("btnNearConnect").disabled    = !!acc;
-    document.getElementById("btnNearDisconnect").disabled = !acc;
-    // Binding erst später: heute reicht Account-Anzeige
-  };
+    const { setupWalletSelector } = core;
+    const { setupModal } = modalUi;
+    const { setupMeteorWallet } = meteor;
+    const { setupMyNearWallet } = mynear;
 
-  // Token/mesh/wallets-Funktionen bleiben wie zuvor (nutzen window.authHeaders)
+    // Globale Struktur wie bisher
+    window.__near = { selector:null, modal:null };
+
+    window.nearInit = async function(){
+      const selector = await setupWalletSelector({
+        network: window.NEAR_NETWORK,
+        modules: [ setupMeteorWallet(), setupMyNearWallet() ],
+      });
+      const modal = setupModal(selector, { contractId: "example.near" });
+      window.__near.selector = selector;
+      window.__near.modal = modal;
+      await window.nearRefreshUi();
+    };
+
+    async function findSignedIn(){
+      if (!window.__near.selector) return null;
+      const wallet = await window.__near.selector.wallet();
+      const accs = await wallet.getAccounts();
+      return accs?.[0]?.accountId || null;
+    }
+
+    window.nearConnect = () => window.__near?.modal?.show();
+    window.nearDisconnect = async () => {
+      const w = await window.__near.selector.wallet();
+      try { await w.signOut(); } catch {}
+      await window.nearRefreshUi();
+    };
+
+    window.nearRefreshUi = async () => {
+      const acc = await findSignedIn();
+      document.getElementById("nearAccount").textContent   = acc || "—";
+      document.getElementById("nearConnected").textContent = acc ? "verbunden" : "nicht verbunden";
+      document.getElementById("btnNearConnect").disabled    = !!acc;
+      document.getElementById("btnNearDisconnect").disabled = !acc;
+      // Binding/Signaturen können wir später wieder aktivieren; heute reicht Anzeige.
+    };
+  }
+
+  // Start
+  bootSelector().catch(e => console.error("Wallet-Selector init error:", e));
 </script>
 
 </head>
