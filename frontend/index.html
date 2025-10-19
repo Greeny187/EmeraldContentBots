@@ -23,11 +23,23 @@
     window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash";  // <- anpassen
     window.BOT_USERNAME = "EmeraldContentBot";                       // <- ohne @
     window.NEAR_NETWORK = "testnet";                                 // oder "testnet"
-  </script>
-  
-  <script>
-    window.authHeaders  = authHeaders;
+
     const tokenKey = "emerald_token";
+
+    // Function Declaration (wird hoisted)
+    function authHeaders(){
+      const t = localStorage.getItem(tokenKey);
+      return t
+        ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
+        : { "Content-Type":"application/json" };
+    }
+
+    // erst NACH der Definition exportieren:
+    window.authHeaders = authHeaders;
+
+  </script>
+
+  <script>
     const setToken = t => localStorage.setItem(tokenKey, t);
     const getToken = () => localStorage.getItem(tokenKey);
     const authHeaders = () => {
