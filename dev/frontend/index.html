@@ -14,128 +14,189 @@
   </style>
 </head>
 <body class="text-slate-200">
-  <div class="max-w-7xl mx-auto p-4">
-    <header class="flex items-center justify-between mb-6">
-      <h1 class="text-xl font-semibold">Emerald DevDashboard</h1>
-      <div id="userBox" class="text-sm text-slate-400"></div>
-    </header>
+    <div class="max-w-7xl mx-auto p-4">
+        <header class="flex items-center justify-between mb-6">
+            <h1 class="text-xl font-semibold">Emerald DevDashboard</h1>
+            <div id="userBox" class="text-sm text-slate-400"></div>
+        </header>
 
-    <div id="loginCard" class="glass rounded-2xl p-6 mb-6">
-      <h2 class="text-lg font-medium mb-2">Anmeldung</h2>
-      <p class="text-sm text-slate-400 mb-4">Mit Telegram anmelden.</p>
-      <div id="tgLoginSlot"></div>
-      <p class="text-xs text-slate-500 mt-4">Login wird serverseitig verifiziert.</p>
+        <div id="loginCard" class="glass rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-medium mb-2">Anmeldung</h2>
+            <p class="text-sm text-slate-400 mb-4">Mit Telegram anmelden.</p>
+            <div id="tgLoginSlot"></div>
+            <p class="text-xs text-slate-500 mt-4">Login wird serverseitig verifiziert.</p>
+        </div>
+
+        <nav id="tabs" class="hidden flex flex-wrap gap-2 mb-4">
+            <button data-tab="overview" class="tab px-3 py-1.5 rounded-lg glass">Overview</button>
+            <button data-tab="metrics" class="tab px-3 py-1.5 rounded-lg glass">Metrics</button>
+            <button data-tab="bots" class="tab px-3 py-1.5 rounded-lg glass">Bots</button>
+            <button data-tab="tiers" class="tab px-3 py-1.5 rounded-lg glass">Pro vs Free</button>
+            <button data-tab="ads" class="tab px-3 py-1.5 rounded-lg glass">Werbung</button>
+            <button data-tab="flags" class="tab px-3 py-1.5 rounded-lg glass">Feature Flags</button>
+            <button data-tab="settings" class="tab px-3 py-1.5 rounded-lg glass">Settings</button>
+        </nav>
+
+        <section id="overview" class="hidden grid md:grid-cols-3 gap-3">
+            <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Gesamtnutzer</p><p id="statUsers" class="text-2xl font-semibold">–</p></div>
+            <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Aktive Ads</p><p id="statAds" class="text-2xl font-semibold">–</p></div>
+            <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Aktive Bots</p><p id="statBots" class="text-2xl font-semibold">–</p></div>
+        </section>
+
+        <section id="metrics" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">Zeitreihen (14 Tage)</h3>
+                    <select id="metricKey" class="bg-transparent border border-slate-500/40 rounded-lg text-sm px-2 py-1">
+                        <option value="content_bot.dau">Content Bot DAU</option>
+                        <option value="trade_api.orders">Trade API Orders</option>
+                        <option value="trade_dex.swaps">Trade DEX Swaps</option>
+                        <option value="crossposter.posts">Crossposter Posts</option>
+                        <option value="learning.sessions">Learning Sessions</option>
+                        <option value="support.tickets">Support Tickets</option>
+                    </select>
+                </div>
+                <canvas id="metricChart" height="120"></canvas>
+            </div>
+        </section>
+
+        <section id="bots" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">Bots Registry</h3>
+                    <button id="btnAddBot" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
+                </div>
+                <div id="botsList" class="grid gap-2"></div>
+            </div>
+        </section>
+        <section id="wallets" class="hidden"
+            <!-- Wallets (NEAR + TON) -->
+            <div class="card" id="walletsCard" style="display:none">
+                <h3>Wallets</h3>
+                <div class="row" style="gap:8px; align-items:center">
+                    <span class="pill">NEAR Watch: emeraldcontent.near</span>
+                    <span class="pill">NEAR Watch: pay.emeraldcontent.near</span>
+                </div>
+                <div class="row" style="margin-top:8px">
+                    <div style="flex:1">
+                        <h4>emeraldcontent.near</h4>
+                        <pre id="nearAcc1"></pre>
+                    </div>
+                    <div style="flex:1">
+                        <h4>pay.emeraldcontent.near</h4>
+                        <pre id="nearAcc2"></pre>
+                    </div>
+                </div>
+                <hr style="border-color:#1f2937; margin:12px 0">
+                <div>
+                    <h4>TON Wallet</h4>
+                    <div class="row">
+                        <input id="tonAddress" placeholder="EQC... (TON Adresse)" style="flex:1; background:#0b1020; color:#cbd5e1; border:1px solid #1f2937; border-radius:8px; padding:6px 8px">
+                        <button id="btnSaveTon">Speichern</button>
+                    </div>
+                    <pre id="tonInfo"></pre>
+                </div>
+            </div>
+        </section>
+        <section id="tiers" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <h3 class="font-medium mb-4">Nutzer & Stufen</h3>
+                <div id="tiersList" class="grid gap-2"></div>
+            </div>
+        </section>
+
+        <section id="ads" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">Werbungen</h3>
+                    <div class="flex items-center gap-2">
+                        <input id="adsBotSlug" placeholder="bot slug (optional)" class="text-xs bg-transparent border border-slate-500/40 rounded px-2 py-1" />
+                        <button id="btnLoadAds" class="text-xs px-2 py-1 rounded bg-slate-500/10 border border-slate-400/30">Laden</button>
+                        <button id="btnAddAd" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
+                    </div>
+                </div>
+                <div id="adsList" class="grid gap-2"></div>
+            </div>
+        </section>
+
+        <section id="flags" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-medium">Feature Flags</h3>
+                    <button id="btnAddFlag" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
+                </div>
+                <div id="flagsList" class="grid gap-2"></div>
+            </div>
+        </section>
+
+        <section id="settings" class="hidden">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center gap-2 mb-4">
+                    <input id="settingsScope" placeholder="scope (z.B. 'global' oder bot slug)" class="text-xs bg-transparent border border-slate-500/40 rounded px-2 py-1" />
+                    <button id="btnLoadSettings" class="text-xs px-2 py-1 rounded bg-slate-500/10 border border-slate-400/30">Laden</button>
+                    <button id="btnAddSetting" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
+                </div>
+                <div id="settingsList" class="grid gap-2"></div>
+            </div>
+        </section>
+
+        <footer class="mt-8 text-xs text-slate-500">
+            © Emerald Ökosystem · DevDashboard
+        </footer>
     </div>
+    <script src="./js/api.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/app.js"></script>
+    <script>
+        async function refreshWallets() {
+            // NEAR overview beider Accounts (optional Token-Contracts via ?tokens=... anhängen)
+            const one = await (await fetch(API_BASE + "/near/account/overview?account_id=emeraldcontent.near", { headers: authHeaders() })).json();
+            const two = await (await fetch(API_BASE + "/near/account/overview?account_id=pay.emeraldcontent.near", { headers: authHeaders() })).json();
+            document.getElementById("nearAcc1").textContent = JSON.stringify(one, null, 2);
+            document.getElementById("nearAcc2").textContent = JSON.stringify(two, null, 2);
 
-    <nav id="tabs" class="hidden flex flex-wrap gap-2 mb-4">
-      <button data-tab="overview" class="tab px-3 py-1.5 rounded-lg glass">Overview</button>
-      <button data-tab="metrics" class="tab px-3 py-1.5 rounded-lg glass">Metrics</button>
-      <button data-tab="bots" class="tab px-3 py-1.5 rounded-lg glass">Bots</button>
-      <button data-tab="tiers" class="tab px-3 py-1.5 rounded-lg glass">Pro vs Free</button>
-      <button data-tab="ads" class="tab px-3 py-1.5 rounded-lg glass">Werbung</button>
-      <button data-tab="flags" class="tab px-3 py-1.5 rounded-lg glass">Feature Flags</button>
-      <button data-tab="settings" class="tab px-3 py-1.5 rounded-lg glass">Settings</button>
-    </nav>
+            // Eigene TON-Adresse aus /me bzw. /wallets laden
+            const wallets = await (await fetch(API_BASE + "/wallets", { headers: authHeaders() })).json();
+            document.getElementById("tonAddress").value = wallets?.me?.ton_address || "";
+            document.getElementById("tonInfo").textContent = JSON.stringify({ ton_address: wallets?.me?.ton_address }, null, 2);
+        }
 
-    <section id="overview" class="hidden grid md:grid-cols-3 gap-3">
-      <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Gesamtnutzer</p><p id="statUsers" class="text-2xl font-semibold">–</p></div>
-      <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Aktive Ads</p><p id="statAds" class="text-2xl font-semibold">–</p></div>
-      <div class="glass rounded-2xl p-5"><p class="text-xs text-slate-400 mb-1">Aktive Bots</p><p id="statBots" class="text-2xl font-semibold">–</p></div>
-    </section>
+        async function saveTon() {
+            const address = document.getElementById("tonAddress").value.trim();
+            const res = await fetch(API_BASE + "/wallets/ton", {
+                method: "POST", headers: authHeaders(), body: JSON.stringify({ address })
+            });
+            if (!res.ok) { alert(await res.text()); return; }
+            const data = await res.json();
+            document.getElementById("tonInfo").textContent = JSON.stringify(data, null, 2);
+        }
 
-    <section id="metrics" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-medium">Zeitreihen (14 Tage)</h3>
-          <select id="metricKey" class="bg-transparent border border-slate-500/40 rounded-lg text-sm px-2 py-1">
-            <option value="content_bot.dau">Content Bot DAU</option>
-            <option value="trade_api.orders">Trade API Orders</option>
-            <option value="trade_dex.swaps">Trade DEX Swaps</option>
-            <option value="crossposter.posts">Crossposter Posts</option>
-            <option value="learning.sessions">Learning Sessions</option>
-            <option value="support.tickets">Support Tickets</option>
-          </select>
-        </div>
-        <canvas id="metricChart" height="120"></canvas>
-      </div>
-    </section>
-
-    <section id="bots" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-medium">Bots Registry</h3>
-          <button id="btnAddBot" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
-        </div>
-        <div id="botsList" class="grid gap-2"></div>
-      </div>
-    </section>
-
-    <section id="tiers" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <h3 class="font-medium mb-4">Nutzer & Stufen</h3>
-        <div id="tiersList" class="grid gap-2"></div>
-      </div>
-    </section>
-
-    <section id="ads" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-medium">Werbungen</h3>
-          <div class="flex items-center gap-2">
-            <input id="adsBotSlug" placeholder="bot slug (optional)" class="text-xs bg-transparent border border-slate-500/40 rounded px-2 py-1"/>
-            <button id="btnLoadAds" class="text-xs px-2 py-1 rounded bg-slate-500/10 border border-slate-400/30">Laden</button>
-            <button id="btnAddAd" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
-          </div>
-        </div>
-        <div id="adsList" class="grid gap-2"></div>
-      </div>
-    </section>
-
-    <section id="flags" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-medium">Feature Flags</h3>
-          <button id="btnAddFlag" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
-        </div>
-        <div id="flagsList" class="grid gap-2"></div>
-      </div>
-    </section>
-
-    <section id="settings" class="hidden">
-      <div class="glass rounded-2xl p-5">
-        <div class="flex items-center gap-2 mb-4">
-          <input id="settingsScope" placeholder="scope (z.B. 'global' oder bot slug)" class="text-xs bg-transparent border border-slate-500/40 rounded px-2 py-1"/>
-          <button id="btnLoadSettings" class="text-xs px-2 py-1 rounded bg-slate-500/10 border border-slate-400/30">Laden</button>
-          <button id="btnAddSetting" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">Neu</button>
-        </div>
-        <div id="settingsList" class="grid gap-2"></div>
-      </div>
-    </section>
-
-    <footer class="mt-8 text-xs text-slate-500">
-      © Emerald Ökosystem · DevDashboard
-    </footer>
-  </div>
-  <script src="./js/api.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/app.js"></script>
-  <script>
-    // Example in your frontend code
-    const response = await fetch(`${API_BASE}/auth/telegram`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-        credentials: 'include'
-    });
-    if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('auth_token', data.access_token);
-        window.location.href = '/dashboard'; // Ensure this path is correct
-    } else {
-        console.error('Authentication failed:', await response.text());
-    }
-  </script>
+        // bestehendes bootAfterLogin erweitern:
+        const _oldBoot = bootAfterLogin;
+        bootAfterLogin = async function () {
+            await _oldBoot();
+            document.getElementById("walletsCard").style.display = "";
+            await refreshWallets();
+            document.getElementById("btnSaveTon").onclick = saveTon;
+        }
+    </script>
+    <script>
+        // Example in your frontend code
+        const response = await fetch(`${API_BASE}/auth/telegram`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+            credentials: 'include'
+        });
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('auth_token', data.access_token);
+            window.location.href = '/dashboard'; // Ensure this path is correct
+        } else {
+            console.error('Authentication failed:', await response.text());
+        }
+    </script>
 </body>
 </html>
