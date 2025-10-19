@@ -16,56 +16,76 @@
   </style>
   <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
-
   <script>
-    // ===== GLOBAL CONFIG (edit these) =====
-    window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash";  // <- anpassen
-    window.BOT_USERNAME = "EmeraldContentBot";                       // <- ohne @
-    window.NEAR_NETWORK = "testnet";                                 // oder "testnet"
+    // ---- Konfiguration ----
+    window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // MIT /devdash
+    window.BOT_USERNAME = "EmeraldContentBot";  // exakt wie bei BotFather, ohne @
+    window.NEAR_NETWORK = "mainnet";
 
     const tokenKey = "emerald_token";
 
-    // Function Declaration (wird hoisted)
+    // Wird HOISTED (keine TDZ-Probleme)
     function authHeaders(){
       const t = localStorage.getItem(tokenKey);
       return t
         ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
         : { "Content-Type":"application/json" };
     }
-
     // erst NACH der Definition exportieren:
     window.authHeaders = authHeaders;
 
-  </script>
-
-  <script>
-    const setToken = t => localStorage.setItem(tokenKey, t);
-    const getToken = () => localStorage.getItem(tokenKey);
-    const authHeaders = () => {
-      const t = getToken();
-      return t ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
-               : { "Content-Type":"application/json" };
-    };
-
-    window.addEventListener("error", e => console.error("[DevDash] window.error:", e.message, e.filename, e.lineno));
-
-    // ===== TELEGRAM LOGIN CALLBACK =====
+    // Telegram Login Callback – MUSS VOR dem Widget-Script definiert sein
     window.onTelegramAuth = async function(user){
       try {
-        const res = await fetch(window.API_BASE+"/auth/telegram", {
-          method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(user)
+        const res = await fetch(window.API_BASE + "/auth/telegram", {
+          method:"POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(user)
         });
-        if (!res.ok) { alert("Login fehlgeschlagen: "+ await res.text()); return; }
+        if(!res.ok){
+          alert("Login fehlgeschlagen: " + await res.text());
+          return;
+        }
         const data = await res.json();
-        setToken(data.access_token);
+        localStorage.setItem(tokenKey, data.access_token);
         document.getElementById("login").style.display = "none";
         await bootAfterLogin();
-      } catch (err) {
-        alert("Netzwerkfehler beim Login: "+(err && err.message ? err.message : err));
+      } catch (e) {
+        alert("Netzwerkfehler beim Login: " + (e?.message||e));
       }
     };
 
+    // Widget-Mount (fügt das Telegram-Script dynamisch ein)
+    function mountLogin(){
+      const slot = document.getElementById("tgSlot");
+      slot.innerHTML = "";
+      const s = document.createElement("script");
+      s.src = "https://telegram.org/js/telegram-widget.js?22";
+      s.async = true;
+      s.setAttribute("data-telegram-login", window.BOT_USERNAME);
+      s.setAttribute("data-size", "large");
+      s.setAttribute("data-userpic", "true");
+      s.setAttribute("data-request-access", "write");
+      s.setAttribute("data-onauth", "onTelegramAuth");
+      slot.appendChild(s);
+    }
+
+    function getToken(){ return localStorage.getItem(tokenKey); }
+
+    function boot(){
+      mountLogin(); // Widget IMMER einhängen
+      if (getToken()) {
+        document.getElementById("login").style.display = "none";
+        bootAfterLogin();
+      }
+    }
+    document.addEventListener("DOMContentLoaded", boot);
+  </script>
+
+  <!-- Favicon-404 vermeiden -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
+
+  <script>
     // ===== UI Boot (after login) =====
     async function bootAfterLogin(){
       document.getElementById("meCard").style.display = "";
