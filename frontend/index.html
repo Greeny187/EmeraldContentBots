@@ -12,54 +12,50 @@
     pre { white-space: pre-wrap; word-break: break-word; }
     .pill { padding:2px 8px; border:1px solid #374151; border-radius:999px; font-size:12px; }
     input { background:#0b1020; color:#cbd5e1; border:1px solid #1f2937; border-radius:8px; padding:6px 8px; }
-    h4 { margin: 8px 0; }    
+    h4 { margin: 8px 0; }
   </style>
-  <script src="https://telegram.org/js/telegram-widget.js?22" async></script>
+
+  <!-- Verhindert favicon-404 auf GitHub Pages -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
   <script>
-    // ---- Config ----
-    window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // MIT /devdash
-    window.BOT_USERNAME = "EmeraldContentBot"; // exakt wie im BotFather, ohne @
+    // ------- KONFIG -------
+    window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // exakt MIT /devdash
+    window.BOT_USERNAME = "EmeraldContentBot"; // Bot-Username ohne @
     window.NEAR_NETWORK = "mainnet";
 
+    // ------- TOKEN / HEADERS -------
     const tokenKey = "emerald_token";
-
-    // 1) authHeaders als Function Declaration (hoisted, keine TDZ-Probleme)
     function authHeaders(){
       const t = localStorage.getItem(tokenKey);
       return t
-        ? { "Authorization": "Bearer "+t, "Content-Type": "application/json" }
-        : { "Content-Type": "application/json" };
+        ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
+        : { "Content-Type":"application/json" };
     }
-    window.authHeaders = authHeaders; // erst NACH der Definition exportieren
+    window.authHeaders = authHeaders;
 
-    // 2) Telegram-Callback: hier sehr laut debuggen
+    // ------- TELEGRAM LOGIN CALLBACK -------
     window.onTelegramAuth = async function(user){
       try {
-        console.log("[TG] callback payload:", user);
         const r = await fetch(window.API_BASE + "/auth/telegram", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(user)
+          method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(user)
         });
         const txt = await r.text();
-        console.log("[TG] /auth/telegram ->", r.status, txt);
-
         if (!r.ok) { alert("Login-Fehler: " + txt); return; }
-
         const data = JSON.parse(txt);
         localStorage.setItem(tokenKey, data.access_token);
-        document.getElementById("login")?.style?.setProperty("display","none");
-        await bootAfterLogin?.();
+        const login = document.getElementById("login");
+        if (login) login.style.display = "none";
+        await bootAfterLogin();
       } catch (e) {
-        console.error("[TG] exception", e);
-        alert("Netzwerkfehler beim Login: " + (e?.message||e));
+        alert("Netzwerkfehler beim Login: " + (e && e.message ? e.message : e));
       }
     };
 
-    // 3) Widget-Mount (Callback muss JETZT schon existieren)
+    // ------- TELEGRAM WIDGET DYNAMISCH MOUNTEN -------
     function mountLogin(){
       const slot = document.getElementById("tgSlot");
+      if (!slot) return;
       slot.innerHTML = "";
       const s = document.createElement("script");
       s.src = "https://telegram.org/js/telegram-widget.js?22";
@@ -68,48 +64,53 @@
       s.setAttribute("data-size", "large");
       s.setAttribute("data-userpic", "true");
       s.setAttribute("data-request-access", "write");
-      s.setAttribute("data-onauth", "onTelegramAuth");  // exakt der Funktionsname (global)
+      s.setAttribute("data-onauth", "onTelegramAuth");
       slot.appendChild(s);
     }
 
-    function getToken(){ return localStorage.getItem(tokenKey); }
-
-    function boot(){
-      mountLogin(); // Script ins DOM hängen => Button erscheint
-      if (getToken()) { document.getElementById("login").style.display = "none"; bootAfterLogin?.(); }
+    // ------- STUBS (damit nichts crasht, bis Features aktiv sind) -------
+    async function nearInit(){ document.getElementById("nearConnected")?.replaceChildren(document.createTextNode("nicht verbunden")); }
+    async function nearConnect(){ alert("NEAR-Connect wird später aktiviert."); }
+    async function nearDisconnect(){}
+    async function refreshNearToken(){ document.getElementById("tokenSummary")?.replaceChildren(document.createTextNode("–")); }
+    async function meshRefresh(){ document.getElementById("meshHealth")?.replaceChildren(document.createTextNode("–")); document.getElementById("meshMetrics")?.replaceChildren(document.createTextNode("–")); }
+    async function refreshWallets(){
+      try{
+        const one = await (await fetch(window.API_BASE + "/near/account/overview?account_id=emeraldcontent.near", { headers: authHeaders() })).json();
+        const two = await (await fetch(window.API_BASE + "/near/account/overview?account_id=pay.emeraldcontent.near", { headers: authHeaders() })).json();
+        document.getElementById("nearAcc1").textContent = JSON.stringify(one, null, 2);
+        document.getElementById("nearAcc2").textContent = JSON.stringify(two, null, 2);
+        const wallets = await (await fetch(window.API_BASE + "/wallets", { headers: authHeaders() })).json();
+        document.getElementById("tonAddress").value = wallets?.me?.ton_address || "";
+        document.getElementById("tonInfo").textContent = JSON.stringify({ton_address: wallets?.me?.ton_address || null}, null, 2);
+      }catch(e){ /* still */ }
     }
-    document.addEventListener("DOMContentLoaded", boot);
+    async function saveTon(){
+      const address = document.getElementById("tonAddress").value.trim();
+      const r = await fetch(window.API_BASE + "/wallets/ton", {
+        method:"POST", headers: authHeaders(), body: JSON.stringify({ address })
+      });
+      const data = await r.json().catch(()=>({}));
+      document.getElementById("tonInfo").textContent = JSON.stringify(data, null, 2);
+    }
 
-    <!-- Stelle sicher: window.onTelegramAuth ist bereits definiert -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22"
-      data-telegram-login="EmeraldContentBot"   <!-- exakt dein Bot, ohne @ -->
-      data-size="large"
-      data-userpic="true"
-      data-request-access="write"
-      data-onauth="onTelegramAuth">
-    </script>
-
-  </script>
-
-  <!-- Favicon-404 vermeiden -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
-
-  <script>
-    // ===== UI Boot (after login) =====
+    // ------- BOOT AFTER LOGIN -------
     async function bootAfterLogin(){
-      document.getElementById("meCard").style.display = "";
-      document.getElementById("overviewCard").style.display = "";
-      document.getElementById("botsCard").style.display = "";
-      document.getElementById("walletCard").style.display = "";
-      document.getElementById("tokenCard").style.display = "";
-      document.getElementById("meshCard").style.display = "";
-      document.getElementById("walletsCard").style.display = "";
+      // Karten einblenden
+      const ids = ["meCard","overviewCard","botsCard","walletCard","tokenCard","meshCard","walletsCard"];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
 
-      const me = await (await fetch(window.API_BASE+"/me", { headers: authHeaders() })).json();
-      document.getElementById("me").textContent = JSON.stringify(me, null, 2);
+      // /me
+      try {
+        const me = await (await fetch(window.API_BASE + "/me", { headers: authHeaders() })).json();
+        document.getElementById("me").textContent = JSON.stringify(me, null, 2);
+      } catch {}
 
-      const ov = await (await fetch(window.API_BASE+"/metrics/overview", { headers: authHeaders() })).json();
-      document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
+      // Overview
+      try {
+        const ov = await (await fetch(window.API_BASE + "/metrics/overview", { headers: authHeaders() })).json();
+        document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
+      } catch {}
 
       await loadBots();
       await nearInit();
@@ -117,126 +118,71 @@
       await meshRefresh();
       await refreshWallets();
 
-      // Wire buttons
-      document.getElementById("btnReloadBots").onclick = loadBots;
-      document.getElementById("btnAddBot").onclick = addBot;
-      document.getElementById("btnNearConnect").onclick = nearConnect;
-      document.getElementById("btnNearDisconnect").onclick = nearDisconnect;
-      document.getElementById("btnTokenReload").onclick = refreshNearToken;
-      document.getElementById("btnMeshReload").onclick = meshRefresh;
-      document.getElementById("btnSaveTon").onclick = saveTon;
+      // Buttons
+      const byId = (id)=>document.getElementById(id);
+      byId("btnReloadBots") && (byId("btnReloadBots").onclick = loadBots);
+      byId("btnAddBot") && (byId("btnAddBot").onclick = addBot);
+      byId("btnNearConnect") && (byId("btnNearConnect").onclick = nearConnect);
+      byId("btnNearDisconnect") && (byId("btnNearDisconnect").onclick = nearDisconnect);
+      byId("btnTokenReload") && (byId("btnTokenReload").onclick = refreshNearToken);
+      byId("btnMeshReload") && (byId("btnMeshReload").onclick = meshRefresh);
+      byId("btnSaveTon") && (byId("btnSaveTon").onclick = saveTon);
+      byId("btnDevLogin") && (byId("btnDevLogin").onclick = devLogin);
     }
 
+    // ------- BOTS -------
     async function loadBots(){
-      const res  = await fetch(window.API_BASE+"/bots", { headers: authHeaders() });
-      const bots = await res.json();
-      document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
+      try{
+        const res  = await fetch(window.API_BASE + "/bots", { headers: authHeaders() });
+        const bots = await res.json();
+        document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
+      }catch(e){
+        document.getElementById("bots").textContent = "—";
+      }
     }
 
     async function addBot(){
       const name = prompt("Bot Name?"); if (!name) return;
       const slug = prompt("Slug (unique)?"); if (!slug) return;
       const description = prompt("Beschreibung (optional)") || null;
-      const res = await fetch(window.API_BASE+"/bots", {
+      const res = await fetch(window.API_BASE + "/bots", {
         method:"POST", headers: authHeaders(), body: JSON.stringify({ name, slug, description, is_active:true })
       });
       if (!res.ok) { alert(await res.text()); return; }
       await loadBots();
     }
-  </script>
 
-  <!-- Wallet Selector (ESM) -->
-  <link rel="stylesheet" href="https://unpkg.com/@near-wallet-selector/modal-ui@8.3.1/styles.css" />
-  <script type="module">
-  // 1) Erst versuchen wir esm.sh OHNE harte Version (manche Builds sind nicht gecached):
-  const sources = [
-    "https://esm.sh/@near-wallet-selector/core?target=es2020&bundle",
-    "https://esm.sh/@near-wallet-selector/modal-ui?target=es2020&bundle",
-    "https://esm.sh/@near-wallet-selector/meteor-wallet?target=es2020&bundle",
-    "https://esm.sh/@near-wallet-selector/my-near-wallet?target=es2020&bundle",
-  ];
-
-  // 2) Fallback auf jsDelivr (falls esm.sh 404 liefert). jsDelivr benötigt ?module:
-  const fallbacks = [
-    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/core/dist/index.js?module",
-    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui/dist/index.js?module",
-    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/meteor-wallet/dist/index.js?module",
-    "https://cdn.jsdelivr.net/npm/@near-wallet-selector/my-near-wallet/dist/index.js?module",
-  ];
-
-  async function importAll(arr) {
-    return Promise.all(arr.map(u => import(u)));
-  }
-
-  async function bootSelector() {
-    try {
-      var [
-        core, modalUi, meteor, mynear
-      ] = await importAll(sources);
-    } catch (e1) {
-      console.warn("esm.sh Import fehlgeschlagen, versuche jsDelivr…", e1);
-      try {
-        [core, modalUi, meteor, mynear] = await importAll(fallbacks);
-      } catch (e2) {
-        console.warn("jsDelivr auch fehlgeschlagen – NEAR-Connect wird vorübergehend deaktiviert.", e2);
-        // Soft-Disable: UI bleibt benutzbar; Wallet-Übersicht kommt serverseitig.
-        window.nearInit = async function(){
-          document.getElementById("nearConnected").textContent = "nicht verbunden";
-          document.getElementById("nearAccount").textContent   = "—";
-        };
-        window.nearConnect = ()=>alert("NEAR-Connect ist vorübergehend deaktiviert (CDN-Import).");
-        window.nearDisconnect = ()=>{};
-        return;
-      }
-    }
-
-    const { setupWalletSelector } = core;
-    const { setupModal } = modalUi;
-    const { setupMeteorWallet } = meteor;
-    const { setupMyNearWallet } = mynear;
-
-    // Globale Struktur wie bisher
-    window.__near = { selector:null, modal:null };
-
-    window.nearInit = async function(){
-      const selector = await setupWalletSelector({
-        network: window.NEAR_NETWORK,
-        modules: [ setupMeteorWallet(), setupMyNearWallet() ],
+    // ------- DEV-LOGIN (Bypass) -------
+    async function devLogin(){
+      const code = document.getElementById('devCode').value.trim();
+      const telegram_id = document.getElementById('devTgId').value.trim();
+      const r = await fetch(window.API_BASE + "/dev-login", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ code, telegram_id, username: "andreas" })
       });
-      const modal = setupModal(selector, { contractId: "example.near" });
-      window.__near.selector = selector;
-      window.__near.modal = modal;
-      await window.nearRefreshUi();
-    };
-
-    async function findSignedIn(){
-      if (!window.__near.selector) return null;
-      const wallet = await window.__near.selector.wallet();
-      const accs = await wallet.getAccounts();
-      return accs?.[0]?.accountId || null;
+      const txt = await r.text();
+      if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + txt); return; }
+      const data = JSON.parse(txt);
+      localStorage.setItem(tokenKey, data.access_token);
+      const login = document.getElementById("login");
+      if (login) login.style.display = "none";
+      await bootAfterLogin();
     }
 
-    window.nearConnect = () => window.__near?.modal?.show();
-    window.nearDisconnect = async () => {
-      const w = await window.__near.selector.wallet();
-      try { await w.signOut(); } catch {}
-      await window.nearRefreshUi();
-    };
-
-    window.nearRefreshUi = async () => {
-      const acc = await findSignedIn();
-      document.getElementById("nearAccount").textContent   = acc || "—";
-      document.getElementById("nearConnected").textContent = acc ? "verbunden" : "nicht verbunden";
-      document.getElementById("btnNearConnect").disabled    = !!acc;
-      document.getElementById("btnNearDisconnect").disabled = !acc;
-      // Binding/Signaturen können wir später wieder aktivieren; heute reicht Anzeige.
-    };
-  }
-
-  // Start
-  bootSelector().catch(e => console.error("Wallet-Selector init error:", e));
-</script>
-
+    // ------- BOOT -------
+    function boot(){
+      mountLogin();
+      if (localStorage.getItem(tokenKey)) {
+        const login = document.getElementById("login");
+        if (login) login.style.display = "none";
+        bootAfterLogin();
+      }
+      // Dev-Login Button handler (falls DOM schon da)
+      const btn = document.getElementById('btnDevLogin');
+      if (btn) btn.onclick = devLogin;
+    }
+    document.addEventListener("DOMContentLoaded", boot);
+  </script>
 </head>
 
 <body>
@@ -244,34 +190,15 @@
 
   <!-- Login -->
   <div class="card" id="login">
-      <h3>Anmeldung</h3>
-      <div id="tgSlot"></div>
-      <small>Login wird serverseitig verifiziert.</small>
-    </div>
-
+    <h3>Anmeldung</h3>
+    <div id="tgSlot"></div>
     <div style="margin-top:8px; display:flex; gap:8px;">
-    <input id="devCode"  placeholder="DEV CODE">
-    <input id="devTgId"  placeholder="Telegram ID z.B. 123456789">
-    <button id="btnDevLogin">Dev-Login</button>
+      <input id="devCode"  placeholder="DEV CODE">
+      <input id="devTgId"  placeholder="Telegram ID z.B. 123456789">
+      <button id="btnDevLogin">Dev-Login</button>
+    </div>
+    <small>Login wird serverseitig verifiziert.</small>
   </div>
-  <script>
-  async function devLogin(){
-    const code = document.getElementById('devCode').value.trim();
-    const telegram_id = document.getElementById('devTgId').value.trim();
-    const r = await fetch(window.API_BASE + "/dev-login", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ code, telegram_id, username:"andreas" })
-    });
-    const txt = await r.text();
-    if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + txt); return; }
-    const data = JSON.parse(txt);
-    localStorage.setItem("emerald_token", data.access_token);
-    document.getElementById("login").style.display = "none";
-    await bootAfterLogin();
-  }
-  document.getElementById('btnDevLogin').onclick = devLogin;
-  </script>
-
 
   <!-- Me -->
   <div class="card" id="meCard" style="display:none">
@@ -304,11 +231,11 @@
       <span class="pill">Status: <span id="nearConnected">—</span></span>
       <span class="pill">Account: <span id="nearAccount">—</span></span>
     </div>
-    <p><small>Nach Verbindung wird die Wallet mit deiner Telegram‑ID verknüpft (Server‑Verify).</small></p>
+    <p><small>Nach Verbindung wird die Wallet mit deiner Telegram-ID verknüpft (Server-Verify).</small></p>
     <pre id="nearBindResult"></pre>
   </div>
 
-  <!-- Token Dynamics (NEP‑141 + Off‑chain Events) -->
+  <!-- Token Dynamics -->
   <div class="card" id="tokenCard" style="display:none">
     <h3>Token Dynamics</h3>
     <div class="row"><button id="btnTokenReload">Neu laden</button></div>
@@ -343,9 +270,9 @@
     </div>
   </div>
 
-  <!-- Mesh: alle Bots ansprechen -->
+  <!-- Mesh -->
   <div class="card" id="meshCard" style="display:none">
-    <h3>Bot‑Mesh</h3>
+    <h3>Bot-Mesh</h3>
     <div class="row"><button id="btnMeshReload">Pingen & Laden</button></div>
     <h4>Health</h4>
     <pre id="meshHealth"></pre>
@@ -354,3 +281,4 @@
   </div>
 </body>
 </html>
+
