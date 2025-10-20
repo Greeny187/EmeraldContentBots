@@ -56,13 +56,7 @@
         alert("Netzwerkfehler beim Login: " + (e?.message||e));
       }
     };
-    <script async src="https://telegram.org/js/telegram-widget.js?22"
-      data-telegram-login="EmeraldContentBot"   <!-- exakt dein Bot, ohne @ -->
-      data-size="large"
-      data-userpic="true"
-      data-request-access="write"
-      data-onauth="onTelegramAuth"></script>
-      
+
     // 3) Widget-Mount (Callback muss JETZT schon existieren)
     function mountLogin(){
       const slot = document.getElementById("tgSlot");
@@ -85,6 +79,15 @@
       if (getToken()) { document.getElementById("login").style.display = "none"; bootAfterLogin?.(); }
     }
     document.addEventListener("DOMContentLoaded", boot);
+
+    <!-- Stelle sicher: window.onTelegramAuth ist bereits definiert -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+      data-telegram-login="EmeraldContentBot"   <!-- exakt dein Bot, ohne @ -->
+      data-size="large"
+      data-userpic="true"
+      data-request-access="write"
+      data-onauth="onTelegramAuth">
+    </script>
 
   </script>
 
