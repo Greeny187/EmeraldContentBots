@@ -15,87 +15,104 @@
     h4 { margin: 8px 0; }
   </style>
 
-  <!-- Verhindert favicon-404 auf GitHub Pages -->
+  <!-- Favicon-404 auf GitHub Pages vermeiden -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
-  <script type="module">
-      // -------- NEAR WalletSelector (robust, mit Fallback) --------
-      let core, modalUi, mynear;
-      async function loadNearSelector(){
-        try {
-          [core, modalUi, mynear] = await Promise.all([
-            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/core@8.3.1/dist/index.js?module"),
-            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui@8.3.1/dist/index.js?module"),
-            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/my-near-wallet@8.3.1/dist/index.js?module"),
-          ]);
-        } catch(e) {
-          console.warn("NEAR selector CDN problem, disabling connect.", e);
-          return false;
-        }
-        return true;
-      }
-      window.nearInit = async function(){
-        const ok = await loadNearSelector();
-        if (!ok){
-          document.getElementById("nearConnected").textContent = "nicht verbunden";
-          return;
-        }
-        const { setupWalletSelector } = core;
-        const { setupModal } = modalUi;
-        const { setupMyNearWallet } = mynear;
-        const selector = await setupWalletSelector({
-          network: window.NEAR_NETWORK,
-          modules: [ setupMyNearWallet() ],
-        });
-        const modal = setupModal(selector, { contractId: "example.near" });
-        window.__near = { selector, modal };
-        await window.nearRefreshUi();
-      };
-      window.nearConnect = ()=>window.__near?.modal?.show();
-      window.nearDisconnect = async ()=>{
-        try { const w = await window.__near.selector.wallet(); await w.signOut(); } catch {}
-        await window.nearRefreshUi();
-      };
-      window.nearRefreshUi = async ()=>{
-        try{
-          const w = await window.__near.selector.wallet();
-          const accs = await w.getAccounts();
-          const acc = accs?.[0]?.accountId || null;
-          document.getElementById("nearConnected").textContent = acc ? "verbunden" : "nicht verbunden";
-          document.getElementById("nearAccount").textContent   = acc || "—";
-          if (acc){
-            // Serverseitig speichern
-            await fetch(window.API_BASE + "/wallets/near", {
-              method:"POST", headers: window.authHeaders(), body: JSON.stringify({ account_id: acc })
-            });
-            await refreshWallets();
-            await refreshPayments();
-          }
-        }catch{}
-      };
+  <!-- TonConnect UI (UMD) als globales Objekt laden -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
-      // -------- TON Connect (UI) --------
-      // Minimal: Button öffnet Wallet-Auswahl, speichert Adresse am Server
+  <script type="module">
+    // -------- NEAR WalletSelector (robust, mit Fallback auf neuere CDN) --------
+    let core, modalUi, mynear;
+    async function loadNearSelector(){
+      try {
+        [core, modalUi, mynear] = await Promise.all([
+          import("https://esm.sh/@near-wallet-selector/core@8.9.1?target=es2020"),
+          import("https://esm.sh/@near-wallet-selector/modal-ui@8.9.1?target=es2020"),
+          import("https://esm.sh/@near-wallet-selector/my-near-wallet@8.9.1?target=es2020"),
+        ]);
+        return true;
+      } catch(e) {
+        console.warn("NEAR selector CDN problem, disabling connect.", e);
+        return false;
+      }
+    }
+
+    // NEAR API
+    window.nearInit = async function(){
+      const ok = await loadNearSelector();
+      if (!ok){
+        const el = document.getElementById("nearConnected");
+        if (el) el.textContent = "nicht verbunden";
+        return;
+      }
+      const { setupWalletSelector } = core;
+      const { setupModal } = modalUi;
+      const { setupMyNearWallet } = mynear;
+      const selector = await setupWalletSelector({
+        network: window.NEAR_NETWORK || "mainnet",
+        modules: [ setupMyNearWallet() ],
+      });
+      const modal = setupModal(selector, { contractId: "example.near" });
+      window.__near = { selector, modal };
+      await window.nearRefreshUi();
+    };
+    window.nearConnect = ()=>window.__near?.modal?.show();
+    window.nearDisconnect = async ()=>{
+      try { const w = await window.__near.selector.wallet(); await w.signOut(); } catch {}
+      await window.nearRefreshUi();
+    };
+    window.nearRefreshUi = async ()=>{
       try{
-        const { TonConnectUI } = await import("https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js");
-        const ton = new TonConnectUI({
+        const w = await window.__near.selector.wallet();
+        const accs = await w.getAccounts();
+        const acc = accs?.[0]?.accountId || null;
+        const sEl = document.getElementById("nearConnected");
+        const aEl = document.getElementById("nearAccount");
+        if (sEl) sEl.textContent = acc ? "verbunden" : "nicht verbunden";
+        if (aEl) aEl.textContent = acc || "—";
+        if (acc){
+          // serverseitig verknüpfen
+          await fetch(window.API_BASE + "/wallets/near", {
+            method:"POST", headers: window.authHeaders(), body: JSON.stringify({ account_id: acc })
+          });
+          await refreshWallets();
+          await refreshPayments();
+        }
+      }catch{}
+    };
+
+    // -------- TON Connect (UI) --------
+    // Aus globalem Namespace lesen (UMD)
+    try{
+      const Ctor =
+        (window.TON_CONNECT_UI && window.TON_CONNECT_UI.TonConnectUI) ||
+        window.TonConnectUI;
+      if (Ctor) {
+        const ton = new Ctor({
           manifestUrl: location.origin + location.pathname.replace(/\/[^/]*$/, "/") + "tonconnect-manifest.json"
         });
         window.tonConnect = ton;
-        // Wenn verbunden → Adresse speichern
         ton.onStatusChange(async (w)=>{
           if (w?.account?.address){
-            document.getElementById("tonAddress").value = w.account.address;
+            const el = document.getElementById("tonAddress");
+            if (el) el.value = w.account.address;
             await saveTon();
             await refreshPayments();
           }
         });
-      }catch(e){ console.warn("TON Connect not available:", e); }
-    </script>
+      } else {
+        console.warn("TON Connect not available: constructor missing");
+      }
+    }catch(e){ console.warn("TON Connect init failed:", e); }
+  </script>
 
   <script>
     // ------- KONFIG -------
-    window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // exakt MIT /devdash
+    const API_ORIGIN = "https://emeraldcontent-aac379fc581e.herokuapp.com";
+    const API_PREFIX = "/devdash";
+    const api = (path) => API_ORIGIN + API_PREFIX + path;
+    window.API_BASE = API_ORIGIN + API_PREFIX; // für bestehenden Code
     window.BOT_USERNAME = "EmeraldContentBot"; // Bot-Username ohne @
     window.NEAR_NETWORK = "mainnet";
 
@@ -103,16 +120,16 @@
     const tokenKey = "emerald_token";
     function authHeaders(){
       const t = localStorage.getItem(tokenKey);
-      return t
-        ? { "Authorization":"Bearer "+t, "Content-Type":"application/json" }
-        : { "Content-Type":"application/json" };
+      const h = { "Content-Type":"application/json" };
+      if (t) h["Authorization"] = "Bearer " + t;
+      return h;
     }
     window.authHeaders = authHeaders;
 
     // ------- TELEGRAM LOGIN CALLBACK -------
     window.onTelegramAuth = async function(user){
       try {
-        const r = await fetch(window.API_BASE + "/auth/telegram", {
+        const r = await fetch(api("/auth/telegram"), {
           method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(user)
         });
         const txt = await r.text();
@@ -143,106 +160,80 @@
       slot.appendChild(s);
     }
 
-    // ------- STUBS (damit nichts crasht, bis Features aktiv sind) -------
-    async function nearInit(){ document.getElementById("nearConnected")?.replaceChildren(document.createTextNode("nicht verbunden")); }
-    async function nearConnect(){ alert("NEAR-Connect wird später aktiviert."); }
-    async function nearDisconnect(){}
-    async function refreshNearToken(){ document.getElementById("tokenSummary")?.replaceChildren(document.createTextNode("–")); }
-    async function meshRefresh(){ document.getElementById("meshHealth")?.replaceChildren(document.createTextNode("–")); document.getElementById("meshMetrics")?.replaceChildren(document.createTextNode("–")); }
+    // ------- OPTIONAL: Token Dynamics / Mesh (Platzhalter) -------
+    async function refreshNearToken(){ const el = document.getElementById("tokenSummary"); if (el) el.textContent = "–"; }
+    async function meshRefresh(){
+      const hEl = document.getElementById("meshHealth");
+      const mEl = document.getElementById("meshMetrics");
+      if (hEl) hEl.textContent = "–";
+      if (mEl) mEl.textContent = "–";
+    }
+
+    // ------- WALLET / PAYMENTS -------
     async function refreshWallets(){
       try{
-        const one = await (await fetch(window.API_BASE + "/near/account/overview?account_id=emeraldcontent.near", { headers: authHeaders() })).json();
-        const two = await (await fetch(window.API_BASE + "/near/account/overview?account_id=pay.emeraldcontent.near", { headers: authHeaders() })).json();
-        document.getElementById("nearAcc1").textContent = JSON.stringify(one, null, 2);
-        document.getElementById("nearAcc2").textContent = JSON.stringify(two, null, 2);
-        const wallets = await (await fetch(window.API_BASE + "/wallets", { headers: authHeaders() })).json();
-        document.getElementById("tonAddress").value = wallets?.me?.ton_address || "";
-        document.getElementById("tonInfo").textContent = JSON.stringify({ton_address: wallets?.me?.ton_address || null}, null, 2);
-      }catch(e){ /* still */ }
+        const one = await (await fetch(api("/near/account/overview?account_id=emeraldcontent.near"), { headers: authHeaders() })).json();
+        const two = await (await fetch(api("/near/account/overview?account_id=pay.emeraldcontent.near"), { headers: authHeaders() })).json();
+        const a1 = document.getElementById("nearAcc1");
+        const a2 = document.getElementById("nearAcc2");
+        if (a1) a1.textContent = JSON.stringify(one, null, 2);
+        if (a2) a2.textContent = JSON.stringify(two, null, 2);
+        const wallets = await (await fetch(api("/wallets"), { headers: authHeaders() })).json();
+        const tonAddr = wallets?.me?.ton_address || "";
+        const tonAddressEl = document.getElementById("tonAddress");
+        const tonInfoEl = document.getElementById("tonInfo");
+        if (tonAddressEl) tonAddressEl.value = tonAddr;
+        if (tonInfoEl) tonInfoEl.textContent = JSON.stringify({ ton_address: tonAddr || null }, null, 2);
+      }catch(e){ /* ignore */ }
     }
     async function refreshPayments(){
       const tokenHdr = authHeaders();
-      // NEAR – emeraldcontent & pay.
       try{
-        const n1 = await (await fetch(window.API_BASE + "/near/payments?account_id=emeraldcontent.near&limit=20", { headers: tokenHdr })).json();
-        const n2 = await (await fetch(window.API_BASE + "/near/payments?account_id=pay.emeraldcontent.near&limit=20", { headers: tokenHdr })).json();
-        document.getElementById("nearIn1").textContent = JSON.stringify(n1.incoming, null, 2);
-        document.getElementById("nearIn2").textContent = JSON.stringify(n2.incoming, null, 2);
+        const n1 = await (await fetch(api("/near/payments?account_id=emeraldcontent.near&limit=20"), { headers: tokenHdr })).json();
+        const n2 = await (await fetch(api("/near/payments?account_id=pay.emeraldcontent.near&limit=20"), { headers: tokenHdr })).json();
+        const i1 = document.getElementById("nearIn1");
+        const i2 = document.getElementById("nearIn2");
+        if (i1) i1.textContent = JSON.stringify(n1.incoming || n1, null, 2);
+        if (i2) i2.textContent = JSON.stringify(n2.incoming || n2, null, 2);
       }catch(e){ /* ignore */ }
-      // TON – wenn Adresse gesetzt
       try{
-        const addr = document.getElementById("tonAddress").value.trim();
+        const addrEl = document.getElementById("tonAddress");
+        const addr = addrEl ? addrEl.value.trim() : "";
         if (addr){
-          const t = await (await fetch(window.API_BASE + "/ton/payments?address="+encodeURIComponent(addr)+"&limit=20", { headers: tokenHdr })).json();
-          document.getElementById("tonIn").textContent = JSON.stringify(t.incoming, null, 2);
+          const t = await (await fetch(api("/ton/payments?address="+encodeURIComponent(addr)+"&limit=20"), { headers: tokenHdr })).json();
+          const ti = document.getElementById("tonIn");
+          if (ti) ti.textContent = JSON.stringify(t.incoming || t, null, 2);
         }
       }catch(e){ /* ignore */ }
     }
     async function saveTon(){
-      const address = document.getElementById("tonAddress").value.trim();
-      const r = await fetch(window.API_BASE + "/wallets/ton", {
+      const addressEl = document.getElementById("tonAddress");
+      const address = addressEl ? addressEl.value.trim() : "";
+      const r = await fetch(api("/wallets/ton"), {
         method:"POST", headers: authHeaders(), body: JSON.stringify({ address })
       });
       const data = await r.json().catch(()=>({}));
-      document.getElementById("tonInfo").textContent = JSON.stringify(data, null, 2);
-    }
-
-    // ------- BOOT AFTER LOGIN -------
-    async function bootAfterLogin(){
-      // Karten einblenden
-      const ids = ["meCard","overviewCard","botsCard","walletCard","tokenCard","meshCard","walletsCard"];
-      ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
-
-      // /me
-      try {
-        const me = await (await fetch(window.API_BASE + "/me", { headers: authHeaders() })).json();
-        document.getElementById("me").textContent = JSON.stringify(me, null, 2);
-      } catch {}
-
-      // Overview
-      try {
-        const ov = await (await fetch(window.API_BASE + "/metrics/overview", { headers: authHeaders() })).json();
-        document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
-      } catch {}
-
-      // Bots aus ENV einsammeln (Auto-Discovery) und laden
-      try { await fetch(window.API_BASE + "/bots/refresh", { method:"POST", headers: authHeaders() }); } catch {}
-      await loadBots();
-      await nearInit();
-      await refreshNearToken();
-      await meshRefresh();
-      await refreshWallets();
-      await refreshPayments();
-
-      // Buttons
-      const byId = (id)=>document.getElementById(id);
-      byId("btnReloadBots") && (byId("btnReloadBots").onclick = loadBots);
-      byId("btnAddBot") && (byId("btnAddBot").onclick = addBot);
-      byId("btnNearConnect") && (byId("btnNearConnect").onclick = nearConnect);
-      byId("btnNearDisconnect") && (byId("btnNearDisconnect").onclick = nearDisconnect);
-      byId("btnTokenReload") && (byId("btnTokenReload").onclick = refreshNearToken);
-      byId("btnMeshReload") && (byId("btnMeshReload").onclick = meshRefresh);
-      byId("btnSaveTon") && (byId("btnSaveTon").onclick = saveTon);
-      byId("btnRefreshPayments") && (byId("btnRefreshPayments").onclick = refreshPayments);
-      byId("btnDevLogin") && (byId("btnDevLogin").onclick = devLogin);
+      const ti = document.getElementById("tonInfo");
+      if (ti) ti.textContent = JSON.stringify(data, null, 2);
     }
 
     // ------- BOTS -------
     async function loadBots(){
       try{
-        const res  = await fetch(window.API_BASE + "/bots", { headers: authHeaders() });
+        const res  = await fetch(api("/bots"), { headers: authHeaders() });
         const bots = await res.json();
-        document.getElementById("bots").textContent = JSON.stringify(bots, null, 2);
+        const el = document.getElementById("bots");
+        if (el) el.textContent = JSON.stringify(bots, null, 2);
       }catch(e){
-        document.getElementById("bots").textContent = "—";
+        const el = document.getElementById("bots");
+        if (el) el.textContent = "—";
       }
     }
-
     async function addBot(){
       const name = prompt("Bot Name?"); if (!name) return;
       const slug = prompt("Slug (unique)?"); if (!slug) return;
       const description = prompt("Beschreibung (optional)") || null;
-      const res = await fetch(window.API_BASE + "/bots", {
+      const res = await fetch(api("/bots"), {
         method:"POST", headers: authHeaders(), body: JSON.stringify({ name, slug, description, is_active:true })
       });
       if (!res.ok) { alert(await res.text()); return; }
@@ -251,17 +242,57 @@
 
     // ------- DEV-LOGIN (Bypass) -------
     async function devLogin(){
-      const code = document.getElementById('devCode').value.trim();
-      const telegram_id = document.getElementById('devTgId').value.trim();
-      const r = await fetch(window.API_BASE + "/dev-login", {
-        method:"POST", headers:{"Content-Type":"application/json"},
+      const codeEl = document.getElementById('devCode');
+      const tgEl   = document.getElementById('devTgId');
+      const code = codeEl ? codeEl.value.trim() : "";
+      const telegram_id = tgEl ? tgEl.value.trim() : "";
+      const r = await fetch(api("/dev-login"), {
+        method:"POST", headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({ code, telegram_id, username: "andreas" })
       });
-      const d = await r.json();
+      const d = await r.json().catch(()=> ({}));
       if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + (d.error||"")); return; }
-      localStorage.setItem(tokenKey, d.access_token);   // <— wichtig
-      document.getElementById("login").style.display="none";
+      localStorage.setItem(tokenKey, d.access_token);
+      const login = document.getElementById("login");
+      if (login) login.style.display="none";
       await bootAfterLogin();
+    }
+
+    // ------- BOOT AFTER LOGIN -------
+    async function bootAfterLogin(){
+      const ids = ["meCard","overviewCard","botsCard","walletCard","tokenCard","meshCard","walletsCard"];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
+
+      try {
+        const me = await (await fetch(api("/me"), { headers: authHeaders() })).json();
+        const el = document.getElementById("me");
+        if (el) el.textContent = JSON.stringify(me, null, 2);
+      } catch {}
+
+      try {
+        const ov = await (await fetch(api("/metrics/overview"), { headers: authHeaders() })).json();
+        const el = document.getElementById("overview");
+        if (el) el.textContent = JSON.stringify(ov, null, 2);
+      } catch {}
+
+      try { await fetch(api("/bots/refresh"), { method:"POST", headers: authHeaders() }); } catch {}
+      await loadBots();
+      await nearInit();
+      await refreshNearToken();
+      await meshRefresh();
+      await refreshWallets();
+      await refreshPayments();
+
+      const byId = (id)=>document.getElementById(id);
+      byId("btnReloadBots")      && (byId("btnReloadBots").onclick      = loadBots);
+      byId("btnAddBot")          && (byId("btnAddBot").onclick          = addBot);
+      byId("btnNearConnect")     && (byId("btnNearConnect").onclick     = nearConnect);
+      byId("btnNearDisconnect")  && (byId("btnNearDisconnect").onclick  = nearDisconnect);
+      byId("btnTokenReload")     && (byId("btnTokenReload").onclick     = refreshNearToken);
+      byId("btnMeshReload")      && (byId("btnMeshReload").onclick      = meshRefresh);
+      byId("btnSaveTon")         && (byId("btnSaveTon").onclick         = saveTon);
+      byId("btnRefreshPayments") && (byId("btnRefreshPayments").onclick = refreshPayments);
+      byId("btnDevLogin")        && (byId("btnDevLogin").onclick        = devLogin);
     }
 
     // ------- BOOT -------
@@ -272,7 +303,6 @@
         if (login) login.style.display = "none";
         bootAfterLogin();
       }
-      // Dev-Login Button handler (falls DOM schon da)
       const btn = document.getElementById('btnDevLogin');
       if (btn) btn.onclick = devLogin;
     }
@@ -281,7 +311,7 @@
 </head>
 
 <body>
-  <h1>Emerald DevDashboard <span class="pill">v1.1</span></h1>
+  <h1>Emerald DevDashboard <span class="pill">v1.2</span></h1>
 
   <!-- Login -->
   <div class="card" id="login">
@@ -393,4 +423,5 @@
   </div>
 </body>
 </html>
+
 
