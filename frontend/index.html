@@ -160,12 +160,10 @@
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ code, telegram_id, username: "andreas" })
       });
-      const txt = await r.text();
-      if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + txt); return; }
-      const data = JSON.parse(txt);
-      localStorage.setItem(tokenKey, data.access_token);
-      const login = document.getElementById("login");
-      if (login) login.style.display = "none";
+      const d = await r.json();
+      if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + (d.error||"")); return; }
+      localStorage.setItem(tokenKey, d.access_token);   // <— wichtig
+      document.getElementById("login").style.display="none";
       await bootAfterLogin();
     }
 
