@@ -18,6 +18,81 @@
   <!-- Verhindert favicon-404 auf GitHub Pages -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 
+  <script type="module">
+      // -------- NEAR WalletSelector (robust, mit Fallback) --------
+      let core, modalUi, mynear;
+      async function loadNearSelector(){
+        try {
+          [core, modalUi, mynear] = await Promise.all([
+            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/core@8.3.1/dist/index.js?module"),
+            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui@8.3.1/dist/index.js?module"),
+            import("https://cdn.jsdelivr.net/npm/@near-wallet-selector/my-near-wallet@8.3.1/dist/index.js?module"),
+          ]);
+        } catch(e) {
+          console.warn("NEAR selector CDN problem, disabling connect.", e);
+          return false;
+        }
+        return true;
+      }
+      window.nearInit = async function(){
+        const ok = await loadNearSelector();
+        if (!ok){
+          document.getElementById("nearConnected").textContent = "nicht verbunden";
+          return;
+        }
+        const { setupWalletSelector } = core;
+        const { setupModal } = modalUi;
+        const { setupMyNearWallet } = mynear;
+        const selector = await setupWalletSelector({
+          network: window.NEAR_NETWORK,
+          modules: [ setupMyNearWallet() ],
+        });
+        const modal = setupModal(selector, { contractId: "example.near" });
+        window.__near = { selector, modal };
+        await window.nearRefreshUi();
+      };
+      window.nearConnect = ()=>window.__near?.modal?.show();
+      window.nearDisconnect = async ()=>{
+        try { const w = await window.__near.selector.wallet(); await w.signOut(); } catch {}
+        await window.nearRefreshUi();
+      };
+      window.nearRefreshUi = async ()=>{
+        try{
+          const w = await window.__near.selector.wallet();
+          const accs = await w.getAccounts();
+          const acc = accs?.[0]?.accountId || null;
+          document.getElementById("nearConnected").textContent = acc ? "verbunden" : "nicht verbunden";
+          document.getElementById("nearAccount").textContent   = acc || "—";
+          if (acc){
+            // Serverseitig speichern
+            await fetch(window.API_BASE + "/wallets/near", {
+              method:"POST", headers: window.authHeaders(), body: JSON.stringify({ account_id: acc })
+            });
+            await refreshWallets();
+            await refreshPayments();
+          }
+        }catch{}
+      };
+
+      // -------- TON Connect (UI) --------
+      // Minimal: Button öffnet Wallet-Auswahl, speichert Adresse am Server
+      try{
+        const { TonConnectUI } = await import("https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js");
+        const ton = new TonConnectUI({
+          manifestUrl: location.origin + location.pathname.replace(/\/[^/]*$/, "/") + "tonconnect-manifest.json"
+        });
+        window.tonConnect = ton;
+        // Wenn verbunden → Adresse speichern
+        ton.onStatusChange(async (w)=>{
+          if (w?.account?.address){
+            document.getElementById("tonAddress").value = w.account.address;
+            await saveTon();
+            await refreshPayments();
+          }
+        });
+      }catch(e){ console.warn("TON Connect not available:", e); }
+    </script>
+
   <script>
     // ------- KONFIG -------
     window.API_BASE     = "https://emeraldcontent-aac379fc581e.herokuapp.com/devdash"; // exakt MIT /devdash
@@ -85,6 +160,24 @@
         document.getElementById("tonInfo").textContent = JSON.stringify({ton_address: wallets?.me?.ton_address || null}, null, 2);
       }catch(e){ /* still */ }
     }
+    async function refreshPayments(){
+      const tokenHdr = authHeaders();
+      // NEAR – emeraldcontent & pay.
+      try{
+        const n1 = await (await fetch(window.API_BASE + "/near/payments?account_id=emeraldcontent.near&limit=20", { headers: tokenHdr })).json();
+        const n2 = await (await fetch(window.API_BASE + "/near/payments?account_id=pay.emeraldcontent.near&limit=20", { headers: tokenHdr })).json();
+        document.getElementById("nearIn1").textContent = JSON.stringify(n1.incoming, null, 2);
+        document.getElementById("nearIn2").textContent = JSON.stringify(n2.incoming, null, 2);
+      }catch(e){ /* ignore */ }
+      // TON – wenn Adresse gesetzt
+      try{
+        const addr = document.getElementById("tonAddress").value.trim();
+        if (addr){
+          const t = await (await fetch(window.API_BASE + "/ton/payments?address="+encodeURIComponent(addr)+"&limit=20", { headers: tokenHdr })).json();
+          document.getElementById("tonIn").textContent = JSON.stringify(t.incoming, null, 2);
+        }
+      }catch(e){ /* ignore */ }
+    }
     async function saveTon(){
       const address = document.getElementById("tonAddress").value.trim();
       const r = await fetch(window.API_BASE + "/wallets/ton", {
@@ -112,11 +205,14 @@
         document.getElementById("overview").textContent = JSON.stringify(ov, null, 2);
       } catch {}
 
+      // Bots aus ENV einsammeln (Auto-Discovery) und laden
+      try { await fetch(window.API_BASE + "/bots/refresh", { method:"POST", headers: authHeaders() }); } catch {}
       await loadBots();
       await nearInit();
       await refreshNearToken();
       await meshRefresh();
       await refreshWallets();
+      await refreshPayments();
 
       // Buttons
       const byId = (id)=>document.getElementById(id);
@@ -127,6 +223,7 @@
       byId("btnTokenReload") && (byId("btnTokenReload").onclick = refreshNearToken);
       byId("btnMeshReload") && (byId("btnMeshReload").onclick = meshRefresh);
       byId("btnSaveTon") && (byId("btnSaveTon").onclick = saveTon);
+      byId("btnRefreshPayments") && (byId("btnRefreshPayments").onclick = refreshPayments);
       byId("btnDevLogin") && (byId("btnDevLogin").onclick = devLogin);
     }
 
@@ -258,6 +355,23 @@
       </div>
     </div>
     <hr>
+    <div class="row" style="margin:8px 0">
+      <button id="btnRefreshPayments">Zahlungseingänge aktualisieren</button>
+    </div>
+    <div class="row">
+      <div style="flex:1">
+        <h4>NEAR Eingänge – emeraldcontent.near</h4>
+        <pre id="nearIn1"></pre>
+      </div>
+      <div style="flex:1">
+        <h4>NEAR Eingänge – pay.emeraldcontent.near</h4>
+        <pre id="nearIn2"></pre>
+      </div>
+    </div>
+    <div>
+      <h4>TON Eingänge</h4>
+      <pre id="tonIn"></pre>
+    </div>
     <div>
       <h4>TON Wallet</h4>
       <div class="row">
