@@ -133,29 +133,6 @@
       if (!res.ok) { alert(await res.text()); return; }
       await loadBots();
     }
-
-    function mountLogin(){
-      const slot = document.getElementById("tgSlot");
-      slot.innerHTML = "";
-      const s = document.createElement("script");
-      s.src = "https://telegram.org/js/telegram-widget.js?22";
-      s.async = true;
-      s.setAttribute("data-telegram-login", window.BOT_USERNAME);
-      s.setAttribute("data-size", "large");
-      s.setAttribute("data-userpic", "true");
-      s.setAttribute("data-request-access", "write");
-      s.setAttribute("data-onauth", "onTelegramAuth");
-      slot.appendChild(s);
-    }
-
-    function boot(){
-      mountLogin();
-      if (getToken()) {
-        document.getElementById("login").style.display = "none";
-        bootAfterLogin();
-      }
-    }
-    document.addEventListener("DOMContentLoaded", boot);
   </script>
 
   <!-- Wallet Selector (ESM) -->
