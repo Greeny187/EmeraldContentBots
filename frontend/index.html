@@ -56,7 +56,13 @@
         alert("Netzwerkfehler beim Login: " + (e?.message||e));
       }
     };
-
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+      data-telegram-login="EmeraldContentBot"   <!-- exakt dein Bot, ohne @ -->
+      data-size="large"
+      data-userpic="true"
+      data-request-access="write"
+      data-onauth="onTelegramAuth"></script>
+      
     // 3) Widget-Mount (Callback muss JETZT schon existieren)
     function mountLogin(){
       const slot = document.getElementById("tgSlot");
@@ -79,6 +85,7 @@
       if (getToken()) { document.getElementById("login").style.display = "none"; bootAfterLogin?.(); }
     }
     document.addEventListener("DOMContentLoaded", boot);
+
   </script>
 
   <!-- Favicon-404 vermeiden -->
@@ -234,10 +241,34 @@
 
   <!-- Login -->
   <div class="card" id="login">
-    <h3>Anmeldung</h3>
-    <div id="tgSlot"></div>
-    <small>Login wird serverseitig verifiziert.</small>
+      <h3>Anmeldung</h3>
+      <div id="tgSlot"></div>
+      <small>Login wird serverseitig verifiziert.</small>
+    </div>
+
+    <div style="margin-top:8px; display:flex; gap:8px;">
+    <input id="devCode"  placeholder="DEV CODE">
+    <input id="devTgId"  placeholder="Telegram ID z.B. 123456789">
+    <button id="btnDevLogin">Dev-Login</button>
   </div>
+  <script>
+  async function devLogin(){
+    const code = document.getElementById('devCode').value.trim();
+    const telegram_id = document.getElementById('devTgId').value.trim();
+    const r = await fetch(window.API_BASE + "/dev-login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ code, telegram_id, username:"andreas" })
+    });
+    const txt = await r.text();
+    if(!r.ok){ alert("Dev-Login fehlgeschlagen: " + txt); return; }
+    const data = JSON.parse(txt);
+    localStorage.setItem("emerald_token", data.access_token);
+    document.getElementById("login").style.display = "none";
+    await bootAfterLogin();
+  }
+  document.getElementById('btnDevLogin').onclick = devLogin;
+  </script>
+
 
   <!-- Me -->
   <div class="card" id="meCard" style="display:none">
