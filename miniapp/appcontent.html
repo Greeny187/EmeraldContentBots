@@ -346,8 +346,14 @@
         </label>
         <button class="btn" id="stats_reload">Aktualisieren</button>
       </div>
+      <!-- NEU: KPI-Box (inkl. EMRLD-Gesamt) -->
+      <div class="list" id="statsKPIs"></div>
       <div class="list" id="statsAgg"></div>
       <div class="list" id="statsTop"></div>
+      <!-- NEU: Claim-Zeile (vorerst deaktiver Button) -->
+      <div class="row" id="emrldClaimBox" style="justify-content:center;gap:8px; margin-top:8px;">
+        <button class="btn primary" id="emrldClaimBtn" disabled title="Wallet-Connect (NEAR) bald verfügbar">💎 EMRLD claimen</button>
+      </div>
     </section>
 
     <!-- MOOD -->
@@ -902,6 +908,38 @@
         });
         if(!res.ok) throw new Error(await res.text());
         const data = await res.json();
+        // NEU: KPIs inkl. EMRLD-Gesamt
+    const k = data.summary || {};
+    const RATE =  parseFloat(new URLSearchParams(location.search).get('emrld_rate')) 
+               || parseFloat(window.EMRLD_RATE || '0.1') 
+               || 0.1; // Fallback-Rate, falls Backend noch nichts liefert
+    const totalMsgs = k.messages_total ?? 0;
+    const rewardTotal = (typeof k.reward_tokens === 'number')
+      ? k.reward_tokens
+      : Math.round(totalMsgs * RATE * 10000) / 10000;
+    const kpiBox = qs('#statsKPIs');
+    if (kpiBox){
+      kpiBox.innerHTML = '<div class="title">Übersicht ('+(data.used_days||days)+' Tage)</div>';
+      const items = [
+        ['Nachrichten', totalMsgs],
+        ['Aktive Nutzer', k.active_users ?? 0],
+        ['Joins', k.joins ?? 0],
+        ['Leaves', k.leaves ?? 0],
+        ['Kicks', k.kicks ?? 0],
+        ['Spam-Aktionen', k.spam_actions ?? 0],
+        ['Auto-Antworten', k.autoresp_hits ?? 0],
+        ['Hilfreich-Votes', k.autoresp_helpful ?? 0],
+        ['Reply p50', k.reply_median_ms!=null ? (Math.round(k.reply_median_ms/1000)+'s') : '–'],
+        ['Reply p90', k.reply_p90_ms!=null ? (Math.round(k.reply_p90_ms/1000)+'s') : '–'],
+        // NEU:
+        ['EMRLD-Belohnung', rewardTotal+' EMRLD'],
+      ];
+      items.forEach(([name,val])=>{
+        const it=document.createElement('div'); it.className='item';
+        it.innerHTML = `<div class="left"><div class="title">${name}</div><div class="hint">${val}</div></div>`;
+        kpiBox.append(it);
+      });
+    }
         // Agg
         const aggBox = qs('#statsAgg'); aggBox.innerHTML = '<div class="title">Tageswerte</div>';
         (data.agg||[]).forEach(r=>{
@@ -912,11 +950,19 @@
         });
         // Top
         const topBox = qs('#statsTop'); topBox.innerHTML = '<div class="title">Top-Responder</div>';
-        (data.top_responders||[]).forEach(t=>{
+         (data.top_responders||[]).forEach(t=>{
           const it = document.createElement('div'); it.className='item';
           const s = Math.round((t.avg_ms||0)/1000);
-          it.innerHTML = `<div class="left"><div class="title">User ${t.user_id}</div>
-            <div class="hint">${t.answers} Antworten · Ø ${s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`}</div></div>`;
+          const sTxt = s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;
+          const emrld = (typeof t.emrld === 'number')
+            ? t.emrld
+            : Math.round((t.answers||0) * RATE * 10000)/10000;
+          it.innerHTML = `<div class="left">
+              <div class="title">User ${t.user_id}</div>
+              <div class="hint">
+                ${t.answers} Antworten · Ø ${sTxt} · 💎 ${emrld} EMRLD
+              </div>
+            </div>`;
           topBox.append(it);
         });
       }catch(e){
@@ -931,6 +977,14 @@
     // kleines Helferlein
     function ok(msg){ const out=qs('#out'); out.textContent=msg||'✅ Gespeichert'; out.style.opacity=1; setTimeout(()=>out.style.opacity=0, 2200); }
     function err(msg){ const out=qs('#out'); out.textContent=msg||'⚠️ Fehler beim Speichern'; out.style.opacity=1; }
+
+    // NEU: (später aktiv) Claim-Handler – aktuell nur Hinweis
+    qs('#emrldClaimBtn')?.addEventListener('click', ()=>{
+    const txt = qs('#statsKPIs')?.textContent || '';
+    const m = txt.match(/([\d.,]+)\s*EMRLD/);
+    const val = m ? m[1] : '0';
+    alert(`Wallet-Connect (NEAR) folgt.\nDu könntest jetzt ~ ${val} EMRLD claimen.`);
+    });
 
     // EINHEITLICHES Speichern mit Bild-Upload + Feedback
     async function sendPayload(extra = {}) {
