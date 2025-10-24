@@ -640,16 +640,17 @@
     }
 
     // WICHTIG: akzeptiert KEY ("welcome") ODER direkt ein <img>-Element
-    function setPreview(keyOrEl, url){
-      const imgEl = (typeof keyOrEl === 'string') ? IMG_PREV[keyOrEl] : keyOrEl;
-      if (!imgEl) return;
-      if (!url) {
-        imgEl.removeAttribute('src');
-        imgEl.dataset.hasImage = '0';
-        return;
+    function setPreview(key, url){
+      const img = PREVIEW_IMG[key]; const box=PREVIEW_BOX[key];
+      if(!img||!box) return;
+      if(url){
+        img.onerror = ()=>{ /* Vorschau fehlgeschlagen → NICHT löschen */
+          console.warn('[preview] failed to load image for', key);
+        };
+        img.src = url; box.hidden = false;
+      }else{
+        img.removeAttribute('src'); box.hidden = true;
       }
-      imgEl.src = authUrl(url);
-      imgEl.dataset.hasImage = '1';
     }
 
     // Upload-Change-Handler (bleibt wie gehabt – nutzt IMG_INPUT/IMG_CLEAR_BTN/CLEAR_FLAGS)
