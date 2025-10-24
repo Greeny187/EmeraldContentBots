@@ -885,6 +885,7 @@
         // More
         setVal('language', j.language||'');
         qs('#out').textContent='Bereit.';
+        STATE_READY = true;
         if (j.clean_deleted){
           qs('#clean_enabled').checked = !!j.clean_deleted.enabled;
           qs('#clean_time').value = (j.clean_deleted.time || "03:00");
@@ -896,7 +897,11 @@
 
         // lade aggregierte Statistik separat (auslagerung)
         await loadStats();
-      }catch(e){ console.error(e); qs('#out').textContent='Fehler beim Laden.'; }
+      }catch(e){ 
+          console.error(e); 
+          qs('#out').textContent='Fehler beim Laden.';
+          STATE_READY = false;
+       }
       validateAll();
     }
 
@@ -989,6 +994,7 @@
 
     // EINHEITLICHES Speichern mit Bild-Upload + Feedback
     async function sendPayload(extra = {}) {
+      if (!STATE_READY) { err('⚠️ Erst Daten laden (Reload), dann speichern.'); return; }
       const tg = window.Telegram?.WebApp; tg?.ready?.();
       const out = Object.assign({}, collect(), extra);
 
