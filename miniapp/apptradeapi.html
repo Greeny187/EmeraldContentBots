@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Emerald Trade API – Verknüpfen</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root { --pad:12px; --radius:14px; --muted:#666; --line:#e6e6e6; }
+    html,body { margin:0; padding:0; font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif; }
+    body { padding: var(--pad); }
+    h1 { font-size: 18px; margin: 0 0 8px; }
+    .card {
+      padding: var(--pad);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      background: var(--tg-theme-bg-color, #fff);
+      color: var(--tg-theme-text-color, #111);
+      margin-bottom: var(--pad);
+    }
+    label { display:block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+    input, select, button, textarea {
+      width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line);
+      background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #111);
+      outline: none;
+    }
+    input::placeholder { color: #999; }
+    button {
+      border: none; font-weight: 600; cursor: pointer;
+      background: var(--tg-theme-button-color, #16a34a);
+      color: var(--tg-theme-button-text-color, #fff);
+      margin-top: 12px;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .list-item {
+      display:flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid var(--line);
+    }
+    .list-item b { display:block; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .danger { background:#ef4444 !important; }
+    .foot {
+      font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 8px;
+    }
+    .ok { color:#16a34a; font-weight:600; }
+    .err { color:#b91c1c; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Trading-Konten verknüpfen</h1>
+    <p class="muted">Deine Zugangsdaten werden <b>clientseitig</b> übertragen, <b>serverseitig verschlüsselt</b> gespeichert und sind nur dir zugeordnet. Du kannst sie jederzeit löschen.</p>
+
+    <label for="provider">Anbieter</label>
+    <select id="provider"></select>
+
+    <label for="label">Bezeichnung (optional)</label>
+    <input id="label" placeholder="z. B. Main / Futures" />
+
+    <div class="row">
+      <div>
+        <label for="api_key">API Key</label>
+        <input id="api_key" placeholder="…" autocomplete="off" />
+      </div>
+      <div>
+        <label for="api_secret">API Secret</label>
+        <input id="api_secret" placeholder="…" autocomplete="off" />
+      </div>
+    </div>
+
+    <label for="passphrase">Passphrase (falls benötigt)</label>
+    <input id="passphrase" placeholder="OKX / Coinbase Pro etc." autocomplete="off" />
+
+    <button id="save">Speichern</button>
+    <div id="status" class="foot" aria-live="polite"></div>
+  </div>
+
+  <div class="card">
+    <h1>Gespeicherte Anbindungen</h1>
+    <div id="list" class="muted">Lade…</div>
+  </div>
+
+  <div class="card">
+    <h1>Hinweise</h1>
+    <p class="foot">
+      • Empfehlung: Börsenseitig nur <b>Leserechte</b> aktivieren (kein „Trade/Withdraw“).<br>
+      • Löschst du einen Eintrag, wird er <b>sofort</b> aus der Datenbank entfernt.<br>
+      • Rechtliche Grundlagen: DSGVO Art. 6 Abs. 1 lit. b (Leistungserbringung), Art. 17 (Löschung).
+    </p>
+  </div>
+
+  <script>
+    // Telegram WebApp init
+    const tg = window.Telegram.WebApp;
+    tg.expand(); tg.MainButton.hide();
+
+    // Minimaler Helper für API-Calls (same-origin, relative Pfade)
+    async function api(path, method="GET", body=null) {
+      const initData = tg.initDataUnsafe || {};
+      const headers = {"Content-Type":"application/json"};
+      const opts = { method, headers };
+      let url = path;
+      if (method === "GET" && initData.user?.id) {
+        const sep = path.includes("?") ? "&" : "?";
+        url = path + sep + "telegram_id=" + encodeURIComponent(initData.user.id);
+      }
+      if (body) opts.body = JSON.stringify({ ...body, initData });
+      const res = await fetch(url, opts);
+      let json = {};
+      try { json = await res.json(); } catch { /* noop */ }
+      if (!res.ok || json.error) throw new Error(json.error || ("HTTP "+res.status));
+      return json;
+    }
+
+    const el = (id) => document.getElementById(id);
+    const st = el("status");
+
+    function toastOk(msg) {
+      st.innerHTML = '<span class="ok">✔︎</span> ' + msg;
+      tg.HapticFeedback.notificationOccurred("success");
+    }
+    function toastErr(msg) {
+      st.innerHTML = '<span class="err">✖︎</span> ' + msg;
+      tg.HapticFeedback.notificationOccurred("error");
+    }
+
+    async function loadProviders() {
+      const j = await api("/tradeapi/providers");
+      const sel = el("provider");
+      sel.innerHTML = "";
+      j.providers.forEach(p => {
+        const o = document.createElement("option");
+        o.value = p.id; o.textContent = p.name;
+        sel.appendChild(o);
+      });
+    }
+
+    async function loadList() {
+      const box = el("list");
+      const j = await api("/tradeapi/keys", "GET");
+      if (!j.items || j.items.length === 0) {
+        box.innerHTML = "Noch keine Keys gespeichert.";
+        return;
+      }
+      box.innerHTML = j.items.map(it => `
+        <div class="list-item">
+          <div>
+            <b>${it.provider}${it.label ? " – " + escapeHtml(it.label) : ""}</b>
+            <div class="muted">${new Date(it.updated_at).toLocaleString()}</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="danger" data-id="${it.id}" data-action="delete">Löschen</button>
+          </div>
+        </div>
+      `).join("");
+      box.querySelectorAll("button[data-action='delete']").forEach(btn => {
+        btn.onclick = async () => {
+          try {
+            await api("/tradeapi/keys/delete", "POST", { id: btn.dataset.id });
+            toastOk("Eintrag gelöscht.");
+            await loadList();
+          } catch (e) { toastErr(e.message); }
+        };
+      });
+    }
+
+    function escapeHtml(s){ return (s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    el("save").onclick = async () => {
+      try {
+        const body = {
+          provider:  el("provider").value,
+          label:     el("label").value,
+          api_key:   el("api_key").value,
+          api_secret:el("api_secret").value,
+          passphrase:el("passphrase").value,
+        };
+        if (!body.provider || !body.api_key || !body.api_secret) {
+          toastErr("Bitte Anbieter, API Key und Secret ausfüllen.");
+          return;
+        }
+        await api("/tradeapi/keys", "POST", body);
+        el("api_key").value = ""; el("api_secret").value = ""; // nicht liegen lassen
+        toastOk("Gespeichert.");
+        await loadList();
+      } catch (e) { toastErr(e.message); }
+    };
+
+    (async () => {
+      try {
+        const auth = await api("/tradeapi/auth", "POST", {});
+        if (!auth.ok) throw new Error("Auth fehlgeschlagen");
+        await loadProviders();
+        await loadList();
+      } catch (e) {
+        toastErr(e.message || "Fehler beim Laden.");
+        alert("MiniApp konnte nicht initialisiert werden: " + (e.message || e));
+      }
+    })();
+  </script>
+</body>
+</html>
