@@ -84,6 +84,7 @@
       <button class="pill" data-tab="faq">FAQ</button>
       <button class="pill" data-tab="report">Report</button>
       <button class="pill" data-tab="stats">Statistik</button>
+      <button class="pill" data-tab="rewards">Rewards</button>
       <button class="pill" data-tab="mood">Mood</button>
       <button class="pill" data-tab="night">Nachtmodus</button>
       <button class="pill" data-tab="router">Router</button>
@@ -346,35 +347,27 @@
         </label>
         <button class="btn" id="stats_reload">Aktualisieren</button>
       </div>
-      <!-- NEU: KPI-Box (inkl. EMRLD-Gesamt) -->
-      <div class="list" id="statsKPIs"></div>
-      <div class="list" id="statsAgg"></div>
-      <div class="list" id="statsTop"></div>
-      <!-- NEU: Claim-Zeile (vorerst deaktiver Button) -->
-      <div class="row" id="emrldClaimBox" style="justify-content:center;gap:8px; margin-top:8px;">
-        <button class="btn primary" id="emrldClaimBtn" disabled title="Wallet-Connect (NEAR) bald verfügbar">💎 EMRLD claimen</button>
-      </div>
     </section>
     
     <!-- Rewards -->
-    <div class="card">
-        <h3>Rewards (EMRLD)</h3>
-        <div class="row">
-          <label>Rate pro Antwort</label>
-          <input id="reward_rate" type="number" min="0" step="0.0001" placeholder="z.B. 0.01">
-        </div>
-        <div class="row">
-          <label>Auszahlungsmodus</label>
-          <select id="reward_mode">
-            <option value="claim">Claim durch User</option>
-            <option value="auto">Auto an Owner (Wallet Connect)</option>
-          </select>
-        </div>
-        <div class="hint">Hinweis: Wallet-Connect (NEAR/TON/BSC) folgt. Nur Gruppen-Owner erhalten Auto-Payout.</div>
-        <div class="row">
-          <button class="btn" id="reward_save">Speichern</button>
-        </div>
+    <section id="tab-rewards" class="tab-pane" hidden>
+      <h3>Rewards</h3>
+      <div class="form-row">
+        <label for="rw-token">Token (Symbol/Adresse)</label>
+        <input id="rw-token" type="text" placeholder="z. B. EMRLD oder 0x…">
       </div>
+      <div class="form-row">
+        <label for="rw-network">Netzwerk</label>
+        <input id="rw-network" type="text" placeholder="NEAR / TON / EVM">
+      </div>
+      <div class="form-row">
+        <label for="rw-decimals">Dezimals</label>
+        <input id="rw-decimals" type="number" min="0" max="36" value="24">
+      </div>
+      <div class="actions">
+        <button id="rw-save" class="btn-primary">Speichern</button>
+      </div>
+    </section>
 
     <!-- MOOD -->
     <section class="card" id="sec-mood">
@@ -940,9 +933,6 @@
                || parseFloat(window.EMRLD_RATE || '0.1') 
                || 0.1; // Fallback-Rate, falls Backend noch nichts liefert
     const totalMsgs = k.messages_total ?? 0;
-    const rewardTotal = (typeof k.reward_tokens === 'number')
-      ? k.reward_tokens
-      : Math.round(totalMsgs * RATE * 10000) / 10000;
     const kpiBox = qs('#statsKPIs');
     if (kpiBox){
       kpiBox.innerHTML = '<div class="title">Übersicht ('+(data.used_days||days)+' Tage)</div>';
@@ -957,8 +947,6 @@
         ['Hilfreich-Votes', k.autoresp_helpful ?? 0],
         ['Reply p50', k.reply_median_ms!=null ? (Math.round(k.reply_median_ms/1000)+'s') : '–'],
         ['Reply p90', k.reply_p90_ms!=null ? (Math.round(k.reply_p90_ms/1000)+'s') : '–'],
-        // NEU:
-        ['EMRLD-Belohnung', rewardTotal+' EMRLD'],
       ];
       items.forEach(([name,val])=>{
         const it=document.createElement('div'); it.className='item';
