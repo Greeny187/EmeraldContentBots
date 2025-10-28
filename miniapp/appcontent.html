@@ -355,6 +355,26 @@
         <button class="btn primary" id="emrldClaimBtn" disabled title="Wallet-Connect (NEAR) bald verfügbar">💎 EMRLD claimen</button>
       </div>
     </section>
+    
+    <!-- Rewards -->
+    <div class="card">
+        <h3>Rewards (EMRLD)</h3>
+        <div class="row">
+          <label>Rate pro Antwort</label>
+          <input id="reward_rate" type="number" min="0" step="0.0001" placeholder="z.B. 0.01">
+        </div>
+        <div class="row">
+          <label>Auszahlungsmodus</label>
+          <select id="reward_mode">
+            <option value="claim">Claim durch User</option>
+            <option value="auto">Auto an Owner (Wallet Connect)</option>
+          </select>
+        </div>
+        <div class="hint">Hinweis: Wallet-Connect (NEAR/TON/BSC) folgt. Nur Gruppen-Owner erhalten Auto-Payout.</div>
+        <div class="row">
+          <button class="btn" id="reward_save">Speichern</button>
+        </div>
+      </div>
 
     <!-- MOOD -->
     <section class="card" id="sec-mood">
@@ -631,26 +651,22 @@
     }
 
 
-    // Auth-Parameter an /miniapp/file hängen (Telegram init_data oder Browser-Fallback uid)
     function authUrl(u){
       if(!u || !u.includes('/miniapp/file')) return u;
       const glue = u.includes('?') ? '&' : '?';
       if (INIT_DATA) return `${u}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
       return `${u}${glue}uid=${encodeURIComponent(uid)}`;
     }
-
-    // WICHTIG: akzeptiert KEY ("welcome") ODER direkt ein <img>-Element
-    function setPreview(key, url){
-      const img = PREVIEW_IMG[key]; const box=PREVIEW_BOX[key];
-      if(!img||!box) return;
-      if(url){
-        img.onerror = ()=>{ /* Vorschau fehlgeschlagen → NICHT löschen */
-          console.warn('[preview] failed to load image for', key);
-        };
-        img.src = url; box.hidden = false;
-      }else{
-        img.removeAttribute('src'); box.hidden = true;
+    function setPreview(keyOrEl, url){
+      const imgEl = (typeof keyOrEl === 'string') ? IMG_PREV[keyOrEl] : keyOrEl;
+      if (!imgEl) return;
+      if (!url) {
+        imgEl.removeAttribute('src');
+        imgEl.dataset.hasImage = '0';
+        return;
       }
+      imgEl.src = authUrl(url);
+      imgEl.dataset.hasImage = '1';
     }
 
     // Upload-Change-Handler (bleibt wie gehabt – nutzt IMG_INPUT/IMG_CLEAR_BTN/CLEAR_FLAGS)
@@ -873,6 +889,10 @@
         setVal('report.topic', rep.topic ?? 0);
         renderReportStats(rep.stats || j.stats || []);
         
+        // Belohnung (falls später aus DB geliefert wird, jetzt Null-safe)
+        setVal('reward_rate', j.reward?.rate ?? '');
+        setVal('reward_mode', j.reward?.mode ?? 'claim');
+
         // Mood
         setVal('mood.question', j.mood?.question);
         setVal('mood.topic', j.mood?.topic);
