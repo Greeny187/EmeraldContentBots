@@ -73,7 +73,6 @@ async def _migrate():
     await execute("""
       insert into dashboard_watch_accounts(chain, account_id, label)
       values ('near','emeraldcontent.near','Main Wallet'),
-             ('near','pay.emeraldcontent.near','Payments')
       on conflict do nothing;
     """)
 

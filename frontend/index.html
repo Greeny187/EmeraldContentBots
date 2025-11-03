@@ -173,11 +173,8 @@
     async function refreshWallets(){
       try{
         const one = await (await fetch(api("/near/account/overview?account_id=emeraldcontent.near"), { headers: authHeaders() })).json();
-        const two = await (await fetch(api("/near/account/overview?account_id=pay.emeraldcontent.near"), { headers: authHeaders() })).json();
         const a1 = document.getElementById("nearAcc1");
-        const a2 = document.getElementById("nearAcc2");
         if (a1) a1.textContent = JSON.stringify(one, null, 2);
-        if (a2) a2.textContent = JSON.stringify(two, null, 2);
         const wallets = await (await fetch(api("/wallets"), { headers: authHeaders() })).json();
         const tonAddr = wallets?.me?.ton_address || "";
         const tonAddressEl = document.getElementById("tonAddress");
@@ -190,11 +187,8 @@
       const tokenHdr = authHeaders();
       try{
         const n1 = await (await fetch(api("/near/payments?account_id=emeraldcontent.near&limit=20"), { headers: tokenHdr })).json();
-        const n2 = await (await fetch(api("/near/payments?account_id=pay.emeraldcontent.near&limit=20"), { headers: tokenHdr })).json();
         const i1 = document.getElementById("nearIn1");
-        const i2 = document.getElementById("nearIn2");
         if (i1) i1.textContent = JSON.stringify(n1.incoming || n1, null, 2);
-        if (i2) i2.textContent = JSON.stringify(n2.incoming || n2, null, 2);
       }catch(e){ /* ignore */ }
       try{
         const addrEl = document.getElementById("tonAddress");
@@ -372,16 +366,11 @@
     <h3>Wallets</h3>
     <div class="row" style="gap:8px; align-items:center">
       <span class="pill">NEAR Watch: emeraldcontent.near</span>
-      <span class="pill">NEAR Watch: pay.emeraldcontent.near</span>
     </div>
     <div class="row" style="margin-top:8px">
       <div style="flex:1">
         <h4>emeraldcontent.near</h4>
         <pre id="nearAcc1"></pre>
-      </div>
-      <div style="flex:1">
-        <h4>pay.emeraldcontent.near</h4>
-        <pre id="nearAcc2"></pre>
       </div>
     </div>
     <hr>
@@ -392,10 +381,6 @@
       <div style="flex:1">
         <h4>NEAR Eingänge – emeraldcontent.near</h4>
         <pre id="nearIn1"></pre>
-      </div>
-      <div style="flex:1">
-        <h4>NEAR Eingänge – pay.emeraldcontent.near</h4>
-        <pre id="nearIn2"></pre>
       </div>
     </div>
     <div>
