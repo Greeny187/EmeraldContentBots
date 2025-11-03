@@ -11,6 +11,27 @@ import os, time
 import httpx
 from decimal import Decimal, getcontext
 
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, resources={
+    r"/devdash/*": {
+        "origins": ["https://greeny187.github.io"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
+    }
+})
+
+# Alternative manuelle Implementation:
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://greeny187.github.io')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    return response
+
+
 getcontext().prec = 40
 
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +42,8 @@ app = FastAPI(title="Emerald DevDash API",version="0.2-min")
 
 _origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
 allow_all = "*" in _origins
+
+
 
 app.add_middleware(
     CORSMiddleware,
