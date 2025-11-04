@@ -76,438 +76,523 @@
     /* Errors */
     .input-error{border-color:var(--danger)!important; box-shadow:0 0 0 2px rgba(239,68,68,.2)}
     .err{color:var(--danger); font-size:12px; margin:4px 2px 0}
+    
+    /* Neue Styles für Startseite */
+    #startPage {
+      max-width: 600px;
+      margin: 20px auto;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .welcome-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .welcome-header h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--brand);
+    }
+
+    .welcome-header p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .group-list {
+      margin-top: 20px;
+    }
+
+    .group-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      margin: 12px 0;
+      background: var(--panel);
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .group-item:hover {
+      border-color: var(--brand);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .group-info {
+      flex: 1;
+    }
+
+    .group-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .group-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Content Area Transition */
+    #contentArea {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #contentArea.visible {
+      opacity: 1;
+    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <div class="titlebar">
-      <div class="title">Mini-App</div>
-      <select id="groupSelect" class="group-select">
-        <option value="">Gruppe wählen...</option>
-      </select>
-    </div>
-    <div class="pillbar" id="tabs">
-      <button class="pill active" data-tab="welcome">Begrüßung</button>
-      <button class="pill" data-tab="rules">Regeln</button>
-      <button class="pill" data-tab="farewell">Verabschiedung</button>
-      <button class="pill" data-tab="spam">Spam</button>
-      <button class="pill" data-tab="rss">RSS</button>
-      <button class="pill" data-tab="ai">KI</button>
-      <button class="pill" data-tab="aimod">KI-Moderation</button>
-      <button class="pill" data-tab="faq">FAQ</button>
-      <button class="pill" data-tab="report">Report</button>
-      <button class="pill" data-tab="stats">Statistik</button>
-      <button class="pill" data-tab="rewards">Rewards</button>
-      <button class="pill" data-tab="mood">Mood</button>
-      <button class="pill" data-tab="night">Nachtmodus</button>
-      <button class="pill" data-tab="router">Router</button>
-      <button class="pill" data-tab="more">Mehr</button>
-      <button class="pill" data-tab="pro">Pro</button>
-    </div>
-
-    <!-- WELCOME -->
-    <section class="card active" id="sec-welcome">
-      <div class="row">
-        <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
-      </div>
-      <div class="row gap-6" style="margin-top:8px">
-        <div>
-          <label>Bild (optional)</label>
-          <div class="row">
-            <img id="welcome_img_prev" class="imgprev" alt="Welcome Bild"/>
-            <input type="file" id="welcome_img" accept="image/*"/>
-            <button class="btn small" id="welcome_img_clear" type="button">Löschen</button>
-          </div>
-          <div class="hint">Wird mit der Begrüßung gepostet.</div>
-        </div>
-      </div>
-      <label>Text</label>
-      <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
-      <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
-    </section>
-
-    <!-- RULES -->
-    <section class="card" id="sec-rules">
-      <div class="row">
-        <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
-      </div>
-      <div class="row gap-6" style="margin-top:8px">
-        <div>
-          <label>Bild (optional)</label>
-          <div class="row">
-            <img id="rules_img_prev" class="imgprev" alt="Regeln Bild"/>
-            <input type="file" id="rules_img" accept="image/*"/>
-            <button class="btn small" id="rules_img_clear" type="button">Löschen</button>
-          </div>
-          <div class="hint">Wird zusammen mit dem Regeltext gepostet.</div>
-        </div>
-      </div>
-      <label>Text</label>
-      <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
-    </section>
-
-    <!-- FAREWELL -->
-    <section class="card" id="sec-farewell">
-      <div class="row">
-        <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
-      </div>
-      <div class="row gap-6" style="margin-top:8px">
-        <div>
-          <label>Bild (optional)</label>
-          <div class="row">
-            <img id="farewell_img_prev" class="imgprev" alt="Farewell Bild"/>
-            <input type="file" id="farewell_img" accept="image/*"/>
-            <button class="btn small" id="farewell_img_clear" type="button">Löschen</button>
-          </div>
-          <div class="hint">Wird bei der Verabschiedung gepostet.</div>
-        </div>
-      </div>
-      <label>Text</label>
-      <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
-    </section>
-
-    <!-- SPAM -->
-    <section class="card" id="sec-spam">
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="spam.on"> Spam-Filter aktiv</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (nur Admins)</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
-        <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
-      </div>
-      <div class="grid">
-        <label>Policy-Topic (ID)
-          <input type="text" data-key="spam.policy_topic" data-validate="int" placeholder="z.B. 123" />
-          <div class="err" hidden id="err_spamtopic"></div>
-        </label>
-        <label>Spam-Aktion
-          <select data-key="spam.action" id="spam_action">
-            <option value="">—</option>
-            <option value="delete">Löschen</option>
-            <option value="warn">Warnen</option>
-            <option value="mute">Stummschalten</option>
-          </select>
-        </label>
-      </div>
-      <div class="grid">
-        <label>Whitelist-Domains (eine pro Zeile)
-          <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
-        </label>
-        <label>Blacklist-Domains (eine pro Zeile)
-          <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
-        </label>
-      </div>
-      <div class="grid">
-        <label>Tägliches Limit pro Nutzer
-          <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
-        </label>
-        <label>Quota-Notify
-          <select data-key="spam.quota_notify" id="spam_quota">
-            <option value="">—</option>
-            <option value="off">Aus</option>
-            <option value="smart">Smart</option>
-            <option value="always">Immer</option>
-          </select>
-        </label>
-      </div>
-    </section>
-
-    <!-- RSS -->
-    <section class="card" id="sec-rss">
-      <div class="grid">
-        <label>RSS-Feed URL
-          <input type="text" id="rss_url" data-validate="url" placeholder="https://example.com/feed.xml"/>
-          <div class="err" hidden id="err_rssurl"></div>
-        </label>
-        <label>Topic (ID)
-          <input type="text" id="rss_topic" data-validate="int" placeholder="0 = Standard"/>
-          <div class="err" hidden id="err_rsstopic"></div>
-        </label>
-      </div>
-      <div class="row">
-        <label class="switch"><input type="checkbox" id="rss_postimg"> Beitragsbilder posten</label>
-        <label class="switch"><input type="checkbox" id="rss_enabled" checked> Feed aktivieren</label>
-        <button class="btn small" id="rss_add">Hinzufügen</button>
-      </div>
-      <div class="sep"></div>
-      <div id="rssList" class="list"></div>
-      <div class="hint">Bestehende Feeds unten verwalten.</div>
-    </section>
-
-    <!-- KI -->
-    <section class="card" id="sec-ai">
-      <div class="row">
-        <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
-      </div>
-      <label>FAQ-Hinweis / Prompt (optional)</label>
-      <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
-    </section>
-
-    <!-- KI-Moderation -->
-    <section class="card" id="sec-aimod">
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="ai_mod.enabled"> Aktiviert</label>
-        <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow-Mode (nur loggen)</label>
-      </div>
-      <div class="grid">
-        <label>Primär-Aktion
-          <select data-key="ai_mod.action_primary">
-            <option value="">—</option>
-            <option value="delete">Löschen</option>
-            <option value="warn">Warnen</option>
-            <option value="mute">Stummschalten</option>
-          </select>
-        </label>
-        <label>Mute-Minuten
-          <input type="number" data-key="ai_mod.mute_minutes" min="0" placeholder="0 = aus" />
-        </label>
-      </div>
-      <div class="grid">
-        <label>Warntext
-          <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI-Moderation)."/>
-        </label>
-        <label>Appeal-URL
-          <input type="text" data-key="ai_mod.appeal_url" placeholder="https://…"/>
-        </label>
-      </div>
-      <div class="grid">
-        <label>Anfragen / Minute (Max)
-          <input type="number" data-key="ai_mod.max_per_min" min="1" placeholder="20" />
-        </label>
-        <label>Cooldown (Sekunden)
-          <input type="number" data-key="ai_mod.cooldown_s" min="0" placeholder="30" />
-        </label>
-      </div>
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_admins"> Admins ausnehmen</label>
-        <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic-Owner ausnehmen</label>
-      </div>
-      <div class="sep"></div>
-      <div class="grid">
-        <label>Toxicity-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.toxicity" placeholder="0.90" />
-        </label>
-        <label>Hate-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.hate" placeholder="0.85" />
-        </label>
-        <label>Sexual-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.sexual" placeholder="0.90" />
-        </label>
-        <label>Harassment-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.harassment" placeholder="0.90" />
-        </label>
-        <label>Self-Harm-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.selfharm" placeholder="0.95" />
-        </label>
-        <label>Violence-Schwelle
-          <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.violence" placeholder="0.90" />
-        </label>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="card" id="sec-faq">
-      <div class="grid">
-        <label>Frage
-          <input type="text" id="faq_q" placeholder="Deine Frage …" />
-        </label>
-        <label>Antwort
-          <input type="text" id="faq_a" placeholder="Kurze Antwort …" />
-        </label>
-      </div>
-      <div class="row">
-        <button class="btn small" id="faq_add">Hinzufügen</button>
-      </div>
-      <div class="sep"></div>
-      <div id="faqList" class="list"></div>
-    </section>
-
-    <!-- REPORT -->
-    <section class="card" id="sec-report">
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="report.enabled"> Täglichen Report aktiv</label>
-        <div>
-          <label>Ziel</label>
-          <div class="row">
-            <label class="switch"><input type="radio" name="report_dest" id="report_dest_dm" value="dm"> Per DM</label>
-            <label class="switch"><input type="radio" name="report_dest" id="report_dest_topic" value="topic"> In Topic</label>
-          </div>
-          <div class="hint">Wähle „In Topic“ und gib unten die Topic-ID deiner Gruppe (z. B. „General“) an.</div>
-        </div>
-        <label>Topic (ID)
-          <input type="text" data-key="report.topic" data-validate="int" placeholder="0 = Standard; sonst ID von „General“"/>
-          <div class="err" hidden id="err_reporttopic"></div>
-        </label>
-      </div>
-      <div class="row">
-        <button class="btn small" id="report_send_now" type="button">Report jetzt posten</button>
-      </div>
-      <div class="sep"></div>
-      <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
-      <div id="reportStats" class="list"></div>
-    </section>
-
-    <!-- STATS -->
-    <section class="card" id="sec-stats">
-      <h3>📊 Statistik</h3>
-      <div class="grid">
-        <label>Zeitraum
-          <select id="stats_days">
-            <option value="7">7 Tage</option>
-            <option value="14" selected>14 Tage</option>
-            <option value="30">30 Tage</option>
-            <option value="60">60 Tage</option>
-          </select>
-        </label>
-        <button class="btn" id="stats_reload">Aktualisieren</button>
-      </div>
-    </section>
-    
-    <!-- Rewards -->
-    <section class="card">
-      <h3>Rewards (EMRLD)</h3>
-        <div class="row"><label>Aktiv</label><input type="checkbox" id="reward_enabled"></div>
-        <div class="row"><label>Modus</label>
-      <select id="reward_mode">
-        <option value="claim">Claim (User)</option>
-        <option value="auto">Auto (Owner)</option>
-      </select>
-    </div>
-    <div class="row"><label>Rate pro Antwort</label><input id="reward_rate_answer" type="number" step="0.0001" min="0" placeholder="0.01"></div>
-    <div class="row"><label>Rate pro Helpful</label><input id="reward_rate_helpful" type="number" step="0.0001" min="0" placeholder="0.05"></div>
-    <div class="row"><label>Cap pro Nutzer/Tag</label><input id="reward_cap_user" type="number" step="1" min="0" placeholder="0"></div>
-    <div class="row"><label>Cap pro Chat/Tag</label><input id="reward_cap_chat" type="number" step="1" min="0" placeholder="0"></div>
-    <button class="btn" id="reward_save">Speichern</button>
-    </section>
-
-    <!-- MOOD -->
-    <section class="card" id="sec-mood">
-      <div class="grid">
-        <label>Frage (Stimmungsumfrage)
-          <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung heute?" />
-        </label>
-        <label>Topic (ID)
-          <input type="text" data-key="mood.topic" data-validate="int" placeholder="0 = Standard" />
-          <div class="err" hidden id="err_moodtopic"></div>
-        </label>
-      </div>
-      <div class="row">
-        <button class="btn small" id="mood_send_now" type="button">Mood-Frage jetzt senden</button>
-      </div>
-    </section>
-
-    <!-- NIGHT MODE -->
-    <section class="card" id="sec-night">
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
-        <label>Start (HH:MM)
-          <input type="text" data-key="night.start" data-validate="time" placeholder="22:00" />
-          <div class="err" hidden id="err_nstart"></div>
-        </label>
-        <label>Ende (HH:MM)
-          <input type="text" data-key="night.end" data-validate="time" placeholder="07:00" />
-          <div class="err" hidden id="err_nend"></div>
-        </label>
-      </div>
-      <div class="grid">
-        <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht-Admin-Nachrichten löschen</label>
-        <label class="switch"><input type="checkbox" data-key="night.warn_once"> Einmalige Warnung anzeigen</label>
-        <label>Zeitzone
-          <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
-        </label>
-        <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard-Mode</label>
-      </div>
-      <div class="grid">
-        <label>Temporär bis (Override)
-          <input type="datetime-local" data-key="night.override_until" />
-        </label>
-      </div>
-    </section>
-
-    <!-- TOPIC ROUTER -->
-    <section class="card" id="sec-router">
-      <div class="grid">
-        <label>Ziel-Topic (ID)
-          <input type="text" id="router_target" data-validate="int" placeholder="Topic ID" />
-          <div class="err" hidden id="err_rtarget"></div>
-        </label>
-        <label>Keywords (Komma getrennt)
-          <input type="text" id="router_keywords" placeholder="hilfe, frage, support" />
-        </label>
-        <label>Domains (Komma getrennt)
-          <input type="text" id="router_domains" placeholder="example.com, foo.bar" />
-        </label>
-      </div>
-      <div class="row">
-        <label class="switch"><input type="checkbox" id="router_delete" checked> Original löschen</label>
-        <label class="switch"><input type="checkbox" id="router_warn" checked> Nutzer warnen</label>
-        <button class="btn small" id="router_add">Regel anlegen</button>
-      </div>
-      <div class="sep"></div>
-      <div id="routerList" class="list"></div>
-    </section>
-
-    <!-- MORE -->
-    <section class="card" id="sec-more">
-      <div class="row">
-        <label>Sprache
-          <select data-key="language">
-            <option value="">Automatisch</option>
-            <option value="de">Deutsch</option>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="ru">Русский</option>
-          </select>
-        </label>
-      </div>
-      <div class="subsec">
-        <h3>Gelöschte Accounts</h3>
-        <div class="grid">
-          <label class="switch">
-            <input type="checkbox" id="clean_enabled"> Scheduler aktiv
-          </label>
-          <label>Uhrzeit <input type="time" id="clean_time" value="03:00"></label>
-          <label>Wochentag (optional)
-            <select id="clean_weekday">
-              <option value="">Täglich</option>
-              <option value="0">Montag</option><option value="1">Dienstag</option>
-              <option value="2">Mittwoch</option><option value="3">Donnerstag</option>
-              <option value="4">Freitag</option><option value="5">Samstag</option>
-              <option value="6">Sonntag</option>
-            </select>
-          </label>
-          <label class="switch"><input type="checkbox" id="clean_demote"> Admins demoten</label>
-          <label class="switch"><input type="checkbox" id="clean_notify" checked> Ergebnis melden</label>
-        </div>
-        <div class="row">
-          <button class="btn" onclick="sendPayload({ clean_delete_now: true })">Jetzt aufräumen</button>
-          <button class="btn primary" onclick="saveCleanScheduler()">Scheduler speichern</button>
-        </div>
-      </div>
-      <script>
-        function saveCleanScheduler(){
-          const wd = document.getElementById('clean_weekday').value;
-          sendPayload({ clean_deleted: {
-            enabled: document.getElementById('clean_enabled').checked,
-            time: document.getElementById('clean_time').value || "03:00",
-            weekday: wd === "" ? null : parseInt(wd,10),
-            demote: document.getElementById('clean_demote').checked,
-            notify: document.getElementById('clean_notify').checked
-          }});
-        }
-      </script>
-    </section>
-    
-    <!-- PRO -->
-    <section class="card" id="sec-pro">
-      <div class="row">
-        <label>Pro-Monate kaufen/verlängern
-          <input type="number" id="pro_months" data-validate="int" min="1" placeholder="z.B. 1" />
-        </label>
-        <button class="btn small" id="pro_buy">Abo setzen</button>
-      </div>
-    </section>
+  <!-- Startseite -->
+<div id="startPage">
+  <div class="welcome-header">
+    <h1>Emerald Content Bot</h1>
+    <p>Verwalte deine Gruppen-Einstellungen</p>
   </div>
+  <div class="card">
+    <div id="groupList">
+      <p class="hint">Lade Gruppen...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Hauptbereich (initial versteckt) -->
+<div id="contentArea" style="display: none">
+  <div class="titlebar">
+    <div class="title">Gruppeneinstellungen</div>
+    <select id="groupSelect" class="group-select">
+      <option value="">Gruppe wählen...</option>
+    </select>
+  </div>
+  <div class="pillbar" id="tabs">
+    <button class="pill active" data-tab="welcome">Begrüßung</button>
+    <button class="pill" data-tab="rules">Regeln</button>
+    <button class="pill" data-tab="farewell">Verabschiedung</button>
+    <button class="pill" data-tab="spam">Spam</button>
+    <button class="pill" data-tab="rss">RSS</button>
+    <button class="pill" data-tab="ai">KI</button>
+    <button class="pill" data-tab="aimod">KI-Moderation</button>
+    <button class="pill" data-tab="faq">FAQ</button>
+    <button class="pill" data-tab="report">Report</button>
+    <button class="pill" data-tab="stats">Statistik</button>
+    <button class="pill" data-tab="rewards">Rewards</button>
+    <button class="pill" data-tab="mood">Mood</button>
+    <button class="pill" data-tab="night">Nachtmodus</button>
+    <button class="pill" data-tab="router">Router</button>
+    <button class="pill" data-tab="more">Mehr</button>
+    <button class="pill" data-tab="pro">Pro</button>
+  </div>
+
+  <!-- WELCOME -->
+  <section class="card active" id="sec-welcome">
+    <div class="row">
+      <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
+    </div>
+    <div class="row gap-6" style="margin-top:8px">
+      <div>
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="welcome_img_prev" class="imgprev" alt="Welcome Bild"/>
+          <input type="file" id="welcome_img" accept="image/*"/>
+          <button class="btn small" id="welcome_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird mit der Begrüßung gepostet.</div>
+      </div>
+    </div>
+    <label>Text</label>
+    <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
+    <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
+  </section>
+
+  <!-- RULES -->
+  <section class="card" id="sec-rules">
+    <div class="row">
+      <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
+    </div>
+    <div class="row gap-6" style="margin-top:8px">
+      <div>
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="rules_img_prev" class="imgprev" alt="Regeln Bild"/>
+          <input type="file" id="rules_img" accept="image/*"/>
+          <button class="btn small" id="rules_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird zusammen mit dem Regeltext gepostet.</div>
+      </div>
+    </div>
+    <label>Text</label>
+    <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
+  </section>
+
+  <!-- FAREWELL -->
+  <section class="card" id="sec-farewell">
+    <div class="row">
+      <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
+    </div>
+    <div class="row gap-6" style="margin-top:8px">
+      <div>
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="farewell_img_prev" class="imgprev" alt="Farewell Bild"/>
+          <input type="file" id="farewell_img" accept="image/*"/>
+          <button class="btn small" id="farewell_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird bei der Verabschiedung gepostet.</div>
+      </div>
+    </div>
+    <label>Text</label>
+    <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
+  </section>
+
+  <!-- SPAM -->
+  <section class="card" id="sec-spam">
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="spam.on"> Spam-Filter aktiv</label>
+      <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (nur Admins)</label>
+      <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
+      <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
+    </div>
+    <div class="grid">
+      <label>Policy-Topic (ID)
+        <input type="text" data-key="spam.policy_topic" data-validate="int" placeholder="z.B. 123" />
+        <div class="err" hidden id="err_spamtopic"></div>
+      </label>
+      <label>Spam-Aktion
+        <select data-key="spam.action" id="spam_action">
+          <option value="">—</option>
+          <option value="delete">Löschen</option>
+          <option value="warn">Warnen</option>
+          <option value="mute">Stummschalten</option>
+        </select>
+      </label>
+    </div>
+    <div class="grid">
+      <label>Whitelist-Domains (eine pro Zeile)
+        <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
+      </label>
+      <label>Blacklist-Domains (eine pro Zeile)
+        <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
+      </label>
+    </div>
+    <div class="grid">
+      <label>Tägliches Limit pro Nutzer
+        <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
+      </label>
+      <label>Quota-Notify
+        <select data-key="spam.quota_notify" id="spam_quota">
+          <option value="">—</option>
+          <option value="off">Aus</option>
+          <option value="smart">Smart</option>
+          <option value="always">Immer</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <!-- RSS -->
+  <section class="card" id="sec-rss">
+    <div class="grid">
+      <label>RSS-Feed URL
+        <input type="text" id="rss_url" data-validate="url" placeholder="https://example.com/feed.xml"/>
+        <div class="err" hidden id="err_rssurl"></div>
+      </label>
+      <label>Topic (ID)
+        <input type="text" id="rss_topic" data-validate="int" placeholder="0 = Standard"/>
+        <div class="err" hidden id="err_rsstopic"></div>
+      </label>
+    </div>
+    <div class="row">
+      <label class="switch"><input type="checkbox" id="rss_postimg"> Beitragsbilder posten</label>
+      <label class="switch"><input type="checkbox" id="rss_enabled" checked> Feed aktivieren</label>
+      <button class="btn small" id="rss_add">Hinzufügen</button>
+    </div>
+    <div class="sep"></div>
+    <div id="rssList" class="list"></div>
+    <div class="hint">Bestehende Feeds unten verwalten.</div>
+  </section>
+
+  <!-- KI -->
+  <section class="card" id="sec-ai">
+    <div class="row">
+      <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
+    </div>
+    <label>FAQ-Hinweis / Prompt (optional)</label>
+    <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
+  </section>
+
+  <!-- KI-Moderation -->
+  <section class="card" id="sec-aimod">
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="ai_mod.enabled"> Aktiviert</label>
+      <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow-Mode (nur loggen)</label>
+    </div>
+    <div class="grid">
+      <label>Primär-Aktion
+        <select data-key="ai_mod.action_primary">
+          <option value="">—</option>
+          <option value="delete">Löschen</option>
+          <option value="warn">Warnen</option>
+          <option value="mute">Stummschalten</option>
+        </select>
+      </label>
+      <label>Mute-Minuten
+        <input type="number" data-key="ai_mod.mute_minutes" min="0" placeholder="0 = aus" />
+      </label>
+    </div>
+    <div class="grid">
+      <label>Warntext
+        <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI-Moderation)."/>
+      </label>
+      <label>Appeal-URL
+        <input type="text" data-key="ai_mod.appeal_url" placeholder="https://…"/>
+      </label>
+    </div>
+    <div class="grid">
+      <label>Anfragen / Minute (Max)
+        <input type="number" data-key="ai_mod.max_per_min" min="1" placeholder="20" />
+      </label>
+      <label>Cooldown (Sekunden)
+        <input type="number" data-key="ai_mod.cooldown_s" min="0" placeholder="30" />
+      </label>
+    </div>
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_admins"> Admins ausnehmen</label>
+      <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic-Owner ausnehmen</label>
+    </div>
+    <div class="sep"></div>
+    <div class="grid">
+      <label>Toxicity-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.toxicity" placeholder="0.90" />
+      </label>
+      <label>Hate-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.hate" placeholder="0.85" />
+      </label>
+      <label>Sexual-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.sexual" placeholder="0.90" />
+      </label>
+      <label>Harassment-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.harassment" placeholder="0.90" />
+      </label>
+      <label>Self-Harm-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.selfharm" placeholder="0.95" />
+      </label>
+      <label>Violence-Schwelle
+        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.violence" placeholder="0.90" />
+      </label>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="card" id="sec-faq">
+    <div class="grid">
+      <label>Frage
+        <input type="text" id="faq_q" placeholder="Deine Frage …" />
+      </label>
+      <label>Antwort
+        <input type="text" id="faq_a" placeholder="Kurze Antwort …" />
+      </label>
+    </div>
+    <div class="row">
+      <button class="btn small" id="faq_add">Hinzufügen</button>
+    </div>
+    <div class="sep"></div>
+    <div id="faqList" class="list"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="card" id="sec-report">
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="report.enabled"> Täglichen Report aktiv</label>
+      <div>
+        <label>Ziel</label>
+        <div class="row">
+          <label class="switch"><input type="radio" name="report_dest" id="report_dest_dm" value="dm"> Per DM</label>
+          <label class="switch"><input type="radio" name="report_dest" id="report_dest_topic" value="topic"> In Topic</label>
+        </div>
+        <div class="hint">Wähle „In Topic“ und gib unten die Topic-ID deiner Gruppe (z. B. „General“) an.</div>
+      </div>
+      <label>Topic (ID)
+        <input type="text" data-key="report.topic" data-validate="int" placeholder="0 = Standard; sonst ID von „General“"/>
+        <div class="err" hidden id="err_reporttopic"></div>
+      </label>
+    </div>
+    <div class="row">
+      <button class="btn small" id="report_send_now" type="button">Report jetzt posten</button>
+    </div>
+    <div class="sep"></div>
+    <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
+    <div id="reportStats" class="list"></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="card" id="sec-stats">
+    <h3>📊 Statistik</h3>
+    <div class="grid">
+      <label>Zeitraum
+        <select id="stats_days">
+          <option value="7">7 Tage</option>
+          <option value="14" selected>14 Tage</option>
+          <option value="30">30 Tage</option>
+          <option value="60">60 Tage</option>
+        </select>
+      </label>
+      <button class="btn" id="stats_reload">Aktualisieren</button>
+    </div>
+  </section>
+  
+  <!-- Rewards -->
+  <section class="card">
+    <h3>Rewards (EMRLD)</h3>
+      <div class="row"><label>Aktiv</label><input type="checkbox" id="reward_enabled"></div>
+      <div class="row"><label>Modus</label>
+    <select id="reward_mode">
+      <option value="claim">Claim (User)</option>
+      <option value="auto">Auto (Owner)</option>
+    </select>
+  </div>
+  <div class="row"><label>Rate pro Antwort</label><input id="reward_rate_answer" type="number" step="0.0001" min="0" placeholder="0.01"></div>
+  <div class="row"><label>Rate pro Helpful</label><input id="reward_rate_helpful" type="number" step="0.0001" min="0" placeholder="0.05"></div>
+  <div class="row"><label>Cap pro Nutzer/Tag</label><input id="reward_cap_user" type="number" step="1" min="0" placeholder="0"></div>
+  <div class="row"><label>Cap pro Chat/Tag</label><input id="reward_cap_chat" type="number" step="1" min="0" placeholder="0"></div>
+  <button class="btn" id="reward_save">Speichern</button>
+  </section>
+
+  <!-- MOOD -->
+  <section class="card" id="sec-mood">
+    <div class="grid">
+      <label>Frage (Stimmungsumfrage)
+        <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung heute?" />
+      </label>
+      <label>Topic (ID)
+        <input type="text" data-key="mood.topic" data-validate="int" placeholder="0 = Standard" />
+        <div class="err" hidden id="err_moodtopic"></div>
+      </label>
+    </div>
+    <div class="row">
+      <button class="btn small" id="mood_send_now" type="button">Mood-Frage jetzt senden</button>
+    </div>
+  </section>
+
+  <!-- NIGHT MODE -->
+  <section class="card" id="sec-night">
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
+      <label>Start (HH:MM)
+        <input type="text" data-key="night.start" data-validate="time" placeholder="22:00" />
+        <div class="err" hidden id="err_nstart"></div>
+      </label>
+      <label>Ende (HH:MM)
+        <input type="text" data-key="night.end" data-validate="time" placeholder="07:00" />
+        <div class="err" hidden id="err_nend"></div>
+      </label>
+    </div>
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht-Admin-Nachrichten löschen</label>
+      <label class="switch"><input type="checkbox" data-key="night.warn_once"> Einmalige Warnung anzeigen</label>
+      <label>Zeitzone
+        <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
+      </label>
+      <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard-Mode</label>
+    </div>
+    <div class="grid">
+      <label>Temporär bis (Override)
+        <input type="datetime-local" data-key="night.override_until" />
+      </label>
+    </div>
+  </section>
+
+  <!-- TOPIC ROUTER -->
+  <section class="card" id="sec-router">
+    <div class="grid">
+      <label>Ziel-Topic (ID)
+        <input type="text" id="router_target" data-validate="int" placeholder="Topic ID" />
+        <div class="err" hidden id="err_rtarget"></div>
+      </label>
+      <label>Keywords (Komma getrennt)
+        <input type="text" id="router_keywords" placeholder="hilfe, frage, support" />
+      </label>
+      <label>Domains (Komma getrennt)
+        <input type="text" id="router_domains" placeholder="example.com, foo.bar" />
+      </label>
+    </div>
+    <div class="row">
+      <label class="switch"><input type="checkbox" id="router_delete" checked> Original löschen</label>
+      <label class="switch"><input type="checkbox" id="router_warn" checked> Nutzer warnen</label>
+      <button class="btn small" id="router_add">Regel anlegen</button>
+    </div>
+    <div class="sep"></div>
+    <div id="routerList" class="list"></div>
+  </section>
+
+  <!-- MORE -->
+  <section class="card" id="sec-more">
+    <div class="row">
+      <label>Sprache
+        <select data-key="language">
+          <option value="">Automatisch</option>
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="ru">Русский</option>
+        </select>
+      </label>
+    </div>
+    <div class="subsec">
+      <h3>Gelöschte Accounts</h3>
+      <div class="grid">
+        <label class="switch">
+          <input type="checkbox" id="clean_enabled"> Scheduler aktiv
+        </label>
+        <label>Uhrzeit <input type="time" id="clean_time" value="03:00"></label>
+        <label>Wochentag (optional)
+          <select id="clean_weekday">
+            <option value="">Täglich</option>
+            <option value="0">Montag</option><option value="1">Dienstag</option>
+            <option value="2">Mittwoch</option><option value="3">Donnerstag</option>
+            <option value="4">Freitag</option><option value="5">Samstag</option>
+            <option value="6">Sonntag</option>
+          </select>
+        </label>
+        <label class="switch"><input type="checkbox" id="clean_demote"> Admins demoten</label>
+        <label class="switch"><input type="checkbox" id="clean_notify" checked> Ergebnis melden</label>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="sendPayload({ clean_delete_now: true })">Jetzt aufräumen</button>
+        <button class="btn primary" onclick="saveCleanScheduler()">Scheduler speichern</button>
+      </div>
+    </div>
+    <script>
+      function saveCleanScheduler(){
+        const wd = document.getElementById('clean_weekday').value;
+        sendPayload({ clean_deleted: {
+          enabled: document.getElementById('clean_enabled').checked,
+          time: document.getElementById('clean_time').value || "03:00",
+          weekday: wd === "" ? null : parseInt(wd,10),
+          demote: document.getElementById('clean_demote').checked,
+          notify: document.getElementById('clean_notify').checked
+        }});
+      }
+    </script>
+  </section>
+  
+  <!-- PRO -->
+  <section class="card" id="sec-pro">
+    <div class="row">
+      <label>Pro-Monate kaufen/verlängern
+        <input type="number" id="pro_months" data-validate="int" min="1" placeholder="z.B. 1" />
+      </label>
+      <button class="btn small" id="pro_buy">Abo setzen</button>
+    </div>
+  </section>
+</div>
 
   <!-- Footerbar unten -->
   <div class="footerbar">
@@ -529,44 +614,100 @@
     // Gruppen laden und Dropdown füllen
     async function loadGroups() {
       try {
-        const response = await fetch(`${API_BASE}/api/groups?${authQS}`);
-        if (!response.ok) throw new Error('Fehler beim Laden der Gruppen');
-        const groups = await response.json();
+        const headers = {};
+        if (INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
         
+        const response = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, { headers });
+        if (!response.ok) throw new Error('Laden fehlgeschlagen');
+        
+        const data = await response.json();
+        const groups = data?.groups || [];
+        
+        // Dropdown aktualisieren
         const select = qs('#groupSelect');
-        select.innerHTML = '<option value="">Gruppe wählen...</option>';
-        groups.forEach(group => {
-          const opt = document.createElement('option');
-          opt.value = group.id;
-          opt.textContent = group.title;
-          select.appendChild(opt);
-        });
-
-        // Aktuelle Gruppe vorauswählen
-        if (cid) select.value = cid;
+        if (select) {
+          select.innerHTML = '<option value="">Gruppe wählen...</option>' +
+            groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join('');
+        }
+        
+        // Gruppenliste aktualisieren
+        const list = qs('#groupList');
+        if (list) {
+          if (groups.length === 0) {
+            list.innerHTML = '<p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>';
+          } else {
+            list.innerHTML = groups.map(g => `
+              <div class="group-item" data-id="${g.id}">
+                <div class="group-info">
+                  <div class="group-title">${g.title || g.id}</div>
+                  <div class="group-meta">Telegram-Gruppe</div>
+                </div>
+                <button class="btn primary small">Verwalten</button>
+              </div>
+            `).join('');
+            
+            // Click-Handler
+            qa('.group-item button').forEach(btn => {
+              btn.onclick = () => {
+                const gid = btn.closest('.group-item').dataset.id;
+                if (gid) {
+                  showContentArea(gid);
+                  loadState();
+                }
+              };
+            });
+          }
+        }
       } catch (err) {
         console.error('Fehler beim Laden der Gruppen:', err);
+        const list = qs('#groupList');
+        if (list) {
+          list.innerHTML = '<p class="hint error">Fehler beim Laden der Gruppen. Bitte versuche es später erneut.</p>';
+        }
       }
     }
 
-    // Gruppe wechseln
-    qs('#groupSelect')?.addEventListener('change', (e) => {
-      const newCid = e.target.value;
-      if (newCid) {
-        window.location.href = `${location.pathname}?cid=${newCid}${authQS}`;
+    // Event-Handler
+    qs('#backBtn')?.addEventListener('click', showStartPage);
+
+    // Initialisierung anpassen
+    document.addEventListener('DOMContentLoaded', () => {
+      // Immer erst Gruppen laden
+      loadGroups();
+      
+      // Wenn CID in URL, direkt diese Gruppe laden
+      if (cid) {
+        showContentArea(cid);
+        loadState();
       }
     });
+    
+    // UI-Bereiche umschalten
+    function showContentArea(groupId) {
+      qs('#startPage').style.display = 'none';
+      const contentArea = qs('#contentArea');
+      contentArea.style.display = 'block';
+      setTimeout(() => contentArea.classList.add('visible'), 50);
+      
+      qs('#backBtn').style.display = 'inline-block';
+      
+      if (groupId) {
+        const select = qs('#groupSelect');
+        if (select) select.value = groupId;
+      }
+    }
 
-    // Telegram Context
-    const tg = window.Telegram?.WebApp || null;
-    tg?.ready?.();
-    const INIT_DATA = tg?.initData || "";
-
-    // Initial Setup
-    document.addEventListener('DOMContentLoaded', () => {
-        loadGroups();  // Gruppen laden
-        loadState();   // Status laden
-    });
+    function showStartPage() {
+      const contentArea = qs('#contentArea');
+      contentArea.classList.remove('visible');
+      setTimeout(() => {
+        contentArea.style.display = 'none';
+        qs('#startPage').style.display = 'block';
+      }, 300);
+      
+      qs('#backBtn').style.display = 'none';
+      qs('#saveBtn').disabled = true;
+    }
 
     const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
     const cid = parseInt(getUrlParam("cid")||0);
