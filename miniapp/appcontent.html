@@ -605,6 +605,80 @@
     </div>
   </div>
   <script>
+    // Konstanten am Anfang des Scripts
+const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
+const INIT_DATA = tg?.initData || "";
+const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
+const cid = parseInt(getUrlParam("cid") || 0);
+const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+
+// Gruppen laden
+async function loadGroups() {
+  try {
+    const headers = {};
+    if (INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
+    
+    // Korrekter Endpunkt
+    const response = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, { headers });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const data = await response.json();
+    const groups = data?.groups || [];
+    
+    // Gruppenliste aktualisieren
+    const list = qs('#groupList');
+    if (list) {
+      if (groups.length === 0) {
+        list.innerHTML = '<p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>';
+      } else {
+        list.innerHTML = groups.map(g => `
+          <div class="group-item" data-id="${g.id}">
+            <div class="group-info">
+              <div class="group-title">${g.title || g.id}</div>
+              <div class="group-meta">Telegram-Gruppe</div>
+            </div>
+            <button class="btn primary small">Verwalten</button>
+          </div>
+        `).join('');
+        
+        // Click-Handler für Gruppen
+        qa('.group-item button').forEach(btn => {
+          btn.onclick = () => {
+            const gid = btn.closest('.group-item').dataset.id;
+            if (gid) {
+              showContentArea(gid);
+              loadState();
+            }
+          };
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Fehler beim Laden der Gruppen:', err);
+    const list = qs('#groupList');
+    if (list) {
+      list.innerHTML = `
+        <p class="hint error">
+          Fehler beim Laden der Gruppen: ${err.message || 'Unbekannter Fehler'}.<br>
+          Bitte versuche es später erneut.
+        </p>`;
+    }
+  }
+}
+
+// Initialisierung
+document.addEventListener('DOMContentLoaded', () => {
+  // Nur Gruppen initial laden
+  loadGroups();
+  
+  // Wenn eine CID in der URL ist, diese Gruppe direkt laden
+  if (cid > 0) {
+    showContentArea(cid);
+    loadState();
+  } else {
+    showStartPage();
+  }
+});
     // --- Helpers ---
     const qs=(s,el=document)=>el.querySelector(s);
     const qa=(s,el=document)=>Array.from(el.querySelectorAll(s));
@@ -708,11 +782,6 @@
       qs('#backBtn').style.display = 'none';
       qs('#saveBtn').disabled = true;
     }
-
-    const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
-    const cid = parseInt(getUrlParam("cid")||0);
-    const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
-    const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`; // Fallback nur für Browser-Tests
 
     // Theme
     const themeKey = "emerald-theme";
