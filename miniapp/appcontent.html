@@ -350,23 +350,20 @@
     </section>
     
     <!-- Rewards -->
-    <section id="tab-rewards" class="tab-pane" hidden>
-      <h3>Rewards</h3>
-      <div class="form-row">
-        <label for="rw-token">Token (Symbol/Adresse)</label>
-        <input id="rw-token" type="text" placeholder="z. B. EMRLD oder 0x…">
-      </div>
-      <div class="form-row">
-        <label for="rw-network">Netzwerk</label>
-        <input id="rw-network" type="text" placeholder="NEAR / TON / EVM">
-      </div>
-      <div class="form-row">
-        <label for="rw-decimals">Dezimals</label>
-        <input id="rw-decimals" type="number" min="0" max="36" value="24">
-      </div>
-      <div class="actions">
-        <button id="rw-save" class="btn-primary">Speichern</button>
-      </div>
+    <section class="card">
+      <h3>Rewards (EMRLD)</h3>
+        <div class="row"><label>Aktiv</label><input type="checkbox" id="reward_enabled"></div>
+        <div class="row"><label>Modus</label>
+      <select id="reward_mode">
+        <option value="claim">Claim (User)</option>
+        <option value="auto">Auto (Owner)</option>
+      </select>
+    </div>
+    <div class="row"><label>Rate pro Antwort</label><input id="reward_rate_answer" type="number" step="0.0001" min="0" placeholder="0.01"></div>
+    <div class="row"><label>Rate pro Helpful</label><input id="reward_rate_helpful" type="number" step="0.0001" min="0" placeholder="0.05"></div>
+    <div class="row"><label>Cap pro Nutzer/Tag</label><input id="reward_cap_user" type="number" step="1" min="0" placeholder="0"></div>
+    <div class="row"><label>Cap pro Chat/Tag</label><input id="reward_cap_chat" type="number" step="1" min="0" placeholder="0"></div>
+    <button class="btn" id="reward_save">Speichern</button>
     </section>
 
     <!-- MOOD -->
