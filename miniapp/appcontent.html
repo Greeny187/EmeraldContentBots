@@ -19,6 +19,15 @@
     .wrap{max-width:980px;margin:0 auto;padding:16px 16px 80px}
     .titlebar{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
     .title{font-weight:800;font-size:22px;letter-spacing:.2px}
+    .group-select{
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--ring);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 14px;
+      margin-left: auto;
+    }
     .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
     .pill{border:1px solid var(--ring);background:#0000;color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
     .pill.active{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
@@ -72,7 +81,12 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="titlebar"><div class="title">Mini-App</div></div>
+    <div class="titlebar">
+      <div class="title">Mini-App</div>
+      <select id="groupSelect" class="group-select">
+        <option value="">Gruppe wählen...</option>
+      </select>
+    </div>
     <div class="pillbar" id="tabs">
       <button class="pill active" data-tab="welcome">Begrüßung</button>
       <button class="pill" data-tab="rules">Regeln</button>
@@ -512,10 +526,47 @@
     const getUrlParam=(k, def=null)=> new URL(location.href).searchParams.get(k) ?? def;
     const FORCE_HTTP = new URL(location.href).searchParams.get('forceHttp') === '1';
 
+    // Gruppen laden und Dropdown füllen
+    async function loadGroups() {
+      try {
+        const response = await fetch(`${API_BASE}/api/groups?${authQS}`);
+        if (!response.ok) throw new Error('Fehler beim Laden der Gruppen');
+        const groups = await response.json();
+        
+        const select = qs('#groupSelect');
+        select.innerHTML = '<option value="">Gruppe wählen...</option>';
+        groups.forEach(group => {
+          const opt = document.createElement('option');
+          opt.value = group.id;
+          opt.textContent = group.title;
+          select.appendChild(opt);
+        });
+
+        // Aktuelle Gruppe vorauswählen
+        if (cid) select.value = cid;
+      } catch (err) {
+        console.error('Fehler beim Laden der Gruppen:', err);
+      }
+    }
+
+    // Gruppe wechseln
+    qs('#groupSelect')?.addEventListener('change', (e) => {
+      const newCid = e.target.value;
+      if (newCid) {
+        window.location.href = `${location.pathname}?cid=${newCid}${authQS}`;
+      }
+    });
+
     // Telegram Context
     const tg = window.Telegram?.WebApp || null;
-    tg?.ready?.();                                // <<< neu
-    const INIT_DATA = tg?.initData || "";         // <<< neu
+    tg?.ready?.();
+    const INIT_DATA = tg?.initData || "";
+
+    // Initial Setup
+    document.addEventListener('DOMContentLoaded', () => {
+        loadGroups();  // Gruppen laden
+        loadState();   // Status laden
+    });
 
     const uid = parseInt(getUrlParam("uid")||tg?.initDataUnsafe?.user?.id||0);
     const cid = parseInt(getUrlParam("cid")||0);
