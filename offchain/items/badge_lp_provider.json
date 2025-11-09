@@ -1,0 +1,9 @@
+{
+  "name": "EMRD LP Provider",
+  "description": "Badge für das Bereitstellen von EMRD/TON-Liquidität.",
+  "image": "https://emeraldecosystem.com/assets/badges/lp.png",
+  "attributes": [
+    { "trait_type": "Badge", "value": "Liquidity" },
+    { "trait_type": "Tier", "value": "Bronze" }
+  ]
+}
