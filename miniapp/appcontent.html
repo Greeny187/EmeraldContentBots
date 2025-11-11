@@ -365,7 +365,7 @@ function setPreview(imgEl, fileIdOrUrl){
   if (!fileIdOrUrl){ imgEl.removeAttribute('src'); return; }
   const url = fileIdOrUrl.startsWith?.('http')
     ? fileIdOrUrl
-    : `${API_BASE}/miniapp/file?file_id=${encodeURIComponent(fileIdOrUrl)}`;
+    : `${API_BASE}/miniapp/file?file_id=${encodeURIComponent(fileIdOrUrl)}&cid=${encodeURIComponent(cid)}${INIT_DATA ? `&init_data=${encodeURIComponent(INIT_DATA)}` : ''}`;
   imgEl.src = url;
 }
 function fileToBase64(input){
