@@ -101,11 +101,24 @@
     <button class="pill" data-tab="aimod">KI-Mod</button>
     <button class="pill" data-tab="report">Report</button>
     <button class="pill" data-tab="stats">Statistik</button>
+    <button class="pill" data-tab="rewards">Rewards</button>
+    <button class="pill" data-tab="more">Sonstiges</button>
   </div>
 
   <section class="card active" id="sec-welcome">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
+    </div>
+    <div class="row gap-6">
+      <div style="flex:1">
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="welcome_img_prev" class="imgprev" alt="Welcome Bild" style="display:none"/>
+          <input type="file" id="welcome_img" accept="image/*"/>
+          <button class="btn small" id="welcome_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird mit der Begrüßung gepostet.</div>
+      </div>
     </div>
     <label>Text</label>
     <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
@@ -116,6 +129,17 @@
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
     </div>
+    <div class="row gap-6">
+      <div style="flex:1">
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="rules_img_prev" class="imgprev" alt="Regeln Bild" style="display:none"/>
+          <input type="file" id="rules_img" accept="image/*"/>
+          <button class="btn small" id="rules_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird zusammen mit dem Regeltext gepostet.</div>
+      </div>
+    </div>
     <label>Text</label>
     <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
   </section>
@@ -123,6 +147,17 @@
   <section class="card" id="sec-farewell">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
+    </div>
+    <div class="row gap-6">
+      <div style="flex:1">
+        <label>Bild (optional)</label>
+        <div class="row">
+          <img id="farewell_img_prev" class="imgprev" alt="Farewell Bild" style="display:none"/>
+          <input type="file" id="farewell_img" accept="image/*"/>
+          <button class="btn small" id="farewell_img_clear" type="button">Löschen</button>
+        </div>
+        <div class="hint">Wird bei der Verabschiedung gepostet.</div>
+      </div>
     </div>
     <label>Text</label>
     <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
@@ -297,7 +332,92 @@
       </label>
       <button class="btn small" id="stats_reload">Aktualisieren</button>
     </div>
-    <div id="statsBox" class="list" style="margin-top:16px"></div>
+    <div id="statsBox" class="list" style="margin-top:16px">
+      <p class="hint">Lade Statistik...</p>
+    </div>
+  </section>
+
+  <section class="card" id="sec-rewards">
+    <h3>💎 Rewards (EMRD-Token)</h3>
+    <div class="hint" style="margin:12px 0">
+      Der <strong>EMRD-Token</strong> ist ein Utility-Token im TON-Netzwerk. 
+      Nutzer erhalten EMRD als Belohnung für hilfreiche Beiträge in deiner Gruppe.
+      Sie können ihre EMRD-Rewards hier claimen und in ihrer TON-Wallet verwalten.
+    </div>
+    <div class="sep"></div>
+    <div class="grid">
+      <label class="switch"><input type="checkbox" data-key="rewards.enabled"> Rewards aktivieren</label>
+      <label>Modus
+        <select data-key="rewards.mode">
+          <option value="claim">Claim (User)</option>
+          <option value="auto">Auto (Owner)</option>
+        </select>
+      </label>
+    </div>
+    <div class="grid">
+      <label>Rate pro Antwort
+        <input type="number" data-key="rewards.rate_answer" step="0.0001" min="0" placeholder="0.01"/>
+      </label>
+      <label>Rate pro Helpful-Vote
+        <input type="number" data-key="rewards.rate_helpful" step="0.0001" min="0" placeholder="0.05"/>
+      </label>
+    </div>
+    <div class="grid">
+      <label>Cap pro Nutzer/Tag
+        <input type="number" data-key="rewards.cap_user" step="1" min="0" placeholder="0 = unbegrenzt"/>
+      </label>
+      <label>Cap pro Chat/Tag
+        <input type="number" data-key="rewards.cap_chat" step="1" min="0" placeholder="0 = unbegrenzt"/>
+      </label>
+    </div>
+    <div class="hint" style="margin-top:12px">
+      💡 Tipp: Nutzer müssen ein TON-Wallet verbunden haben, um Rewards zu claimen.
+    </div>
+  </section>
+
+  <section class="card" id="sec-more">
+    <h3>⚙️ Sonstiges</h3>
+    <div class="sep"></div>
+    <div>
+      <h4 style="margin:12px 0 8px; color:var(--brand)">Werbung / Ads</h4>
+      <div id="adsContainer" class="list">
+        <p class="hint">🎯 Werbeplatzhalter von @emeraldcontentbot wird hier eingeblendet...</p>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div>
+      <h4 style="margin:12px 0 8px; color:var(--brand)">Gelöschte Accounts aufräumen</h4>
+      <div class="grid">
+        <label class="switch">
+          <input type="checkbox" data-key="clean_deleted.enabled"> Scheduler aktiv
+        </label>
+        <label>Uhrzeit 
+          <input type="time" data-key="clean_deleted.time" value="03:00"/>
+        </label>
+        <label>Wochentag (optional)
+          <select data-key="clean_deleted.weekday">
+            <option value="">Täglich</option>
+            <option value="0">Montag</option>
+            <option value="1">Dienstag</option>
+            <option value="2">Mittwoch</option>
+            <option value="3">Donnerstag</option>
+            <option value="4">Freitag</option>
+            <option value="5">Samstag</option>
+            <option value="6">Sonntag</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid">
+        <label class="switch"><input type="checkbox" data-key="clean_deleted.demote"> Admins demoten</label>
+        <label class="switch"><input type="checkbox" data-key="clean_deleted.notify" checked> Ergebnis melden</label>
+      </div>
+      <div class="row">
+        <button class="btn small" id="clean_now" type="button">Jetzt ausführen</button>
+      </div>
+      <div class="hint" style="margin-top:8px">
+        Entfernt Admins/Moderatoren, deren Telegram-Accounts gelöscht wurden.
+      </div>
+    </div>
   </section>
 </div>
 
@@ -331,6 +451,7 @@ let STATE_READY = false;
 function validTime(val) { const s = (val || '').trim(); if (s === '') return true; return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(s); }
 function validInt(val) { const s = (val ?? '').toString().trim(); return s === '' || /^-?\d+$/.test(s); }
 function validUrl(val) { try { const u = new URL(val); return !!u.protocol && !!u.host; } catch { return false; } }
+function validFloat(val, def) { const s = (val ?? '').toString().trim(); return s === '' ? def : (isNaN(parseFloat(s)) ? def : parseFloat(s)); }
 
 function setVal(path, val) {
   const el = qa(`[data-key="${path}"]`)[0];
@@ -531,6 +652,23 @@ async function loadState() {
     renderRss(j.rss?.feeds || []);
     renderFaq(j.faqs || []);
     
+    // Load rewards data
+    const rewardData = j.rewards || {};
+    setVal('rewards.enabled', rewardData.enabled || false);
+    setVal('rewards.mode', rewardData.mode || 'claim');
+    setVal('rewards.rate_answer', rewardData.rate_answer || '');
+    setVal('rewards.rate_helpful', rewardData.rate_helpful || '');
+    setVal('rewards.cap_user', rewardData.cap_user || '');
+    setVal('rewards.cap_chat', rewardData.cap_chat || '');
+    
+    // Load clean_deleted settings
+    const cleanData = j.clean_deleted || {};
+    setVal('clean_deleted.enabled', cleanData.enabled || false);
+    setVal('clean_deleted.time', cleanData.time || '03:00');
+    setVal('clean_deleted.weekday', cleanData.weekday || '');
+    setVal('clean_deleted.demote', cleanData.demote || false);
+    setVal('clean_deleted.notify', cleanData.notify !== false);
+    
     qs('#out').textContent = 'Bereit.';
     STATE_READY = true;
     validateAll();
@@ -545,6 +683,15 @@ async function sendPayload(extra = {}) {
   if(!STATE_READY) { qs('#out').textContent = '⚠️ Erst Daten laden'; return; }
   
   const out = Object.assign({}, collect(), extra);
+  
+  // Add image data if present
+  ['welcome', 'rules', 'farewell'].forEach(type => {
+    const fileInput = qs(`#${type}_img`);
+    if(fileInput?.dataset.base64) {
+      out[`${type}_image_base64`] = fileInput.dataset.base64;
+    }
+  });
+  
   qs('#out').textContent = 'Speichere …';
   
   try {
@@ -604,14 +751,116 @@ qs('#report_send_now')?.addEventListener('click', ()=>{
   sendPayload({report_send_now: {dest:'dm', topic}});
 });
 
+// Image compression and preview function
+async function compressImage(file, maxWidth=1280, quality=0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxWidth) {
+          h = Math.round(h * maxWidth / w);
+          w = maxWidth;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Setup image handlers for welcome, rules, farewell
+['welcome', 'rules', 'farewell'].forEach(type => {
+  const fileInput = qs(`#${type}_img`);
+  const preview = qs(`#${type}_img_prev`);
+  const clearBtn = qs(`#${type}_img_clear`);
+  
+  if(fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      try {
+        const compressed = await compressImage(file);
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          if(preview) {
+            preview.src = evt.target.result;
+            preview.style.display = 'block';
+          }
+          // Store as base64 in a data attribute for sending
+          fileInput.dataset.base64 = evt.target.result;
+        };
+        reader.readAsDataURL(compressed);
+      } catch(err) {
+        console.error('Image compression failed', err);
+        alert('Bilder-Upload fehlgeschlagen');
+      }
+    });
+  }
+  
+  if(clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if(fileInput) {
+        fileInput.value = '';
+        fileInput.dataset.base64 = '';
+      }
+      if(preview) preview.style.display = 'none';
+    });
+  }
+});
+
 qs('#stats_reload')?.addEventListener('click', async ()=>{
   const days = parseInt(qs('#stats_days').value || '14');
-  const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, {headers: {'X-Telegram-Init-Data': INIT_DATA}});
-  const data = await res.json();
-  const box = qs('#statsBox');
-  if(box) {
-    box.innerHTML = (data.top_responders || []).map(t=>`<div class="item"><div class="left"><div class="title">User ${t.user_id}</div><div class="hint">${t.answers} Antworten, Ø ${t.avg_ms}ms</div></div></div>`).join('');
+  try {
+    const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, {headers: {'X-Telegram-Init-Data': INIT_DATA}});
+    const data = await res.json();
+    const box = qs('#statsBox');
+    if(box) {
+      let html = '';
+      // Summary section
+      const summary = data.summary || {};
+      html += `<div class="item" style="background:var(--panel)">
+        <div class="left">
+          <div class="title">📊 Zusammenfassung (${days} Tage)</div>
+          <div class="hint">
+            💬 ${summary.total_messages || 0} Nachrichten |
+            👥 ${summary.active_users || 0} aktive Nutzer |
+            ➕ ${summary.joins || 0} Joins |
+            ➖ ${summary.leaves || 0} Leaves |
+            🚫 ${summary.kicks || 0} Kicks
+          </div>
+        </div>
+      </div>`;
+      // Top responders
+      if(data.top_responders && data.top_responders.length > 0) {
+        html += '<div style="margin-top:12px"><strong>🏆 Top Responder:</strong></div>';
+        html += (data.top_responders || []).map(t=>`<div class="item"><div class="left"><div class="title">User ${t.user_id}</div><div class="hint">${t.answers} Antworten, Ø ${t.avg_ms}ms</div></div></div>`).join('');
+      } else {
+        html += '<div style="margin-top:12px;color:var(--ring);font-size:0.9em">Keine Responder-Daten verfügbar</div>';
+      }
+      box.innerHTML = html;
+    }
+  } catch(e) {
+    console.error('Stats load error', e);
+    const box = qs('#statsBox');
+    if(box) box.innerHTML = '<p class="hint error">Fehler beim Laden der Statistik</p>';
   }
+});
+
+// Clean deleted now button
+qs('#clean_now')?.addEventListener('click', async ()=>{
+  if(!confirm('Gelöschte Accounts jetzt aufräumen?')) return;
+  const demote = qs('[data-key="clean_deleted.demote"]')?.checked || false;
+  const notify = qs('[data-key="clean_deleted.notify"]')?.checked !== false;
+  sendPayload({clean_deleted_now: {demote, notify}});
 });
 
 qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
