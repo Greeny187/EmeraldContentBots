@@ -2,9 +2,23 @@
 // EMERALD DEVDASHBOARD - Main App
 // ============================================================================
 
-const API_BASE = window.location.origin + '/devdash';
+// Dynamische Backend-URL basierend auf Environment
+const API_BASE = (() => {
+  // Im Development: Backend auf Port 8080 (wenn Frontend auf 8000)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const port = window.location.port === '8000' ? 8080 : window.location.port;
+    return `http://localhost:${port}/devdash`;
+  }
+  // In Production: gleiche Domain
+  return window.location.origin + '/devdash';
+})();
+
 const BOT_USERNAME = 'EmeraldContentBot';
 const TOKEN_KEY = 'emerald_devdash_token';
+
+console.log('🚀 DevDashboard initialized');
+console.log('📡 API_BASE:', API_BASE);
+console.log('🤖 BOT_USERNAME:', BOT_USERNAME);
 
 const app = {
   user: null,
@@ -13,7 +27,9 @@ const app = {
 
   // ========== INIT ==========
   async init() {
+    console.log('⏳ Initializing app...');
     this.token = localStorage.getItem(TOKEN_KEY);
+    console.log('🔑 Token from storage:', this.token ? 'Found' : 'Not found');
     
     if (this.token) {
       try {
@@ -59,11 +75,12 @@ const app = {
     script.setAttribute('data-size', 'large');
     script.setAttribute('data-userpic', 'true');
     script.setAttribute('data-request-access', 'write');
-    script.setAttribute('data-onauth', 'app.handleTelegramAuth');
+    script.setAttribute('data-onauth', 'handleTelegramAuthCallback');
     slot.appendChild(script);
   },
 
   async handleTelegramAuth(user) {
+    console.log('🔐 Telegram Auth Callback received:', user);
     try {
       const res = await fetch(API_BASE + '/auth/telegram', {
         method: 'POST',
@@ -71,8 +88,13 @@ const app = {
         body: JSON.stringify(user)
       });
       
-      if (!res.ok) throw new Error('Auth failed');
+      console.log('📡 Server response status:', res.status);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(`Auth failed: ${res.status} - ${errData.error || 'Unknown error'}`);
+      }
       const data = await res.json();
+      console.log('✅ Auth successful, token received');
       
       localStorage.setItem(TOKEN_KEY, data.access_token);
       this.token = data.access_token;
@@ -80,6 +102,7 @@ const app = {
       this.showMainUI();
       await this.loadDashboard();
     } catch (e) {
+      console.error('❌ Login error:', e);
       alert('Login fehlgeschlagen: ' + e.message);
     }
   },
@@ -650,6 +673,13 @@ const app = {
   }
 };
 
-// ========== GLOBAL HANDLER ==========
+// ========== GLOBAL HANDLER FOR TELEGRAM WIDGET ==========
+// Diese globale Funktion wird vom Telegram Widget aufgerufen
+function handleTelegramAuthCallback(user) {
+  console.log('🌍 Global callback triggered with user:', user);
+  app.handleTelegramAuth(user);
+}
+
+// ========== INIT ==========
 window.app = app;
 window.addEventListener('DOMContentLoaded', () => app.init());
