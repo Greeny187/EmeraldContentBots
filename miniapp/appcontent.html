@@ -699,6 +699,36 @@
     function validInt(val) { const s = (val ?? '').toString().trim(); return s === '' || /^-?\d+$/.test(s); }
     function validUrl(val) { try { const u = new URL(val); return !!u.protocol && !!u.host; } catch { return false; } }
 
+    // UI helper functions
+    function showStartPage() {
+      qs('#startPage').style.display = 'block';
+      const area = qs('#contentArea');
+      if (area) { area.style.display = 'none'; area.classList.remove('visible'); }
+      cid = 0;
+    }
+
+    function showContentArea(gid) {
+      cid = parseInt(gid);
+      qs('#startPage').style.display = 'none';
+      const area = qs('#contentArea');
+      if (area) { area.style.display = 'block'; setTimeout(() => area.classList.add('visible'), 10); }
+    }
+
+    function validateAll() {
+      qa('input[data-validate]').forEach(el => {
+        let valid = true;
+        const val = el.value;
+        const rule = el.getAttribute('data-validate');
+        if (rule === 'time') valid = validTime(val);
+        else if (rule === 'int') valid = validInt(val);
+        else if (rule === 'url') valid = validUrl(val);
+        const errId = el.getAttribute('id')?.replace(/^/, 'err_');
+        const errEl = errId ? qs(`#${errId}`) : null;
+        if (errEl) errEl.style.display = (valid || !val) ? 'none' : 'block';
+        el.classList.toggle('input-error', !valid && !!val);
+      });
+    }
+
     // Core: loadGroups (single, clean implementation)
     async function loadGroups() {
       const list = qs('#groupList'); if (!list) return;
@@ -791,7 +821,8 @@
     // Start
     document.addEventListener('DOMContentLoaded', async () => { await loadGroups(); if (cid) { showContentArea(cid); await loadState(); } else { showStartPage(); } });
   </script>
-  if (!list) return;
+</body>
+</html>
   
   try {
     list.innerHTML = '<p class="hint"><span class="loading">⏳</span> Lade Gruppenliste...</p>';
