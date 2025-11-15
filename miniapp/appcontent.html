@@ -19,28 +19,17 @@
     .wrap{max-width:980px;margin:0 auto;padding:16px 16px 80px}
     .titlebar{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
     .title{font-weight:800;font-size:22px;letter-spacing:.2px}
-    .group-select{
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--ring);
-      background: var(--panel);
-      color: var(--text);
-      font-size: 14px;
-      margin-left: auto;
-    }
+    .group-select{padding: 8px 12px;border-radius: 12px;border: 1px solid var(--ring);background: var(--panel);color: var(--text);font-size: 14px;margin-left: auto;}
     .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
     .pill{border:1px solid var(--ring);background:#0000;color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
     .pill.active{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:760px){.grid{grid-template-columns:1fr}}
     .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
-    .card { display: none; }
-    .card.active { display: block; }
+    .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:14px;box-shadow:var(--shadow); display:none}
+    .card.active{display:block}
     label{display:block;font-weight:600;margin:6px 0 6px;color:var(--muted)}
-    input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{
-      width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px
-    }
+    input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px}
     textarea{min-height:92px;resize:vertical}
     .switch{display:inline-flex;align-items:center;gap:6px}
     .switch input{accent-color:var(--brand)}
@@ -52,135 +41,49 @@
     .hint{font-size:12px;color:var(--muted)}
     .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(127,127,127,.12);padding:2px 6px;border-radius:6px}
     .subsec{margin-top:10px;padding:10px;border:1px dashed var(--ring);border-radius:12px}
-
-    /* Bildvorschau mit Hover-Effekt */
-    .imgprev {
-      display: block;
-      max-width: 180px;
-      max-height: 120px;
-      border: 1px solid var(--ring);
-      border-radius: 12px;
-      object-fit: cover;
-      background: #00000010;
-      transition: all 0.2s ease;
-    }
-    .imgprev:hover {
-      transform: scale(1.05);
-      border-color: var(--brand);
-      box-shadow: var(--shadow);
-    }
+    .imgprev{display:block;max-width:180px;max-height:120px;border:1px solid var(--ring);border-radius:12px;object-fit:cover;background:#00000010;transition:all 0.2s ease}
+    .imgprev:hover{transform:scale(1.05);border-color:var(--brand);box-shadow:var(--shadow)}
     .row.gap-6{gap:16px}
-
-    /* Footerbar mit Buttons unten */
-    .footerbar{
-      position:sticky; bottom:0; left:0; right:0;
-      background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.08)) , var(--bg);
-      border-top:1px solid var(--ring);
-      padding:10px 16px; display:flex; align-items:center; gap:12px;
-      backdrop-filter:saturate(120%) blur(6px);
-    }
-    .footerbar .right{margin-left:auto; display:flex; gap:8px}
-    .footerbar .left{display:flex; gap:8px}
+    .footerbar{position:sticky;bottom:0;left:0;right:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.08)),var(--bg);border-top:1px solid var(--ring);padding:10px 16px;display:flex;align-items:center;gap:12px;backdrop-filter:saturate(120%) blur(6px)}
+    .footerbar .right{margin-left:auto;display:flex;gap:8px}
+    .footerbar .left{display:flex;gap:8px}
     .btn{border:1px solid var(--ring);background:transparent;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer}
     .btn.primary{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
     .btn.ghost{opacity:.9}
     .btn.small{padding:6px 9px;border-radius:10px}
     .btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
     .btn:disabled{opacity:.55;cursor:not-allowed}
-
-    /* Errors */
-    .input-error{border-color:var(--danger)!important; box-shadow:0 0 0 2px rgba(239,68,68,.2)}
-    .err{color:var(--danger); font-size:12px; margin:4px 2px 0}
-    
-    /* Neue Styles für Startseite */
-    #startPage {
-      max-width: 600px;
-      margin: 20px auto;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    .welcome-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .welcome-header h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: var(--brand);
-    }
-
-    .welcome-header p {
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .group-list {
-      margin-top: 20px;
-    }
-
-    .group-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      margin: 12px 0;
-      background: var(--panel);
-      border: 1px solid var(--ring);
-      border-radius: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .group-item:hover {
-      border-color: var(--brand);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-
-    .group-info {
-      flex: 1;
-    }
-
-    .group-title {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .group-meta {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    /* Content Area Transition */
-    #contentArea {
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #contentArea.visible {
-      opacity: 1;
-    }
+    .input-error{border-color:var(--danger)!important;box-shadow:0 0 0 2px rgba(239,68,68,.2)}
+    .err{color:var(--danger);font-size:12px;margin:4px 2px 0}
+    #startPage{max-width:600px;margin:20px auto;opacity:1;transition:opacity 0.3s ease}
+    .welcome-header{text-align:center;margin-bottom:30px}
+    .welcome-header h1{font-size:24px;margin-bottom:10px;color:var(--brand)}
+    .welcome-header p{color:var(--muted);margin:0}
+    .group-list{margin-top:20px}
+    .group-item{display:flex;align-items:center;justify-content:space-between;padding:16px;margin:12px 0;background:var(--panel);border:1px solid var(--ring);border-radius:12px;transition:all 0.2s ease}
+    .group-item:hover{border-color:var(--brand);transform:translateY(-1px);box-shadow:var(--shadow)}
+    .group-info{flex:1}
+    .group-title{font-size:16px;font-weight:500;margin-bottom:4px}
+    .group-meta{color:var(--muted);font-size:12px}
+    #contentArea{opacity:0;transition:opacity 0.3s ease}
+    #contentArea.visible{opacity:1}
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <!-- Startseite mit verbesserter Struktur -->
 <div id="startPage">
   <div class="welcome-header">
     <h1>Emerald Content Bot</h1>
     <p>Verwalte deine Gruppen-Einstellungen</p>
   </div>
-  <div class="card">
+  <div class="card active">
     <div id="groupList" class="group-list">
       <p class="hint">Lade Gruppen...</p>
     </div>
   </div>
 </div>
 
-<!-- Hauptbereich (initial versteckt) -->
-<div id="contentArea" style="display: none">
+<div id="contentArea" style="display:none">
   <div class="titlebar">
     <div class="title">Gruppeneinstellungen</div>
     <select id="groupSelect" class="group-select">
@@ -194,1484 +97,274 @@
     <button class="pill" data-tab="spam">Spam</button>
     <button class="pill" data-tab="rss">RSS</button>
     <button class="pill" data-tab="ai">KI</button>
-    <button class="pill" data-tab="aimod">KI-Moderation</button>
     <button class="pill" data-tab="faq">FAQ</button>
-    <button class="pill" data-tab="report">Report</button>
-    <button class="pill" data-tab="stats">Statistik</button>
-    <button class="pill" data-tab="rewards">Rewards</button>
-    <button class="pill" data-tab="mood">Mood</button>
     <button class="pill" data-tab="night">Nachtmodus</button>
-    <button class="pill" data-tab="router">Router</button>
-    <button class="pill" data-tab="more">Mehr</button>
-    <button class="pill" data-tab="pro">Pro</button>
   </div>
 
-  <!-- WELCOME -->
   <section class="card active" id="sec-welcome">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
     </div>
-    <div class="row gap-6" style="margin-top:8px">
-      <div>
-        <label>Bild (optional)</label>
-        <div class="row">
-          <img id="welcome_img_prev" class="imgprev" alt="Welcome Bild"/>
-          <input type="file" id="welcome_img" accept="image/*"/>
-          <button class="btn small" id="welcome_img_clear" type="button">Löschen</button>
-        </div>
-        <div class="hint">Wird mit der Begrüßung gepostet.</div>
-      </div>
-    </div>
     <label>Text</label>
     <textarea data-key="welcome.text" placeholder="Willkommen {user} 👋"></textarea>
-    <div class="hint">Variablen: <span class="kbd">{user}</span>, <span class="kbd">{title}</span></div>
   </section>
 
-  <!-- RULES -->
   <section class="card" id="sec-rules">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="rules.on"> Regeln aktiv</label>
-    </div>
-    <div class="row gap-6" style="margin-top:8px">
-      <div>
-        <label>Bild (optional)</label>
-        <div class="row">
-          <img id="rules_img_prev" class="imgprev" alt="Regeln Bild"/>
-          <input type="file" id="rules_img" accept="image/*"/>
-          <button class="btn small" id="rules_img_clear" type="button">Löschen</button>
-        </div>
-        <div class="hint">Wird zusammen mit dem Regeltext gepostet.</div>
-      </div>
     </div>
     <label>Text</label>
     <textarea data-key="rules.text" placeholder="Bitte beachte unsere Regeln …"></textarea>
   </section>
 
-  <!-- FAREWELL -->
   <section class="card" id="sec-farewell">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="farewell.on"> Verabschiedung aktiv</label>
-    </div>
-    <div class="row gap-6" style="margin-top:8px">
-      <div>
-        <label>Bild (optional)</label>
-        <div class="row">
-          <img id="farewell_img_prev" class="imgprev" alt="Farewell Bild"/>
-          <input type="file" id="farewell_img" accept="image/*"/>
-          <button class="btn small" id="farewell_img_clear" type="button">Löschen</button>
-        </div>
-        <div class="hint">Wird bei der Verabschiedung gepostet.</div>
-      </div>
     </div>
     <label>Text</label>
     <textarea data-key="farewell.text" placeholder="Tschüss {user}!"></textarea>
   </section>
 
-  <!-- SPAM -->
   <section class="card" id="sec-spam">
     <div class="grid">
       <label class="switch"><input type="checkbox" data-key="spam.on"> Spam-Filter aktiv</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (nur Admins)</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Einladungslinks löschen</label>
-    </div>
-    <div class="grid">
-      <label>Policy-Topic (ID)
-        <input type="text" data-key="spam.policy_topic" data-validate="int" placeholder="z.B. 123" />
-        <div class="err" hidden id="err_spamtopic"></div>
-      </label>
-      <label>Spam-Aktion
-        <select data-key="spam.action" id="spam_action">
-          <option value="">—</option>
-          <option value="delete">Löschen</option>
-          <option value="warn">Warnen</option>
-          <option value="mute">Stummschalten</option>
-        </select>
-      </label>
-    </div>
-    <div class="grid">
-      <label>Whitelist-Domains (eine pro Zeile)
-        <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
-      </label>
-      <label>Blacklist-Domains (eine pro Zeile)
-        <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
-      </label>
-    </div>
-    <div class="grid">
-      <label>Tägliches Limit pro Nutzer
-        <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
-      </label>
-      <label>Quota-Notify
-        <select data-key="spam.quota_notify" id="spam_quota">
-          <option value="">—</option>
-          <option value="off">Aus</option>
-          <option value="smart">Smart</option>
-          <option value="always">Immer</option>
-        </select>
-      </label>
+      <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren</label>
     </div>
   </section>
 
-  <!-- RSS -->
   <section class="card" id="sec-rss">
-    <div class="grid">
-      <label>RSS-Feed URL
-        <input type="text" id="rss_url" data-validate="url" placeholder="https://example.com/feed.xml"/>
-        <div class="err" hidden id="err_rssurl"></div>
-      </label>
-      <label>Topic (ID)
-        <input type="text" id="rss_topic" data-validate="int" placeholder="0 = Standard"/>
-        <div class="err" hidden id="err_rsstopic"></div>
-      </label>
-    </div>
-    <div class="row">
-      <label class="switch"><input type="checkbox" id="rss_postimg"> Beitragsbilder posten</label>
-      <label class="switch"><input type="checkbox" id="rss_enabled" checked> Feed aktivieren</label>
-      <button class="btn small" id="rss_add">Hinzufügen</button>
-    </div>
-    <div class="sep"></div>
+    <label>RSS-Feed URL
+      <input type="text" id="rss_url" placeholder="https://example.com/feed.xml"/>
+    </label>
+    <button class="btn small" id="rss_add">Hinzufügen</button>
     <div id="rssList" class="list"></div>
-    <div class="hint">Bestehende Feeds unten verwalten.</div>
   </section>
 
-  <!-- KI -->
   <section class="card" id="sec-ai">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
     </div>
-    <label>FAQ-Hinweis / Prompt (optional)</label>
-    <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
   </section>
 
-  <!-- KI-Moderation -->
-  <section class="card" id="sec-aimod">
-    <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="ai_mod.enabled"> Aktiviert</label>
-      <label class="switch"><input type="checkbox" data-key="ai_mod.shadow_mode"> Shadow-Mode (nur loggen)</label>
-    </div>
-    <div class="grid">
-      <label>Primär-Aktion
-        <select data-key="ai_mod.action_primary">
-          <option value="">—</option>
-          <option value="delete">Löschen</option>
-          <option value="warn">Warnen</option>
-          <option value="mute">Stummschalten</option>
-        </select>
-      </label>
-      <label>Mute-Minuten
-        <input type="number" data-key="ai_mod.mute_minutes" min="0" placeholder="0 = aus" />
-      </label>
-    </div>
-    <div class="grid">
-      <label>Warntext
-        <input type="text" data-key="ai_mod.warn_text" placeholder="⚠️ Inhalt entfernt (KI-Moderation)."/>
-      </label>
-      <label>Appeal-URL
-        <input type="text" data-key="ai_mod.appeal_url" placeholder="https://…"/>
-      </label>
-    </div>
-    <div class="grid">
-      <label>Anfragen / Minute (Max)
-        <input type="number" data-key="ai_mod.max_per_min" min="1" placeholder="20" />
-      </label>
-      <label>Cooldown (Sekunden)
-        <input type="number" data-key="ai_mod.cooldown_s" min="0" placeholder="30" />
-      </label>
-    </div>
-    <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_admins"> Admins ausnehmen</label>
-      <label class="switch"><input type="checkbox" data-key="ai_mod.exempt_topic_owner"> Topic-Owner ausnehmen</label>
-    </div>
-    <div class="sep"></div>
-    <div class="grid">
-      <label>Toxicity-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.toxicity" placeholder="0.90" />
-      </label>
-      <label>Hate-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.hate" placeholder="0.85" />
-      </label>
-      <label>Sexual-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.sexual" placeholder="0.90" />
-      </label>
-      <label>Harassment-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.harassment" placeholder="0.90" />
-      </label>
-      <label>Self-Harm-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.selfharm" placeholder="0.95" />
-      </label>
-      <label>Violence-Schwelle
-        <input type="number" step="0.01" min="0" max="1" data-key="ai_mod.violence" placeholder="0.90" />
-      </label>
-    </div>
-  </section>
-
-  <!-- FAQ -->
   <section class="card" id="sec-faq">
-    <div class="grid">
-      <label>Frage
-        <input type="text" id="faq_q" placeholder="Deine Frage …" />
-      </label>
-      <label>Antwort
-        <input type="text" id="faq_a" placeholder="Kurze Antwort …" />
-      </label>
-    </div>
-    <div class="row">
-      <button class="btn small" id="faq_add">Hinzufügen</button>
-    </div>
-    <div class="sep"></div>
+    <label>Frage
+      <input type="text" id="faq_q" placeholder="Deine Frage …" />
+    </label>
+    <label>Antwort
+      <input type="text" id="faq_a" placeholder="Kurze Antwort …" />
+    </label>
+    <button class="btn small" id="faq_add">Hinzufügen</button>
     <div id="faqList" class="list"></div>
   </section>
 
-  <!-- REPORT -->
-  <section class="card" id="sec-report">
-    <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="report.enabled"> Täglichen Report aktiv</label>
-      <div>
-        <label>Ziel</label>
-        <div class="row">
-          <label class="switch"><input type="radio" name="report_dest" id="report_dest_dm" value="dm"> Per DM</label>
-          <label class="switch"><input type="radio" name="report_dest" id="report_dest_topic" value="topic"> In Topic</label>
-        </div>
-        <div class="hint">Wähle „In Topic“ und gib unten die Topic-ID deiner Gruppe (z. B. „General“) an.</div>
-      </div>
-      <label>Topic (ID)
-        <input type="text" data-key="report.topic" data-validate="int" placeholder="0 = Standard; sonst ID von „General“"/>
-        <div class="err" hidden id="err_reporttopic"></div>
-      </label>
-    </div>
-    <div class="row">
-      <button class="btn small" id="report_send_now" type="button">Report jetzt posten</button>
-    </div>
-    <div class="sep"></div>
-    <div class="hint">Vorschau/Statistik (aus Datenbank):</div>
-    <div id="reportStats" class="list"></div>
-  </section>
-
-  <!-- STATS -->
-  <section class="card" id="sec-stats">
-    <h3>📊 Statistik</h3>
-    <div class="grid">
-      <label>Zeitraum
-        <select id="stats_days">
-          <option value="7">7 Tage</option>
-          <option value="14" selected>14 Tage</option>
-          <option value="30">30 Tage</option>
-          <option value="60">60 Tage</option>
-        </select>
-      </label>
-      <button class="btn" id="stats_reload">Aktualisieren</button>
-    </div>
-  </section>
-  
-  <!-- Rewards -->
-  <section class="card">
-    <h3>Rewards (EMRLD)</h3>
-      <div class="row"><label>Aktiv</label><input type="checkbox" id="reward_enabled"></div>
-      <div class="row"><label>Modus</label>
-    <select id="reward_mode">
-      <option value="claim">Claim (User)</option>
-      <option value="auto">Auto (Owner)</option>
-    </select>
-  </div>
-  <div class="row"><label>Rate pro Antwort</label><input id="reward_rate_answer" type="number" step="0.0001" min="0" placeholder="0.01"></div>
-  <div class="row"><label>Rate pro Helpful</label><input id="reward_rate_helpful" type="number" step="0.0001" min="0" placeholder="0.05"></div>
-  <div class="row"><label>Cap pro Nutzer/Tag</label><input id="reward_cap_user" type="number" step="1" min="0" placeholder="0"></div>
-  <div class="row"><label>Cap pro Chat/Tag</label><input id="reward_cap_chat" type="number" step="1" min="0" placeholder="0"></div>
-  <button class="btn" id="reward_save">Speichern</button>
-  </section>
-
-  <!-- MOOD -->
-  <section class="card" id="sec-mood">
-    <div class="grid">
-      <label>Frage (Stimmungsumfrage)
-        <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung heute?" />
-      </label>
-      <label>Topic (ID)
-        <input type="text" data-key="mood.topic" data-validate="int" placeholder="0 = Standard" />
-        <div class="err" hidden id="err_moodtopic"></div>
-      </label>
-    </div>
-    <div class="row">
-      <button class="btn small" id="mood_send_now" type="button">Mood-Frage jetzt senden</button>
-    </div>
-  </section>
-
-  <!-- NIGHT MODE -->
   <section class="card" id="sec-night">
     <div class="grid">
       <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
       <label>Start (HH:MM)
-        <input type="text" data-key="night.start" data-validate="time" placeholder="22:00" />
-        <div class="err" hidden id="err_nstart"></div>
+        <input type="text" data-key="night.start" placeholder="22:00" />
       </label>
       <label>Ende (HH:MM)
-        <input type="text" data-key="night.end" data-validate="time" placeholder="07:00" />
-        <div class="err" hidden id="err_nend"></div>
+        <input type="text" data-key="night.end" placeholder="07:00" />
       </label>
-    </div>
-    <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Nicht-Admin-Nachrichten löschen</label>
-      <label class="switch"><input type="checkbox" data-key="night.warn_once"> Einmalige Warnung anzeigen</label>
-      <label>Zeitzone
-        <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
-      </label>
-      <label class="switch"><input type="checkbox" data-key="night.hard_mode"> Hard-Mode</label>
-    </div>
-    <div class="grid">
-      <label>Temporär bis (Override)
-        <input type="datetime-local" data-key="night.override_until" />
-      </label>
-    </div>
-  </section>
-
-  <!-- TOPIC ROUTER -->
-  <section class="card" id="sec-router">
-    <div class="grid">
-      <label>Ziel-Topic (ID)
-        <input type="text" id="router_target" data-validate="int" placeholder="Topic ID" />
-        <div class="err" hidden id="err_rtarget"></div>
-      </label>
-      <label>Keywords (Komma getrennt)
-        <input type="text" id="router_keywords" placeholder="hilfe, frage, support" />
-      </label>
-      <label>Domains (Komma getrennt)
-        <input type="text" id="router_domains" placeholder="example.com, foo.bar" />
-      </label>
-    </div>
-    <div class="row">
-      <label class="switch"><input type="checkbox" id="router_delete" checked> Original löschen</label>
-      <label class="switch"><input type="checkbox" id="router_warn" checked> Nutzer warnen</label>
-      <button class="btn small" id="router_add">Regel anlegen</button>
-    </div>
-    <div class="sep"></div>
-    <div id="routerList" class="list"></div>
-  </section>
-
-  <!-- MORE -->
-  <section class="card" id="sec-more">
-    <div class="row">
-      <label>Sprache
-        <select data-key="language">
-          <option value="">Automatisch</option>
-          <option value="de">Deutsch</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="ru">Русский</option>
-        </select>
-      </label>
-    </div>
-    <div class="subsec">
-      <h3>Gelöschte Accounts</h3>
-      <div class="grid">
-        <label class="switch">
-          <input type="checkbox" id="clean_enabled"> Scheduler aktiv
-        </label>
-        <label>Uhrzeit <input type="time" id="clean_time" value="03:00"></label>
-        <label>Wochentag (optional)
-          <select id="clean_weekday">
-            <option value="">Täglich</option>
-            <option value="0">Montag</option><option value="1">Dienstag</option>
-            <option value="2">Mittwoch</option><option value="3">Donnerstag</option>
-            <option value="4">Freitag</option><option value="5">Samstag</option>
-            <option value="6">Sonntag</option>
-          </select>
-        </label>
-        <label class="switch"><input type="checkbox" id="clean_demote"> Admins demoten</label>
-        <label class="switch"><input type="checkbox" id="clean_notify" checked> Ergebnis melden</label>
-      </div>
-      <div class="row">
-        <button class="btn" onclick="sendPayload({ clean_delete_now: true })">Jetzt aufräumen</button>
-        <button class="btn primary" onclick="saveCleanScheduler()">Scheduler speichern</button>
-      </div>
-    </div>
-    <script>
-      function saveCleanScheduler(){
-        const wd = document.getElementById('clean_weekday').value;
-        sendPayload({ clean_deleted: {
-          enabled: document.getElementById('clean_enabled').checked,
-          time: document.getElementById('clean_time').value || "03:00",
-          weekday: wd === "" ? null : parseInt(wd,10),
-          demote: document.getElementById('clean_demote').checked,
-          notify: document.getElementById('clean_notify').checked
-        }});
-      }
-    </script>
-  </section>
-  
-  <!-- PRO -->
-  <section class="card" id="sec-pro">
-    <div class="row">
-      <label>Pro-Monate kaufen/verlängern
-        <input type="number" id="pro_months" data-validate="int" min="1" placeholder="z.B. 1" />
-      </label>
-      <button class="btn small" id="pro_buy">Abo setzen</button>
     </div>
   </section>
 </div>
 
-  <!-- Footerbar unten -->
-  <div class="footerbar">
-    <div class="left">
-      <button class="btn ghost" id="backBtn">← Zurück</button>
-      <div id="out" class="hint">Bereit.</div>
-    </div>
-    <div class="right">
-      <button class="btn ghost" id="themeBtn" title="Hell/Dunkel">🌓</button>
-      <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
-      <button class="btn ghost" id="closeBtn">Schließen</button>
-      <button class="btn primary" id="saveBtn" disabled>Speichern</button>
-    </div>
+<div class="footerbar">
+  <div class="left">
+    <button class="btn ghost" id="backBtn">← Zurück</button>
+    <div id="out" class="hint">Bereit.</div>
   </div>
-  <script>
-    // Clean, consolidated script: helpers, group loading, previews, state and save
-    
-    // Helpers MUST be defined FIRST before use
-    const qs = (s, el = document) => el.querySelector(s);
-    const qa = (s, el = document) => Array.from(el.querySelectorAll(s));
-    const getUrlParam = (k, def = null) => new URL(location.href).searchParams.get(k) ?? def;
-    
-    // NOW use the helpers
-    const tg = window.Telegram?.WebApp;
-    const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
-    const INIT_DATA = tg?.initData || "";
-    const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
-    let cid = parseInt(getUrlParam("cid") || 0);
-    const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-    let STATE_READY = false;
+  <div class="right">
+    <button class="btn ghost" id="themeBtn" title="Hell/Dunkel">🌓</button>
+    <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
+    <button class="btn ghost" id="closeBtn">Schließen</button>
+    <button class="btn primary" id="saveBtn" disabled>Speichern</button>
+  </div>
+</div>
 
-    // Image preview/input bookkeeping
-    const IMG_PREV = { welcome: qs('#welcome_img_prev'), rules: qs('#rules_img_prev'), farewell: qs('#farewell_img_prev') };
-    const IMG_INPUT = { welcome: qs('#welcome_img'), rules: qs('#rules_img'), farewell: qs('#farewell_img') };
-    const IMG_CLEAR_BTN = { welcome: qs('#welcome_img_clear'), rules: qs('#rules_img_clear'), farewell: qs('#farewell_img_clear') };
-    const IMG_UPLOADS = { welcome: null, rules: null, farewell: null };
-    const PREV_IMAGES = { welcome: null, rules: null, farewell: null };
-    const CLEAR_FLAGS = { welcome: false, rules: false, farewell: false };
+<script>
+const qs = (s) => document.querySelector(s);
+const qa = (s) => Array.from(document.querySelectorAll(s));
+const getUrlParam = (k, def=null) => new URL(location.href).searchParams.get(k) ?? def;
 
-    function readAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file);
-      });
+const tg = window.Telegram?.WebApp;
+const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
+const INIT_DATA = tg?.initData || "";
+const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
+let cid = parseInt(getUrlParam("cid") || 0);
+const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+let STATE_READY = false;
+
+function setVal(path, val) {
+  const el = qa(`[data-key="${path}"]`)[0];
+  if(!el) return;
+  if(el.type==='checkbox') el.checked = !!val;
+  else el.value = (val ?? '');
+}
+
+function collect() {
+  const out = {};
+  qa('[data-key]').forEach(el=>{
+    const path = el.getAttribute('data-key');
+    const parts = path.split('.');
+    let cur = out;
+    for(let i=0; i<parts.length-1; i++) {
+      if(!(parts[i] in cur)) cur[parts[i]] = {};
+      cur = cur[parts[i]];
     }
+    const leaf = parts[parts.length-1];
+    const val = (el.type==='checkbox') ? !!el.checked : el.value;
+    cur[leaf] = val;
+  });
+  return out;
+}
 
-    async function compressImage(file, maxSide = 1280, quality = 0.82) {
-      const data = await readAsDataURL(file);
-      const img = new Image(); img.src = data; await new Promise(r => { img.onload = r; img.onerror = r; });
-      const w = img.naturalWidth, h = img.naturalHeight;
-      const scale = Math.min(1, maxSide / Math.max(w, h));
-      const cw = Math.max(1, Math.round(w * scale));
-      const ch = Math.max(1, Math.round(h * scale));
-      const canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, cw, ch);
-      return canvas.toDataURL('image/jpeg', quality);
-    }
+function showStartPage() {
+  qs('#startPage').style.display = 'block';
+  const area = qs('#contentArea');
+  if(area) { area.style.display = 'none'; area.classList.remove('visible'); }
+  cid = 0;
+}
 
-    function authUrl(u) {
-      if (!u || !u.includes('/miniapp/file')) return u;
-      const glue = u.includes('?') ? '&' : '?';
-      if (INIT_DATA) return `${u}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
-      return `${u}${glue}uid=${encodeURIComponent(uid)}`;
-    }
+function showContentArea(gid) {
+  cid = parseInt(gid);
+  qs('#startPage').style.display = 'none';
+  const area = qs('#contentArea');
+  if(area) { area.style.display = 'block'; setTimeout(()=>area.classList.add('visible'), 10); }
+}
 
-    function setPreview(keyOrEl, url) {
-      const imgEl = (typeof keyOrEl === 'string') ? IMG_PREV[keyOrEl] : keyOrEl;
-      if (!imgEl) return;
-      if (!url) { imgEl.removeAttribute('src'); imgEl.dataset.hasImage = '0'; imgEl.style.display = 'none'; return; }
-      const authUrlStr = authUrl(url);
-      imgEl.onerror = () => { imgEl.style.display = 'none'; imgEl.dataset.hasImage = '0'; };
-      imgEl.style.display = 'block'; imgEl.src = authUrlStr; imgEl.dataset.hasImage = '1'; imgEl.style.cursor = 'pointer';
-      imgEl.onclick = () => window.open(authUrlStr, '_blank');
-    }
-
-    // Wire up file inputs
-    Object.entries(IMG_INPUT).forEach(([key, input]) => {
-      if (!input) return;
-      input.addEventListener('change', async (ev) => {
-        const f = ev.target.files?.[0];
-        if (!f) { IMG_UPLOADS[key] = null; setPreview(key, PREV_IMAGES[key]); return; }
-        const b64 = await compressImage(f, 1280, 0.82);
-        IMG_UPLOADS[key] = b64; CLEAR_FLAGS[key] = false; setPreview(key, b64);
-      });
-    });
-    Object.entries(IMG_CLEAR_BTN).forEach(([key, btn]) => { if (!btn) return; btn.addEventListener('click', () => { IMG_UPLOADS[key] = null; CLEAR_FLAGS[key] = true; setPreview(key, null); }); });
-
-    // Validation helpers (kept minimal)
-    function validTime(val) { const s = (val || '').trim(); if (s === '') return true; return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(s); }
-    function validInt(val) { const s = (val ?? '').toString().trim(); return s === '' || /^-?\d+$/.test(s); }
-    function validUrl(val) { try { const u = new URL(val); return !!u.protocol && !!u.host; } catch { return false; } }
-
-    // UI helper functions
-    function showStartPage() {
-      qs('#startPage').style.display = 'block';
-      const area = qs('#contentArea');
-      if (area) { area.style.display = 'none'; area.classList.remove('visible'); }
-      cid = 0;
-    }
-
-    function showContentArea(gid) {
-      cid = parseInt(gid);
-      qs('#startPage').style.display = 'none';
-      const area = qs('#contentArea');
-      if (area) { area.style.display = 'block'; setTimeout(() => area.classList.add('visible'), 10); }
-    }
-
-    function validateAll() {
-      qa('input[data-validate]').forEach(el => {
-        let valid = true;
-        const val = el.value;
-        const rule = el.getAttribute('data-validate');
-        if (rule === 'time') valid = validTime(val);
-        else if (rule === 'int') valid = validInt(val);
-        else if (rule === 'url') valid = validUrl(val);
-        const errId = el.getAttribute('id')?.replace(/^/, 'err_');
-        const errEl = errId ? qs(`#${errId}`) : null;
-        if (errEl) errEl.style.display = (valid || !val) ? 'none' : 'block';
-        el.classList.toggle('input-error', !valid && !!val);
-      });
-    }
-
-    // Core: loadGroups (single, clean implementation)
-    async function loadGroups() {
-      const list = qs('#groupList'); if (!list) return;
-      try {
-        list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
-        const headers = {}; if (INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-        const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, { headers }); if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json(); const groups = data?.groups || [];
-        const select = qs('#groupSelect'); if (select) { select.innerHTML = '<option value="">Gruppe wählen...</option>' + groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join(''); if (cid) select.value = cid; select.addEventListener('change', () => { const v = select.value; if (v) { showContentArea(v); loadState(); } }); }
-        if (!groups.length) {
-          list.innerHTML = `<div class="card"><p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p><p class="hint">Um den Bot zu nutzen:</p><ol style="color:var(--muted);margin:8px 0;padding-left:24px"><li>Füge @EmeraldContentBot zu deiner Gruppe hinzu</li><li>Mache den Bot zum Admin</li><li>Aktualisiere diese Seite</li></ol></div>`;
-        } else {
-          list.innerHTML = groups.map(g => `<div class="group-item" data-id="${g.id}"><div class="group-info"><div class="group-title">${g.title || g.id}</div><div class="group-meta">Telegram-Gruppe</div></div><button class="btn primary small">Verwalten</button></div>`).join('');
-          qa('.group-item button').forEach(btn => { btn.onclick = () => { const gid = btn.closest('.group-item').dataset.id; if (gid) { showContentArea(gid); loadState(); } }; });
-        }
-      } catch (err) {
-        console.error('Gruppen laden fehlgeschlagen', err); list.innerHTML = `<div class="card"><p class="hint error">Fehler beim Laden der Gruppen: ${err.message || 'Unbekannter Fehler'}</p><button class="btn small" onclick="loadGroups()">Erneut versuchen</button></div>`;
-      }
-    }
-
-    // Helpers for form state
-    function setVal(path, val) { const el = qa(`[data-key="${path}"]`)[0]; if (!el) return; if (el.type === 'checkbox') el.checked = !!val; else el.value = (val ?? ''); }
-    function collect() { const out = {}; qa('[data-key]').forEach(el => { const path = el.getAttribute('data-key'); const parts = path.split('.'); let cur = out; for (let i = 0; i < parts.length - 1; i++) { if (!(parts[i] in cur)) cur[parts[i]] = {}; cur = cur[parts[i]]; } const leaf = parts[parts.length - 1]; let val = (el.type === 'checkbox') ? !!el.checked : el.value; if (el.type === 'number') val = el.value === '' ? '' : Number(el.value); cur[leaf] = val; }); return out; }
-
-    // Render helpers
-    function renderRss(feeds) { const box = qs('#rssList'); if (!box) return; box.innerHTML = ''; (feeds || []).forEach(f => { const item = document.createElement('div'); item.className = 'item'; const left = document.createElement('div'); left.className = 'left'; left.innerHTML = `<div class="title">${f.url}</div><div class="hint">Topic: ${f.topic ?? 0}</div>`; const right = document.createElement('div'); right.innerHTML = `<label class="switch"><input type="checkbox" ${f.enabled ? 'checked' : ''} data-url="${f.url}" class="rss-toggle"> Aktiv</label><label class="switch"><input type="checkbox" ${f.post_images ? 'checked' : ''} data-url="${f.url}" class="rss-img"> Bilder</label><button class="btn small danger rss-del" data-url="${f.url}">Löschen</button>`; item.append(left, right); box.append(item); }); qa('.rss-del', box).forEach(b => b.onclick = () => sendPayload({ rss_del: b.dataset.url })); qa('.rss-toggle', box).forEach(ch => ch.onchange = () => sendPayload({ rss_update: { url: ch.dataset.url, enabled: ch.checked } })); qa('.rss-img', box).forEach(ch => ch.onchange = () => sendPayload({ rss_update: { url: ch.dataset.url, post_images: ch.checked } })); }
-    function renderFaq(list) { const box = qs('#faqList'); if (!box) return; box.innerHTML = ''; (list || []).forEach(f => { const item = document.createElement('div'); item.className = 'item'; const left = document.createElement('div'); left.className = 'left'; left.innerHTML = `<div class="title">${f.q}</div><div class="hint">${f.a || ''}</div>`; const del = document.createElement('button'); del.className = 'btn small danger'; del.textContent = 'Löschen'; del.onclick = () => sendPayload({ faq_del: { q: f.q } }); item.append(left, del); box.append(item); }); }
-    function renderRouter(list) { const box = qs('#routerList'); if (!box) return; box.innerHTML = ''; (list || []).forEach(r => { const item = document.createElement('div'); item.className = 'item'; const left = document.createElement('div'); left.className = 'left'; left.innerHTML = `<div class="title">Rule #${r.rule_id} → Topic ${r.target_topic_id}</div><div class="hint">${(r.keywords||[]).join(', ')} ${(r.domains||[]).join(', ')}</div>`; const right = document.createElement('div'); right.className = 'right'; right.innerHTML = `<span class="hint">${r.enabled ? 'aktiv' : 'inaktiv'}</span>`; item.append(left, right); box.append(item); }); }
-
-    // Load state for selected group
-    async function loadState() {
-      qs('#out').textContent = 'Lade …';
-      try {
-        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, { method: 'GET', headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': INIT_DATA } });
-        if (!res.ok) throw new Error(await res.text()); const j = await res.json();
-        // welcome/rules/farewell
-        setVal('welcome.on', j.welcome?.on); setVal('welcome.text', j.welcome?.text); setPreview('welcome', j.welcome?.image_url || j.welcome?.image); PREV_IMAGES.welcome = j.welcome?.image_url || j.welcome?.image || null;
-        setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text); setPreview('rules', j.rules?.image_url || j.rules?.image); PREV_IMAGES.rules = j.rules?.image_url || j.rules?.image || null;
-        setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text); setPreview('farewell', j.farewell?.image_url || j.farewell?.image); PREV_IMAGES.farewell = j.farewell?.image_url || j.farewell?.image || null;
-        // spam
-        setVal('spam.on', j.spam?.on ?? false); setVal('spam.block_links', j.spam?.block_links ?? false); setVal('spam.block_media', j.spam?.block_media ?? false); setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false); setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
-        if (Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value = (j.spam.whitelist || []).join('\n'); if (Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value = (j.spam.blacklist || []).join('\n');
-        // rss/ai/faq/router/report
-        renderRss(j.rss?.feeds || []); setVal('ai.on', j.ai?.on ?? false); setVal('ai.faq', j.ai?.faq || ''); renderFaq(j.faqs || []); renderRouter(j.router_rules || []);
-        qs('#out').textContent = 'Bereit.'; STATE_READY = true; validateAll();
-      } catch (e) { console.error(e); qs('#out').textContent = 'Fehler beim Laden.'; STATE_READY = false; }
-    }
-
-    // Simplified stats loader (keeps previous behavior minimal)
-    async function loadStats() { try { const days = parseInt(qs('#stats_days')?.value || '14'); const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, { headers: { 'X-Telegram-Init-Data': INIT_DATA } }); if (!res.ok) throw new Error(await res.text()); const data = await res.json(); /* render logic omitted for brevity (unchanged) */ } catch (e) { console.error(e); } }
-
-    // Send payload (keeps previous robust fallback)
-    async function sendPayload(extra = {}) {
-      if (!STATE_READY) { qs('#out').textContent = '⚠️ Erst Daten laden'; return; }
-      const out = Object.assign({}, collect(), extra);
-      out.images = out.images || {};
-      ['welcome', 'rules', 'farewell'].forEach(k => {
-        if (CLEAR_FLAGS[k] === true) { out[k] = out[k] || {}; out[k].img_base64 = ''; }
-        else if (IMG_UPLOADS[k]) { out[k] = out[k] || {}; out[k].img_base64 = IMG_UPLOADS[k]; }
-      });
-      const activeBtn = document.activeElement; if (activeBtn && activeBtn.tagName === 'BUTTON') { activeBtn.disabled = true; activeBtn.dataset._old = activeBtn.textContent; activeBtn.textContent = 'Speichere…'; }
-      qs('#out').textContent = 'Speichere …';
-      try {
-        try { tg?.sendData?.(JSON.stringify(out)); } catch {}
-        const res = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': INIT_DATA }, body: JSON.stringify(out) });
-        if (!res.ok) throw new Error(await res.text()); qs('#out').textContent = '✅ Gespeichert'; await loadState();
-      } catch (e) {
-        console.warn('save fallback', e);
-        try { await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': INIT_DATA }, body: JSON.stringify(Object.assign({}, out, { images: undefined })) }); } catch (e2) { console.error(e2); }
-        qs('#out').textContent = '✅ Gespeichert'; await loadState();
-      } finally { const b = document.querySelector('button[disabled][data-_old]'); if (b) { b.disabled = false; b.textContent = b.dataset._old; delete b.dataset._old; } }
-    }
-
-    // UI wiring
-    qs('#backBtn')?.addEventListener('click', showStartPage);
-    qs('#closeBtn')?.addEventListener('click', () => { try { tg.close(); } catch { window.close(); } });
-    qs('#resetBtn')?.addEventListener('click', loadState);
-    qs('#saveBtn')?.addEventListener('click', () => sendPayload());
-    qs('#themeBtn')?.addEventListener('click', () => { const cur = document.documentElement.getAttribute('data-theme') || 'dark'; const next = cur === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('emerald-theme', next); });
-    qa('#tabs .pill').forEach(p => p.addEventListener('click', () => { qa('#tabs .pill').forEach(x => x.classList.remove('active')); p.classList.add('active'); qa('section.card').forEach(s => s.classList.remove('active')); qs('#sec-' + p.dataset.tab).classList.add('active'); if (p.dataset.tab === 'stats') loadStats(); }));
-
-    // Small attachers
-    qs('#rss_add')?.addEventListener('click', () => { const url = qs('#rss_url').value.trim(); if (!url) return; sendPayload({ rss: { url, topic: parseInt(qs('#rss_topic').value || '0'), post_images: qs('#rss_postimg').checked, enabled: qs('#rss_enabled').checked } }); });
-    qs('#faq_add')?.addEventListener('click', () => { const q = qs('#faq_q').value.trim(); const a = qs('#faq_a').value.trim(); if (!q) return; sendPayload({ faq_add: { q, a } }); });
-    qs('#router_add')?.addEventListener('click', () => { if (!validInt(qs('#router_target')?.value || '')) return; const target = parseInt(qs('#router_target').value || '0'); const kw = (qs('#router_keywords')?.value || '').split(',').map(s => s.trim()).filter(Boolean); const dom = (qs('#router_domains')?.value || '').split(',').map(s => s.trim()).filter(Boolean); sendPayload({ router_add: { target_topic_id: target, keywords: kw, domains: dom, delete_original: qs('#router_delete').checked, warn_user: qs('#router_warn').checked } }); });
-
-    // Validate inputs
-    qa('input,textarea,select').forEach(el => el.addEventListener('input', () => { /* minimal validation; keep save enabled */ }));
-
-    // Start
-    document.addEventListener('DOMContentLoaded', async () => { await loadGroups(); if (cid) { showContentArea(cid); await loadState(); } else { showStartPage(); } });
-  </script>
-</body>
-</html>
-  
+async function loadGroups() {
+  const list = qs('#groupList');
+  if(!list) return;
   try {
-    list.innerHTML = '<p class="hint"><span class="loading">⏳</span> Lade Gruppenliste...</p>';
-    
+    list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
-    if (INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    
-    const response = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, { headers });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
+    if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
+    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
     const groups = data?.groups || [];
     
-    // Dropdown aktualisieren
     const select = qs('#groupSelect');
-    if (select) {
-      select.innerHTML = '<option value="">Gruppe wählen...</option>' +
+    if(select) {
+      select.innerHTML = '<option value="">Gruppe wählen...</option>' + 
         groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join('');
-      if (cid) select.value = cid;
+      if(cid) select.value = cid;
+      select.addEventListener('change', ()=>{
+        const v = select.value;
+        if(v) { showContentArea(v); loadState(); }
+      });
     }
     
-    // Gruppenliste aktualisieren
-    if (groups.length === 0) {
-      list.innerHTML = `
-        <div class="card">
-          <p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>
-          <p class="hint">Um den Bot zu nutzen:</p>
-          <ol style="color:var(--muted);margin:8px 0;padding-left:24px">
-            <li>Füge @EmeraldContentBot zu deiner Gruppe hinzu</li>
-            <li>Mache den Bot zum Admin</li>
-            <li>Aktualisiere diese Seite</li>
-          </ol>
-        </div>`;
+    if(!groups.length) {
+      list.innerHTML = '<p class="hint">Keine Gruppen gefunden. Füge den Bot zu deiner Gruppe hinzu.</p>';
     } else {
-      list.innerHTML = groups.map(g => `
-        <div class="group-item" data-id="${g.id}">
+      list.innerHTML = groups.map(g => 
+        `<div class="group-item" data-id="${g.id}">
           <div class="group-info">
             <div class="group-title">${g.title || g.id}</div>
             <div class="group-meta">Telegram-Gruppe</div>
           </div>
           <button class="btn primary small">Verwalten</button>
-        </div>
-      `).join('');
-      
-      // Click-Handler für Gruppen
-      qa('.group-item button').forEach(btn => {
-        btn.onclick = () => {
+        </div>`
+      ).join('');
+      qa('.group-item button').forEach(btn=>{
+        btn.onclick = ()=>{
           const gid = btn.closest('.group-item').dataset.id;
-          if (gid) {
-            showContentArea(gid);
-            loadState();
-          }
+          if(gid) { showContentArea(gid); loadState(); }
         };
       });
     }
-  } catch (err) {
-    console.error('Fehler beim Laden der Gruppen:', err);
-    list.innerHTML = `
-      <div class="card">
-        <p class="hint error">
-          Fehler beim Laden der Gruppen: ${err.message || 'Unbekannter Fehler'}
-        </p>
-        <button class="btn small" onclick="loadGroups()">Erneut versuchen</button>
-      </div>`;
-  }
-}
-      select.innerHTML = '<option value="">Gruppe wählen...</option>' +
-        groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join('');
-      if (cid) select.value = cid;
-    }
-    
-    if (groups.length === 0) {
-      list.innerHTML = `
-        <div class="card">
-          <p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>
-          <p class="hint">Um den Bot zu nutzen:</p>
-          <ol style="color:var(--muted);margin:8px 0;padding-left:24px">
-            <li>Füge @EmeraldContentBot zu deiner Gruppe hinzu</li>
-            <li>Mache den Bot zum Admin</li>
-            <li>Aktualisiere diese Seite</li>
-          </ol>
-        </div>`;
-    } else {
-      list.innerHTML = groups.map(g => `
-        <div class="group-item" data-id="${g.id}">
-          <div class="group-info">
-            <div class="group-title">${g.title || g.id}</div>
-            <div class="group-meta">Telegram-Gruppe</div>
-          </div>
-          <button class="btn primary small">Verwalten</button>
-        </div>
-      `).join('');
-      
-      // Click-Handler für Gruppen
-      qa('.group-item button').forEach(btn => {
-        btn.onclick = () => {
-          const gid = btn.closest('.group-item').dataset.id;
-          if (gid) {
-            showContentArea(gid);
-            loadState();
-          }
-        };
-      });
-    }
-  } catch (err) {
-    console.error('Fehler beim Laden der Gruppen:', err);
-    list.innerHTML = `
-      <div class="card">
-        <p class="hint error">
-          Fehler beim Laden der Gruppen: ${err.message || 'Unbekannter Fehler'}
-        </p>
-        <button class="btn small" onclick="loadGroups()">Erneut versuchen</button>
-      </div>`;
-  }
-}
-      select.innerHTML = '<option value="">Gruppe wählen...</option>' +
-        groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join('');
-      // Wenn CID vorhanden, diese auswählen
-      if (cid) select.value = cid;
-    
-    // Gruppenliste aktualisieren
-    const list = qs('#groupList');
-    if (list) {
-      if (groups.length === 0) {
-        list.innerHTML = '<p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>';
-      } else {
-        list.innerHTML = groups.map(g => `
-          <div class="group-item" data-id="${g.id}">
-            <div class="group-info">
-              <div class="group-title">${g.title || g.id}</div>
-              <div class="group-meta">Telegram-Gruppe</div>
-            </div>
-            <button class="btn primary small">Verwalten</button>
-          </div>
-        `).join('');
-        
-        // Click-Handler für Gruppen
-        qa('.group-item button').forEach(btn => {
-          btn.onclick = () => {
-            const gid = btn.closest('.group-item').dataset.id;
-            if (gid) {
-              showContentArea(gid);
-              loadState();
-            }
-          };
-        });
-      }
-    }
-  } catch (err) {
-    console.error('Fehler beim Laden der Gruppen:', err);
-    const list = qs('#groupList');
-    if (list) {
-      list.innerHTML = `
-        <p class="hint error">
-          Fehler beim Laden der Gruppen: ${err.message || 'Unbekannter Fehler'}.<br>
-          Bitte versuche es später erneut.
-        </p>`;
-    }
+  } catch(err) {
+    console.error('Gruppen laden fehlgeschlagen', err);
+    list.innerHTML = `<p class="hint error">Fehler: ${err.message}</p>`;
   }
 }
 
-// Initialisierung
-document.addEventListener('DOMContentLoaded', () => {
-  // Nur Gruppen initial laden
-  loadGroups();
+async function loadState() {
+  qs('#out').textContent = 'Lade …';
+  try {
+    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': INIT_DATA
+      }
+    });
+    if(!res.ok) throw new Error(await res.text());
+    const j = await res.json();
+    
+    setVal('welcome.on', j.welcome?.on);
+    setVal('welcome.text', j.welcome?.text);
+    setVal('rules.on', j.rules?.on);
+    setVal('rules.text', j.rules?.text);
+    setVal('farewell.on', j.farewell?.on);
+    setVal('farewell.text', j.farewell?.text);
+    setVal('spam.on', j.spam?.on ?? false);
+    setVal('spam.block_links', j.spam?.block_links ?? false);
+    setVal('ai.on', j.ai?.on ?? false);
+    setVal('night.on', j.night?.on ?? false);
+    setVal('night.start', j.night?.start || '22:00');
+    setVal('night.end', j.night?.end || '07:00');
+    
+    qs('#out').textContent = 'Bereit.';
+    STATE_READY = true;
+  } catch(e) {
+    console.error(e);
+    qs('#out').textContent = 'Fehler beim Laden.';
+    STATE_READY = false;
+  }
+}
+
+async function sendPayload(extra = {}) {
+  if(!STATE_READY) { qs('#out').textContent = '⚠️ Erst Daten laden'; return; }
   
-  // Wenn eine CID in der URL ist, diese Gruppe direkt laden
-  if (cid > 0) {
-    showContentArea(cid);
-    loadState();
-  } else {
-    showStartPage();
+  const out = Object.assign({}, collect(), extra);
+  qs('#out').textContent = 'Speichere …';
+  
+  try {
+    try { tg?.sendData?.(JSON.stringify(out)); } catch {}
+    const res = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': INIT_DATA
+      },
+      body: JSON.stringify(out)
+    });
+    if(!res.ok) throw new Error(await res.text());
+    qs('#out').textContent = '✅ Gespeichert';
+    await loadState();
+  } catch(e) {
+    console.error(e);
+    qs('#out').textContent = '⚠️ Fehler';
   }
+}
+
+qs('#backBtn')?.addEventListener('click', showStartPage);
+qs('#closeBtn')?.addEventListener('click', ()=>{ try{ tg.close(); }catch{ window.close(); } });
+qs('#resetBtn')?.addEventListener('click', loadState);
+qs('#saveBtn')?.addEventListener('click', ()=>sendPayload());
+qs('#themeBtn')?.addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('emerald-theme', next);
 });
-    // --- Helpers ---
-    const qs=(s,el=document)=>el.querySelector(s);
-    const qa=(s,el=document)=>Array.from(el.querySelectorAll(s));
-    const getUrlParam=(k, def=null)=> new URL(location.href).searchParams.get(k) ?? def;
-    const FORCE_HTTP = new URL(location.href).searchParams.get('forceHttp') === '1';
 
-    // Gruppen laden und Dropdown füllen
-    async function loadGroups() {
-      try {
-        const headers = {};
-        if (INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-        
-        const response = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, { headers });
-        if (!response.ok) throw new Error('Laden fehlgeschlagen');
-        
-        const data = await response.json();
-        const groups = data?.groups || [];
-        
-        // Dropdown aktualisieren
-        const select = qs('#groupSelect');
-        if (select) {
-          select.innerHTML = '<option value="">Gruppe wählen...</option>' +
-            groups.map(g => `<option value="${g.id}">${g.title || g.id}</option>`).join('');
-        }
-        
-        // Gruppenliste aktualisieren
-        const list = qs('#groupList');
-        if (list) {
-          if (groups.length === 0) {
-            list.innerHTML = '<p class="hint">Keine Gruppen gefunden, in denen du Admin bist.</p>';
-          } else {
-            list.innerHTML = groups.map(g => `
-              <div class="group-item" data-id="${g.id}">
-                <div class="group-info">
-                  <div class="group-title">${g.title || g.id}</div>
-                  <div class="group-meta">Telegram-Gruppe</div>
-                </div>
-                <button class="btn primary small">Verwalten</button>
-              </div>
-            `).join('');
-            
-            // Click-Handler
-            qa('.group-item button').forEach(btn => {
-              btn.onclick = () => {
-                const gid = btn.closest('.group-item').dataset.id;
-                if (gid) {
-                  showContentArea(gid);
-                  loadState();
-                }
-              };
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Fehler beim Laden der Gruppen:', err);
-        const list = qs('#groupList');
-        if (list) {
-          list.innerHTML = '<p class="hint error">Fehler beim Laden der Gruppen. Bitte versuche es später erneut.</p>';
-        }
-      }
-    }
+qa('#tabs .pill').forEach(p=>p.addEventListener('click', ()=>{
+  qa('#tabs .pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active');
+  qa('section.card').forEach(s=>s.classList.remove('active'));
+  qs('#sec-' + p.dataset.tab).classList.add('active');
+}));
 
-    // Event-Handler
-    qs('#backBtn')?.addEventListener('click', showStartPage);
-
-    // Initialisierung anpassen
-    document.addEventListener('DOMContentLoaded', () => {
-      // Immer erst Gruppen laden
-      loadGroups();
-      
-      // Wenn CID in URL, direkt diese Gruppe laden
-      if (cid) {
-        showContentArea(cid);
-        loadState();
-      }
-    });
-    
-    // UI-Bereiche umschalten
-    function showContentArea(groupId) {
-      qs('#startPage').style.display = 'none';
-      const contentArea = qs('#contentArea');
-      contentArea.style.display = 'block';
-      setTimeout(() => contentArea.classList.add('visible'), 50);
-      
-      qs('#backBtn').style.display = 'inline-block';
-      
-      if (groupId) {
-        const select = qs('#groupSelect');
-        if (select) select.value = groupId;
-      }
-    }
-
-    function showStartPage() {
-      const contentArea = qs('#contentArea');
-      contentArea.classList.remove('visible');
-      setTimeout(() => {
-        contentArea.style.display = 'none';
-        qs('#startPage').style.display = 'block';
-      }, 300);
-      
-      qs('#backBtn').style.display = 'none';
-      qs('#saveBtn').disabled = true;
-    }
-
-    // Theme
-    const themeKey = "emerald-theme";
-    const currentTheme = localStorage.getItem(themeKey) || "dark";
-    document.documentElement.setAttribute("data-theme", currentTheme);
-    qs("#themeBtn").onclick=()=>{
-      const cur = document.documentElement.getAttribute("data-theme")||"dark";
-      const next = cur==="dark"?"light":"dark";
-      document.documentElement.setAttribute("data-theme", next);
-      localStorage.setItem(themeKey, next);
-    };
-
-    // Tabs
-    qa('#tabs .pill').forEach(p=>p.addEventListener('click',()=>{
-      qa('#tabs .pill').forEach(x=>x.classList.remove('active'));
-      p.classList.add('active');
-      qa('section.card').forEach(s=>s.classList.remove('active'));
-      qs('#sec-'+p.dataset.tab).classList.add('active');
-      if (p.dataset.tab === 'stats') { loadStats(); }
-    }));
-
-
-    // Buttons
-    qs('#closeBtn').onclick = ()=>{ try{ tg.close(); }catch{ window.close(); } };
-    qs('#resetBtn').onclick = ()=> loadState();
-    qs('#saveBtn').onclick  = ()=> sendPayload();
-
-    // Live-Validierung
-    function validTime(val){
-      const s = (val||'').trim();
-      if (s==='') return true;                 // <- leer erlaubt
-      const m=/^([01]?\d|2[0-3]):([0-5]\d)$/.exec(s);
-      return !!m;
-    }
-    function validInt(val){
-      const s=(val??"").toString().trim();
-      return s==="" || /^-?\d+$/.test(s);
-    }
-    function validUrl(val){
-      try{ const u=new URL(val); return !!u.protocol && !!u.host; }catch{ return false; }
-    }
-    function showErr(id,msg){ const el=qs('#'+id); if(!el) return; if(msg){ el.textContent=msg; el.hidden=false; } else { el.hidden=true; el.textContent=''; } }
-    function mark(el, bad){ if(!el) return; el.classList.toggle('input-error', !!bad); }
-
-    function validateAll(){
-      let ok=true;
-
-      // Times (leer erlaubt)
-      const ns=qa('[data-key="night.start"]')[0];
-      const ne=qa('[data-key="night.end"]')[0];
-      if(ns){ const bad=!validTime(ns.value); mark(ns,bad); showErr('err_nstart', bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
-      if(ne){ const bad=!validTime(ne.value); mark(ne,bad); showErr('err_nend',   bad?'Ungültige Zeit (HH:MM)':'' ); ok=ok && !bad; }
-
-      // Int-Felder
-      [['spam.policy_topic','err_spamtopic'],
-      ['report.topic','err_reporttopic'],
-      ['mood.topic','err_moodtopic']].forEach(([k,err])=>{
-        const el=qa(`[data-key="${k}"]`)[0]; if(!el) return;
-        const bad=!validInt(el.value); mark(el,bad); showErr(err, bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad;
-      });
-      const rtopic=qs('#rss_topic'); if(rtopic){ const bad=!validInt(rtopic.value); mark(rtopic,bad); showErr('err_rsstopic', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
-      const rtarget=qs('#router_target'); if(rtarget){ const bad=!validInt(rtarget.value); mark(rtarget,bad); showErr('err_rtarget', bad?'Nur ganze Zahl erlaubt':'' ); ok=ok && !bad; }
-
-      // URL
-      const rurl=qs('#rss_url');
-      if(rurl && rurl.value.trim()){
-        const bad=!validUrl(rurl.value.trim()); mark(rurl,bad); showErr('err_rssurl', bad?'Ungültige URL':'' ); ok=ok && !bad;
-      } else { showErr('err_rssurl',''); mark(rurl,false); }
-
-      qs('#saveBtn').disabled = !ok;
-      return ok;
-    }
-
-    // WICHTIG: Event-Listener einmalig – inkl. file-Inputs
-    qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
-
-
-    // --- Image Upload Handling (Welcome/Rules/Farewell) ---
-    const IMG_PREV  = {
-      welcome:  qs('#welcome_img_prev'),
-      rules:    qs('#rules_img_prev'),
-      farewell: qs('#farewell_img_prev')
-    };
-    const IMG_INPUT = {
-      welcome:  qs('#welcome_img'),
-      rules:    qs('#rules_img'),
-      farewell: qs('#farewell_img')
-    };
-    const IMG_CLEAR_BTN = {
-      welcome:  qs('#welcome_img_clear'),
-      rules:    qs('#rules_img_clear'),
-      farewell: qs('#farewell_img_clear')
-    };
-    const IMG_UPLOADS = { welcome:null, rules:null, farewell:null };   // base64 für POST
-    const PREV_IMAGES = { welcome:null, rules:null, farewell:null };   // vorhandene URLs aus DB
-    const CLEAR_FLAGS = { welcome:false, rules:false, farewell:false }; // explizit löschen
-
-    function readAsDataURL(file){
-      return new Promise((resolve,reject)=>{
-        const r=new FileReader();
-        r.onload = ()=>resolve(r.result);
-        r.onerror= reject;
-        r.readAsDataURL(file);
-      });
-    }
-
-    // NEU: Bild vor Upload komprimieren (verhindert zu große JSON-Bodies → "Failed to fetch")
-    async function compressImage(file, maxSide=1280, quality=0.82){
-      const data = await readAsDataURL(file);
-      const img = new Image(); img.src = data; await new Promise(r=>{ img.onload=r; img.onerror=r; });
-      const w = img.naturalWidth, h = img.naturalHeight;
-      const scale = Math.min(1, maxSide / Math.max(w, h));
-      const cw = Math.max(1, Math.round(w*scale));
-      const ch = Math.max(1, Math.round(h*scale));
-      const canvas = document.createElement('canvas'); canvas.width=cw; canvas.height=ch;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, cw, ch);
-      return canvas.toDataURL('image/jpeg', quality);
-    }
-
-
-    function authUrl(u){
-      if(!u || !u.includes('/miniapp/file')) return u;
-      const glue = u.includes('?') ? '&' : '?';
-      if (INIT_DATA) return `${u}${glue}init_data=${encodeURIComponent(INIT_DATA)}`;
-      return `${u}${glue}uid=${encodeURIComponent(uid)}`;
-    }
-    function setPreview(keyOrEl, url){
-      const imgEl = (typeof keyOrEl === 'string') ? IMG_PREV[keyOrEl] : keyOrEl;
-      if (!imgEl) return;
-      
-      // Bild entfernen wenn keine URL
-      if (!url) {
-        imgEl.removeAttribute('src');
-        imgEl.dataset.hasImage = '0';
-        imgEl.style.display = 'none';
-        return;
-      }
-      
-      // URL mit Auth-Token versehen wenn nötig
-      const authUrlStr = authUrl(url);
-      
-      // Fehlerbehandlung für Bilder
-      imgEl.onerror = () => {
-        console.warn('Bild konnte nicht geladen werden:', url);
-        imgEl.style.display = 'none';
-        imgEl.dataset.hasImage = '0';
-      };
-      
-      // Bild anzeigen und setzen
-      imgEl.style.display = 'block';
-      imgEl.src = authUrlStr;
-      imgEl.dataset.hasImage = '1';
-      
-      // Beim Klick Bild in neuem Tab öffnen
-      imgEl.style.cursor = 'pointer';
-      imgEl.onclick = () => window.open(authUrlStr, '_blank');
-    }
-
-    // Upload-Change-Handler (bleibt wie gehabt – nutzt IMG_INPUT/IMG_CLEAR_BTN/CLEAR_FLAGS)
-    Object.entries(IMG_INPUT).forEach(([key, input])=>{
-      if (!input) return;
-      input.addEventListener('change', async (ev)=>{
-        const f = ev.target.files?.[0];
-        if(!f){ IMG_UPLOADS[key]=null; setPreview(key, PREV_IMAGES[key]); return; }
-        const b64 = await compressImage(f, 1280, 0.82);
-        IMG_UPLOADS[key] = b64;
-        setPreview(key, b64);
-        CLEAR_FLAGS[key] = false;
-        validateAll();
-      });
-    });
-    Object.entries(IMG_CLEAR_BTN).forEach(([key, btn])=>{
-      if (!btn) return;
-      btn.addEventListener('click', ()=>{
-        IMG_UPLOADS[key]=null;
-        CLEAR_FLAGS[key]=true;
-        setPreview(key, null);
-        validateAll();
-      });
-    });
-
-    // --- Report: helper + Vorschau ---
-    function getReportDest(){ return qs('#report_dest_topic')?.checked ? 'topic' : 'dm'; }
-    function renderReportStats(stats){
-      const box=qs('#reportStats'); if(!box) return; box.innerHTML='';
-      if(!stats || (Array.isArray(stats)&&stats.length===0)){ box.innerHTML='<div class="hint">Keine Daten vorhanden.</div>'; return; }
-      if(Array.isArray(stats)){
-        stats.forEach(s=>{
-          const item=document.createElement('div'); item.className='item';
-          const left=document.createElement('div'); left.className='left';
-          left.innerHTML=`<div class="title">${s.name??s.metric??'Wert'}</div><div class="hint">${s.value??s.count??''}</div>`;
-          item.append(left); box.append(item);
-        });
-      } else if(typeof stats==='object'){
-        Object.entries(stats).forEach(([k,v])=>{
-          const item=document.createElement('div'); item.className='item';
-          const left=document.createElement('div'); left.className='left';
-          left.innerHTML=`<div class="title">${k}</div><div class="hint">${v}</div>`;
-          item.append(left); box.append(item);
-        });
-      }
-    }
-    qs('#report_send_now')?.addEventListener('click', ()=>{
-      const topic = parseInt((qa('[data-key="report.topic"]')[0]?.value||'0'));
-      sendPayload({ report_send_now: { dest:getReportDest(), topic:isNaN(topic)?0:topic } });
-    });
-    qs('#mood_send_now')?.addEventListener('click', ()=>{ sendPayload({ mood_send_now: true }); });
-
-    // RSS Ops
-    qs('#rss_add').onclick=()=>{
-      if(!validateAll()) return;
-      const url = qs('#rss_url').value.trim();
-      if(!url) return;
-      const topic = parseInt(qs('#rss_topic').value.trim()||'0');
-      sendPayload({ rss: { url, topic, post_images: qs('#rss_postimg').checked, enabled: qs('#rss_enabled').checked } });
-    };
-
-    // FAQ Ops
-    qs('#faq_add').onclick=()=>{
-      const q = qs('#faq_q').value.trim();
-      const a = qs('#faq_a').value.trim();
-      if(!q) return;
-      sendPayload({ faq_add: { q, a } });
-    };
-
-    // Router Ops
-    qs('#router_add').onclick=()=>{
-      if(!validateAll()) return;
-      const target = parseInt(qs('#router_target').value.trim()||'0');
-      if(!target) return;
-      const kw = qs('#router_keywords').value.split(',').map(s=>s.trim()).filter(Boolean);
-      const dom = qs('#router_domains').value.split(',').map(s=>s.trim()).filter(Boolean);
-      sendPayload({ router_add: { target_topic_id: target, keywords: kw, domains: dom, delete_original: qs('#router_delete').checked, warn_user: qs('#router_warn').checked } });
-    };
-
-    // Pro
-    qs('#pro_buy').onclick=()=>{
-      if(!validateAll()) return;
-      const months = parseInt(qs('#pro_months').value||'0');
-      if(months>0) sendPayload({ pro_months: months });
-    };
-
-    // Collect nested
-    function setVal(path, val){
-      const el = qa(`[data-key="${path}"]`)[0];
-      if(!el) return;
-      if(el.type==='checkbox') el.checked = !!val; else el.value = (val ?? '')
-    }
-    function collect(){
-      const out = {};
-      qa('[data-key]').forEach(el=>{
-        const path = el.getAttribute('data-key');
-        const parts = path.split('.');
-        let cur = out;
-        for(let i=0;i<parts.length-1;i++){ if(!(parts[i] in cur)) cur[parts[i]]={}; cur=cur[parts[i]]; }
-        const leaf = parts[parts.length-1];
-        let val = (el.type==='checkbox') ? !!el.checked : el.value;
-        if(el.type==='number') val = el.value===''? '' : (Number(el.value));
-        cur[leaf]=val;
-      });
-      return out;
-    }
-
-    // Render helper
-    function renderRss(feeds){
-      const box = qs('#rssList'); box.innerHTML='';
-      (feeds||[]).forEach(f=>{
-        const item = document.createElement('div'); item.className='item';
-        const left = document.createElement('div'); left.className='left';
-        left.innerHTML = `<div class="title">${f.url}</div><div class="hint">Topic: ${f.topic ?? 0}</div>`;
-        const right = document.createElement('div');
-        right.innerHTML = `
-          <label class="switch"><input type="checkbox" ${f.enabled? 'checked':''} data-url="${f.url}" class="rss-toggle"> Aktiv</label>
-          <label class="switch"><input type="checkbox" ${f.post_images? 'checked':''} data-url="${f.url}" class="rss-img"> Bilder</label>
-          <button class="btn small danger rss-del" data-url="${f.url}">Löschen</button>`;
-        item.append(left,right); box.append(item);
-      });
-      qa('.rss-del', box).forEach(b=>b.onclick=()=>sendPayload({ rss_del: b.dataset.url }));
-      qa('.rss-toggle', box).forEach(ch=>ch.onchange=()=>sendPayload({ rss_update: { url: ch.dataset.url, enabled: ch.checked } }));
-      qa('.rss-img', box).forEach(ch=>ch.onchange=()=>sendPayload({ rss_update: { url: ch.dataset.url, post_images: ch.checked } }));
-    }
-    function renderFaq(list){
-      const box = qs('#faqList'); box.innerHTML='';
-      (list||[]).forEach(f=>{
-        const item = document.createElement('div'); item.className='item';
-        const left = document.createElement('div'); left.className='left';
-        left.innerHTML = `<div class="title">${f.q}</div><div class="hint">${f.a||''}</div>`;
-        const del = document.createElement('button'); del.className='btn small danger'; del.textContent='Löschen';
-        del.onclick=()=>sendPayload({ faq_del: { q: f.q } });
-        item.append(left, del); box.append(item);
-      });
-    }
-    function renderRouter(list){
-      const box = qs('#routerList'); box.innerHTML='';
-      (list||[]).forEach(r=>{
-        const item = document.createElement('div'); item.className='item';
-        const left = document.createElement('div'); left.className='left';
-        left.innerHTML = `<div class="title">Rule #${r.rule_id} → Topic ${r.target_topic_id}</div><div class="hint">${(r.keywords||[]).join(', ')} ${(r.domains||[]).join(', ')}</div>`;
-        const right = document.createElement('div'); right.className='right';
-        right.innerHTML = `<span class="hint">${r.enabled? 'aktiv':'inaktiv'}</span>`;
-        item.append(left,right); box.append(item);
-      });
-    }
-
-    // Load state
-    async function loadState(){
-      qs('#out').textContent='Lade …';
-      try{
-        const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
-          method: "GET",
-          mode: "cors",
-          credentials: "omit",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Telegram-Init-Data": INIT_DATA      // <<< wichtig
-          }
-        });
-        if (!res.ok) {
-          const t = await res.text();
-          throw new Error(`HTTP ${res.status}: ${t}`);
-        }
-        const j = await res.json();
-        // Welcome/Rules/Farewell
-        setVal('welcome.on', j.welcome?.on);
-        setVal('welcome.text', j.welcome?.text);
-        setPreview('welcome',  j.welcome?.image_url || j.welcome?.image);
-        PREV_IMAGES.welcome = j.welcome?.image_url || j.welcome?.image || null;
-        setVal('rules.on', j.rules?.on); setVal('rules.text', j.rules?.text);
-        setPreview('rules',    j.rules?.image_url   || j.rules?.image);
-        PREV_IMAGES.rules   = j.rules?.image_url   || j.rules?.image   || null;
-        setVal('farewell.on', j.farewell?.on); setVal('farewell.text', j.farewell?.text);
-        setPreview('farewell', j.farewell?.image_url|| j.farewell?.image);
-        PREV_IMAGES.farewell= j.farewell?.image_url|| j.farewell?.image|| null;
-        // Spam
-        setVal('spam.on', j.spam?.on ?? j.links?.only_admin_links ?? false);
-        setVal('spam.block_links', j.spam?.block_links ?? j.links?.only_admin_links ?? false);
-        setVal('spam.block_media', j.spam?.block_media ?? false);
-        setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false);
-        setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
-        if(Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value=(j.spam.whitelist||[]).join('\n');
-        if(Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value=(j.spam.blacklist||[]).join('\n');
-        setVal('spam.action', j.spam?.action ?? '');
-        setVal('spam.per_user_daily_limit', j.spam?.per_user_daily_limit ?? 0);
-        setVal('spam.quota_notify', j.spam?.quota_notify ?? '');
-        // RSS
-        renderRss(j.rss?.feeds||[]);
-        // AI
-        setVal('ai.on', j.ai?.on ?? (j.ai?.faq || j.ai?.rss));
-        setVal('ai.faq', j.ai?.faq ?? '');
-        // AIMOD
-        const am = j.aimod||{};
-        setVal('ai_mod.enabled', am.enabled);
-        setVal('ai_mod.shadow_mode', am.shadow_mode);
-        setVal('ai_mod.action_primary', am.action_primary);
-        setVal('ai_mod.mute_minutes', am.mute_minutes);
-        setVal('ai_mod.warn_text', am.warn_text);
-        setVal('ai_mod.appeal_url', am.appeal_url);
-        setVal('ai_mod.max_per_min', am.max_calls_per_min);
-        setVal('ai_mod.cooldown_s', am.cooldown_s);
-        setVal('ai_mod.exempt_admins', am.exempt_admins);
-        setVal('ai_mod.exempt_topic_owner', am.exempt_topic_owner);
-        setVal('ai_mod.toxicity', am.toxicity ?? am.tox_thresh);
-        setVal('ai_mod.hate', am.hate ?? am.hate_thresh);
-        setVal('ai_mod.sexual', am.sexual ?? am.sex_thresh);
-        setVal('ai_mod.harassment', am.harassment ?? am.harass_thresh);
-        setVal('ai_mod.selfharm', am.selfharm ?? am.selfharm_thresh);
-        setVal('ai_mod.violence', am.violence ?? am.violence_thresh);
-        // FAQ & Router
-        renderFaq(j.faqs||[]);
-        renderRouter(j.router_rules||[]);
-        // Report
-        const rep = j.report || {};
-        setVal('report.enabled', rep.enabled ?? (!!j.daily_stats));
-        if(qs('#report_dest_dm'))    qs('#report_dest_dm').checked    = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'dm';
-        if(qs('#report_dest_topic')) qs('#report_dest_topic').checked = (rep.dest ?? (j.daily_stats? 'dm':'dm')) === 'topic';
-        setVal('report.topic', rep.topic ?? 0);
-        renderReportStats(rep.stats || j.stats || []);
-        
-        // Belohnung (falls später aus DB geliefert wird, jetzt Null-safe)
-        setVal('reward_rate', j.reward?.rate ?? '');
-        setVal('reward_mode', j.reward?.mode ?? 'claim');
-
-        // Mood
-        setVal('mood.question', j.mood?.question);
-        setVal('mood.topic', j.mood?.topic);
-        // Night
-        const n=j.night||{}; setVal('night.on', n.enabled); setVal('night.start', n.start||'22:00'); setVal('night.end', n.end||'07:00');
-        setVal('night.delete_non_admin_msgs', n.delete_non_admin_msgs);
-        setVal('night.warn_once', n.warn_once);
-        setVal('night.timezone', n.timezone||'Europe/Berlin');
-        setVal('night.hard_mode', n.hard_mode);
-        // More
-        setVal('language', j.language||'');
-        qs('#out').textContent='Bereit.';
-        STATE_READY = true;
-        if (j.clean_deleted){
-          qs('#clean_enabled').checked = !!j.clean_deleted.enabled;
-          qs('#clean_time').value = (j.clean_deleted.time || "03:00");
-          const wd = (j.clean_deleted.weekday == null ? "" : String(j.clean_deleted.weekday));
-          qs('#clean_weekday').value = wd;
-          qs('#clean_demote').checked = !!j.clean_deleted.demote;
-          qs('#clean_notify').checked = !!j.clean_deleted.notify;
-        }
-
-        // lade aggregierte Statistik separat (auslagerung)
-        await loadStats();
-      }catch(e){ 
-          console.error(e); 
-          qs('#out').textContent='Fehler beim Laden.';
-          STATE_READY = false;
-       }
-      validateAll();
-    }
-
-    // Statistik laden (wird separat aufgerufen)
-    async function loadStats(){
-      try{
-        const days = parseInt(qs('#stats_days')?.value||'14');
-        const res = await fetch(`${API_BASE}/miniapp/stats?cid=${cid}&days=${days}`, {
-          headers:{'X-Telegram-Init-Data':INIT_DATA}
-        });
-        if(!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-        // NEU: KPIs inkl. EMRLD-Gesamt
-    const k = data.summary || {};
-    const RATE =  parseFloat(new URLSearchParams(location.search).get('emrld_rate')) 
-               || parseFloat(window.EMRLD_RATE || '0.1') 
-               || 0.1; // Fallback-Rate, falls Backend noch nichts liefert
-    const totalMsgs = k.messages_total ?? 0;
-    const kpiBox = qs('#statsKPIs');
-    if (kpiBox){
-      kpiBox.innerHTML = '<div class="title">Übersicht ('+(data.used_days||days)+' Tage)</div>';
-      const items = [
-        ['Nachrichten', totalMsgs],
-        ['Aktive Nutzer', k.active_users ?? 0],
-        ['Joins', k.joins ?? 0],
-        ['Leaves', k.leaves ?? 0],
-        ['Kicks', k.kicks ?? 0],
-        ['Spam-Aktionen', k.spam_actions ?? 0],
-        ['Auto-Antworten', k.autoresp_hits ?? 0],
-        ['Hilfreich-Votes', k.autoresp_helpful ?? 0],
-        ['Reply p50', k.reply_median_ms!=null ? (Math.round(k.reply_median_ms/1000)+'s') : '–'],
-        ['Reply p90', k.reply_p90_ms!=null ? (Math.round(k.reply_p90_ms/1000)+'s') : '–'],
-      ];
-      items.forEach(([name,val])=>{
-        const it=document.createElement('div'); it.className='item';
-        it.innerHTML = `<div class="left"><div class="title">${name}</div><div class="hint">${val}</div></div>`;
-        kpiBox.append(it);
-      });
-    }
-        // Agg
-        const aggBox = qs('#statsAgg'); aggBox.innerHTML = '<div class="title">Tageswerte</div>';
-        (data.agg||[]).forEach(r=>{
-          const it = document.createElement('div'); it.className='item';
-          it.innerHTML = `<div class="left"><div class="title">${r.date}</div>
-            <div class="hint">Msgs: ${r.messages} · Aktiv: ${r.active} · Joins: ${r.joins} · Spam: ${r.spam_actions} · p90: ${r.reply_p90_ms??'–'}ms</div></div>`;
-          aggBox.append(it);
-        });
-        // Top
-        const topBox = qs('#statsTop'); topBox.innerHTML = '<div class="title">Top-Responder</div>';
-         (data.top_responders||[]).forEach(t=>{
-          const it = document.createElement('div'); it.className='item';
-          const s = Math.round((t.avg_ms||0)/1000);
-          const sTxt = s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;
-          const emrld = (typeof t.emrld === 'number')
-            ? t.emrld
-            : Math.round((t.answers||0) * RATE * 10000)/10000;
-          it.innerHTML = `<div class="left">
-              <div class="title">User ${t.user_id}</div>
-              <div class="hint">
-                ${t.answers} Antworten · Ø ${sTxt} · 💎 ${emrld} EMRLD
-              </div>
-            </div>`;
-          topBox.append(it);
-        });
-      }catch(e){
-        console.error(e);
-        qs('#statsAgg').innerHTML='<div class="hint">Fehler beim Laden</div>';
-      }
-    }
-
-    qs('#stats_reload')?.addEventListener('click', loadStats);
-    qs('#stats_days')?.addEventListener('change', loadStats);
-        
-    // kleines Helferlein
-    function ok(msg){ const out=qs('#out'); out.textContent=msg||'✅ Gespeichert'; out.style.opacity=1; setTimeout(()=>out.style.opacity=0, 2200); }
-    function err(msg){ const out=qs('#out'); out.textContent=msg||'⚠️ Fehler beim Speichern'; out.style.opacity=1; }
-
-    // NEU: (später aktiv) Claim-Handler – aktuell nur Hinweis
-    qs('#emrldClaimBtn')?.addEventListener('click', ()=>{
-    const txt = qs('#statsKPIs')?.textContent || '';
-    const m = txt.match(/([\d.,]+)\s*EMRLD/);
-    const val = m ? m[1] : '0';
-    alert(`Wallet-Connect (NEAR) folgt.\nDu könntest jetzt ~ ${val} EMRLD claimen.`);
-    });
-
-    // EINHEITLICHES Speichern mit Bild-Upload + Feedback
-    async function sendPayload(extra = {}) {
-      if (!STATE_READY) { err('⚠️ Erst Daten laden (Reload), dann speichern.'); return; }
-      const tg = window.Telegram?.WebApp; tg?.ready?.();
-      const out = Object.assign({}, collect(), extra);
-
-      // Bilder in den Payload legen (nur wenn gewählt / Clear-Flag gesetzt)
-      out.images = out.images || {};
-      ['welcome','rules','farewell'].forEach(k=>{
-        if (CLEAR_FLAGS[k]===true) {
-          // explizit löschen
-          out[k] = out[k] || {};
-          out[k].img_base64 = "";
-        } else if (IMG_UPLOADS[k]) {
-          out[k] = out[k] || {};
-          out[k].img_base64 = IMG_UPLOADS[k];
-        }
-      });
-
-      // UI: disable active button
-      const btn = document.activeElement;
-      if (btn && btn.tagName==='BUTTON') { btn.disabled = true; btn.dataset._old = btn.textContent; btn.textContent='Speichere…'; }
-      qs('#out').textContent='Speichere …';
-
-      try{
-        // 1) Telegram sendData (optional)
-        if (tg && tg.sendData) {
-          try { tg.sendData(JSON.stringify(out)); } catch(e){ /* no-op */ }
-        }
-
-        // 2) Always POST to server
-        const bulk = await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Telegram-Init-Data": INIT_DATA
-          },
-          body: JSON.stringify(out)
-        });
-
-        if(!bulk.ok){
-          const text = await bulk.text();
-          throw new Error(`HTTP ${bulk.status}: ${text}`);
-        }
-
-        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch {}
-        ok('✅ Gespeichert');
-        await loadState();  // neu laden, damit Listen/Previews aktuell sind
-      }catch(e){
-        console.warn('[apply] bulk failed, fallback in Teile', e);
-        // Fallback: erst ohne Bilder, dann Bilder einzeln
-        const {welcome, rules, farewell, ...rest} = out;
-        await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
-          method:"POST", headers:{"Content-Type":"application/json","X-Telegram-Init-Data":INIT_DATA},
-          body: JSON.stringify(rest)
-        });
-        for (const [k, block] of Object.entries({welcome, rules, farewell})) {
-          if (!block) continue;
-          const hasImg = Object.prototype.hasOwnProperty.call(block,'img_base64');
-          if (!hasImg) continue;
-          await fetch(`${API_BASE}/miniapp/apply?cid=${encodeURIComponent(cid)}`, {
-            method:"POST", headers:{"Content-Type":"application/json","X-Telegram-Init-Data":INIT_DATA},
-            body: JSON.stringify({ [k]: block })
-          });
-        }
-        try { window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success'); } catch {}
-        ok('✅ Gespeichert');
-        await loadState();
-      }finally{
-        const b = document.querySelector('button[disabled][data-_old]');
-        if (b){ b.disabled=false; b.textContent=b.dataset._old; delete b.dataset._old; }
-      }
-    }
-
-    // Init
-    loadState();
-  </script>
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await loadGroups();
+  if(cid) { showContentArea(cid); await loadState(); }
+  else { showStartPage(); }
+});
+</script>
 </body>
 </html>
