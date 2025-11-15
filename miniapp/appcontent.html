@@ -379,13 +379,6 @@
     <h3>⚙️ Sonstiges</h3>
     <div class="sep"></div>
     <div>
-      <h4 style="margin:12px 0 8px; color:var(--brand)">Werbung / Ads</h4>
-      <div id="adsContainer" class="list">
-        <p class="hint">🎯 Werbeplatzhalter von @emeraldcontentbot wird hier eingeblendet...</p>
-      </div>
-    </div>
-    <div class="sep"></div>
-    <div>
       <h4 style="margin:12px 0 8px; color:var(--brand)">Gelöschte Accounts aufräumen</h4>
       <div class="grid">
         <label class="switch">
@@ -427,6 +420,7 @@
     <div id="out" class="hint">Bereit.</div>
   </div>
   <div class="right">
+    <span style="font-size:11px;color:var(--muted);margin-right:8px">Werbung</span>
     <button class="btn ghost" id="themeBtn" title="Hell/Dunkel">🌓</button>
     <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
     <button class="btn ghost" id="closeBtn">Schließen</button>
@@ -610,10 +604,25 @@ async function loadState() {
     
     setVal('welcome.on', j.welcome?.on);
     setVal('welcome.text', j.welcome?.text);
+    // Load welcome image if available
+    if(j.welcome?.image_url) {
+      const img = qs('#welcome_img_prev');
+      if(img) { img.src = j.welcome.image_url; img.style.display = 'block'; }
+    }
     setVal('rules.on', j.rules?.on);
     setVal('rules.text', j.rules?.text);
+    // Load rules image if available
+    if(j.rules?.image_url) {
+      const img = qs('#rules_img_prev');
+      if(img) { img.src = j.rules.image_url; img.style.display = 'block'; }
+    }
     setVal('farewell.on', j.farewell?.on);
     setVal('farewell.text', j.farewell?.text);
+    // Load farewell image if available
+    if(j.farewell?.image_url) {
+      const img = qs('#farewell_img_prev');
+      if(img) { img.src = j.farewell.image_url; img.style.display = 'block'; }
+    }
     setVal('spam.on', j.spam?.on ?? false);
     setVal('spam.block_links', j.spam?.block_links ?? false);
     setVal('spam.block_media', j.spam?.block_media ?? false);
@@ -684,11 +693,12 @@ async function sendPayload(extra = {}) {
   
   const out = Object.assign({}, collect(), extra);
   
-  // Add image data if present
+  // Add image data if present - format: welcome: { img_base64: ... }
   ['welcome', 'rules', 'farewell'].forEach(type => {
     const fileInput = qs(`#${type}_img`);
     if(fileInput?.dataset.base64) {
-      out[`${type}_image_base64`] = fileInput.dataset.base64;
+      if(!out[type]) out[type] = {};
+      out[type].img_base64 = fileInput.dataset.base64;
     }
   });
   
@@ -825,20 +835,31 @@ qs('#stats_reload')?.addEventListener('click', async ()=>{
     const box = qs('#statsBox');
     if(box) {
       let html = '';
+      // Aggregate data by date for summary
+      const agg = data.agg || [];
+      let totalMsg = 0, totalActive = 0, totalJoins = 0, totalLeaves = 0, totalKicks = 0;
+      (agg || []).forEach(d => {
+        totalMsg += d.messages || 0;
+        totalActive += d.active || 0;
+        totalJoins += d.joins || 0;
+        totalLeaves += d.leaves || 0;
+        totalKicks += d.kicks || 0;
+      });
+      
       // Summary section
-      const summary = data.summary || {};
       html += `<div class="item" style="background:var(--panel)">
         <div class="left">
           <div class="title">📊 Zusammenfassung (${days} Tage)</div>
           <div class="hint">
-            💬 ${summary.total_messages || 0} Nachrichten |
-            👥 ${summary.active_users || 0} aktive Nutzer |
-            ➕ ${summary.joins || 0} Joins |
-            ➖ ${summary.leaves || 0} Leaves |
-            🚫 ${summary.kicks || 0} Kicks
+            💬 ${totalMsg} Nachrichten |
+            👥 ${totalActive} aktive Nutzer |
+            ➕ ${totalJoins} Joins |
+            ➖ ${totalLeaves} Leaves |
+            🚫 ${totalKicks} Kicks
           </div>
         </div>
       </div>`;
+      
       // Top responders
       if(data.top_responders && data.top_responders.length > 0) {
         html += '<div style="margin-top:12px"><strong>🏆 Top Responder:</strong></div>';
@@ -860,7 +881,7 @@ qs('#clean_now')?.addEventListener('click', async ()=>{
   if(!confirm('Gelöschte Accounts jetzt aufräumen?')) return;
   const demote = qs('[data-key="clean_deleted.demote"]')?.checked || false;
   const notify = qs('[data-key="clean_deleted.notify"]')?.checked !== false;
-  sendPayload({clean_deleted_now: {demote, notify}});
+  sendPayload({clean_delete_now: {demote, notify}});
 });
 
 qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
