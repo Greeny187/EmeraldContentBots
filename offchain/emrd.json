@@ -1,11 +1,12 @@
 {
   "name": "Emerald Token",
   "symbol": "EMRD",
-  "decimals": 9,
   "description": "Utility-Token des Emerald Ökosystems (MiniApps, Rewards, Access).",
+  "decimals": 9,
   "image": "https://emeraldecosystem.com/assets/emrd.png",
   "social": {
-    "telegram": "https://t.me/emeraldcontent",
-    "site": "https://greeny187.github.io/EmeraldContentBots/"
+    "website": "https://greeny187.github.io/EmeraldContentBots/",
+    "telegram": "https://t.me/emeraldegosystem"
   }
 }
+
