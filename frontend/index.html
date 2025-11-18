@@ -584,6 +584,13 @@
   <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; backdrop-filter:blur(5px);" onclick="if(event.target===this) app.closeModal()"></div>
   <div id="modalContent" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(51,65,85,0.95); border:1px solid rgba(148,163,184,0.2); border-radius:12px; padding:30px; max-width:500px; max-height:80vh; overflow-y:auto; z-index:1001;"></div>
 
+  <script>
+    // Globale Konfiguration (kann vom Server injiziert werden)
+    window.CONFIG = window.CONFIG || {
+      // WICHTIG: Setzen Sie hier Ihre Backend-URL oder über URL-Parameter ?api_base=...
+      API_BASE_URL: 'https://emeraldcontent-aac379fc581e.herokuapp.com/devdash'
+    };
+  </script>
   <script src="https://telegram.org/js/telegram-widget.js?22"></script>
   <script src="devdash.js"></script>
 </body>

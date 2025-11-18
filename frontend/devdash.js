@@ -3,14 +3,32 @@
 // ============================================================================
 
 // Dynamische Backend-URL basierend auf Environment
+// WICHTIG: Für Production MUSS API_BASE_URL als window.CONFIG.API_BASE_URL oder
+// als URL-Parameter ?api_base=... definiert sein!
 const API_BASE = (() => {
-  // Im Development: Backend auf Port 8080 (wenn Frontend auf 8000)
+  // 1. Prüfe window.CONFIG (kann vom Server injiziert werden)
+  if (window.CONFIG && window.CONFIG.API_BASE_URL) {
+    console.log('📡 Using API_BASE from window.CONFIG');
+    return window.CONFIG.API_BASE_URL;
+  }
+  
+  // 2. Prüfe URL-Parameter ?api_base=...
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('api_base')) {
+    const apiBase = params.get('api_base');
+    console.log('📡 Using API_BASE from URL parameter');
+    return apiBase;
+  }
+  
+  // 3. Development: localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     const port = window.location.port === '8000' ? 8080 : window.location.port;
     return `http://localhost:${port}/devdash`;
   }
-  // In Production: gleiche Domain
-  return window.location.origin + '/devdash';
+  
+  // 4. Fallback (sollte nicht verwendet werden für Production!)
+  console.error('⚠️  API_BASE nicht konfiguriert! Verwende localStorage fallback...');
+  return localStorage.getItem('api_base_url') || 'https://greeny187.github.io/devdash';
 })();
 
 const BOT_USERNAME = 'EmeraldContentBot';
