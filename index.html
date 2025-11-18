@@ -69,59 +69,63 @@
       </div>
     </section>
 
-    <!-- ÖKOSYSTEM -->
+    <!-- ===================== ÖKOSYSTEM (DROP-IN) ===================== -->
     <section class="content ecosystem" id="ecosystem">
       <h3>Emerald Ökosystem</h3>
-      <p class="muted">Alle Bots spielen zusammen – Content, Moderation, Lernen, Support und Trading. TON & EMRD binden Zahlungen und Status sauber ein.</p>
+      <p class="muted">Alle Bots greifen ineinander – Content, Moderation, Lernen, Support & Trading. TON & EMRD binden Zahlungen und Status ein.</p>
 
-      <!-- Responsive, theme-aware Inline-SVG -->
       <div class="ecosystem-viewport">
-        <svg class="ecosystem-svg" viewBox="0 0 980 420" role="img" aria-label="Emerald Ökosystem Diagramm">
-          <!-- Verbindungen -->
+        <!-- Große, gut lesbare Grafik (DAO & Affiliate integriert) -->
+        <svg class="ecosystem-svg" viewBox="0 0 1200 560" role="img" aria-label="Emerald Ökosystem Diagramm" preserveAspectRatio="xMidYMid meet">
+          <!-- Linien -->
           <g stroke="var(--border)" stroke-width="2" fill="none">
-            <path d="M490,120 L490,190" />
-            <path d="M490,120 L245,190" />
-            <path d="M490,120 L735,190" />
-            <path d="M245,230 L245,310" />
-            <path d="M735,230 L735,310" />
-            <path d="M490,230 L490,310" />
-            <path d="M490,350 L820,350" />
+            <!-- von Zentrum zu Ebene 2 -->
+            <path d="M600,120 L600,190" />
+            <path d="M600,120 L280,190" />
+            <path d="M600,120 L920,190" />
+            <!-- Ebene 2 zu Ebene 3 (zugeordnet) -->
+            <path d="M280,255 L250,340" />
+            <path d="M600,255 L600,340" />
+            <path d="M920,255 L940,340" />
+            <path d="M920,255 L1080,340" />
           </g>
 
-          <!-- Zentrale Einheit -->
+          <!-- ZENTRUM -->
           <g class="eco-node">
-            <rect x="370" y="60" rx="14" ry="14" width="240" height="64" class="eco-card"/>
-            <text x="490" y="100" text-anchor="middle" class="eco-title">Emerald Content</text>
+            <rect x="480" y="60" rx="14" ry="14" width="240" height="64" class="eco-card online"/>
+            <text x="600" y="100" text-anchor="middle" class="eco-title">Emerald Content</text>
           </g>
 
-          <!-- Ebene 2 -->
+          <!-- EBENE 2 -->
           <g class="eco-node">
-            <rect x="165" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
-            <text x="245" y="228" text-anchor="middle" class="eco-label">Crossposter</text>
+            <rect x="170" y="190" rx="12" ry="12" width="220" height="64" class="eco-card"/>
+            <text x="280" y="230" text-anchor="middle" class="eco-label">Crossposter</text>
           </g>
           <g class="eco-node">
-            <rect x="410" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
-            <text x="490" y="228" text-anchor="middle" class="eco-label">Support</text>
+            <rect x="490" y="190" rx="12" ry="12" width="220" height="64" class="eco-card"/>
+            <text x="600" y="230" text-anchor="middle" class="eco-label">Support</text>
           </g>
           <g class="eco-node">
-            <rect x="655" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
-            <text x="735" y="228" text-anchor="middle" class="eco-label">Learning</text>
-          </g>
-
-          <!-- Ebene 3 -->
-          <g class="eco-node">
-            <rect x="165" y="310" rx="12" ry="12" width="160" height="64" class="eco-card eco-planned"/>
-            <text x="245" y="348" text-anchor="middle" class="eco-label">Trade API</text>
-          </g>
-          <g class="eco-node">
-            <rect x="410" y="310" rx="12" ry="12" width="160" height="64" class="eco-card eco-planned"/>
-            <text x="490" y="348" text-anchor="middle" class="eco-label">Trade DEX</text>
+            <rect x="810" y="190" rx="12" ry="12" width="220" height="64" class="eco-card"/>
+            <text x="920" y="230" text-anchor="middle" class="eco-label">Learning</text>
           </g>
 
-          <!-- TON / EMRD Badge rechts -->
+          <!-- EBENE 3 (mit DAO & Affiliate) -->
           <g class="eco-node">
-            <rect x="820" y="318" rx="10" ry="10" width="120" height="40" class="eco-badge"/>
-            <text x="880" y="344" text-anchor="middle" class="eco-badge-text">TON · EMRD</text>
+            <rect x="140" y="340" rx="12" ry="12" width="220" height="64" class="eco-card eco-planned"/>
+            <text x="250" y="380" text-anchor="middle" class="eco-label">Trade API</text>
+          </g>
+          <g class="eco-node">
+            <rect x="490" y="340" rx="12" ry="12" width="220" height="64" class="eco-card eco-planned"/>
+            <text x="600" y="380" text-anchor="middle" class="eco-label">Trade DEX</text>
+          </g>
+          <g class="eco-node">
+            <rect x="820" y="340" rx="12" ry="12" width="220" height="64" class="eco-card eco-planned"/>
+            <text x="930" y="380" text-anchor="middle" class="eco-label">Affiliate</text>
+          </g>
+          <g class="eco-node">
+            <rect x="1040" y="340" rx="12" ry="12" width="140" height="64" class="eco-card eco-planned"/>
+            <text x="1110" y="380" text-anchor="middle" class="eco-label">DAO</text>
           </g>
         </svg>
       </div>
@@ -131,6 +135,8 @@
         <span class="chip planned">GEPLANT</span>
       </div>
     </section>
+    <!-- =================== /ÖKOSYSTEM (DROP-IN END) =================== -->
+
 
     <!-- NEWS & UPDATES (statisch + optionaler JSON-Loader) -->
     <section class="content news" id="news">
