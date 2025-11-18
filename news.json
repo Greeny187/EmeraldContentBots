@@ -1,5 +1,23 @@
 [
   {
+    "date": "2025-10-07",
+    "title": "TON Network Integration – angekündigt",
+    "points": [
+      "TON Connect für Wallet-Login/Payments",
+      "On-Chain Lizenz-Verifizierung",
+      "Start im Content Bot, später Suite-weit"
+    ]
+  },
+  {
+    "date": "2025-10-15",
+    "title": "EMRD Token ist online (TON)",
+    "points": [
+      "Contract & Explorer verlinkt in der Gruppe",
+      "Nächster Schritt: Staking & Badges"
+    ],
+    "link": "https://t.me/emeraldegosystem"
+  },
+  {
     "date": "2025-09-05",
     "title": "Content Bot v0.91 – Stabilitäts-Release",
     "points": [

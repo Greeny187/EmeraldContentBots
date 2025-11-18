@@ -69,34 +69,87 @@
       </div>
     </section>
 
+    <!-- ÖKOSYSTEM -->
+    <section class="content ecosystem" id="ecosystem">
+      <h3>Emerald Ökosystem</h3>
+      <p class="muted">Alle Bots spielen zusammen – Content, Moderation, Lernen, Support und Trading. TON & EMRD binden Zahlungen und Status sauber ein.</p>
+
+      <!-- Responsive, theme-aware Inline-SVG -->
+      <div class="ecosystem-viewport">
+        <svg class="ecosystem-svg" viewBox="0 0 980 420" role="img" aria-label="Emerald Ökosystem Diagramm">
+          <!-- Verbindungen -->
+          <g stroke="var(--border)" stroke-width="2" fill="none">
+            <path d="M490,120 L490,190" />
+            <path d="M490,120 L245,190" />
+            <path d="M490,120 L735,190" />
+            <path d="M245,230 L245,310" />
+            <path d="M735,230 L735,310" />
+            <path d="M490,230 L490,310" />
+            <path d="M490,350 L820,350" />
+          </g>
+
+          <!-- Zentrale Einheit -->
+          <g class="eco-node">
+            <rect x="370" y="60" rx="14" ry="14" width="240" height="64" class="eco-card"/>
+            <text x="490" y="100" text-anchor="middle" class="eco-title">Emerald Content</text>
+          </g>
+
+          <!-- Ebene 2 -->
+          <g class="eco-node">
+            <rect x="165" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
+            <text x="245" y="228" text-anchor="middle" class="eco-label">Crossposter</text>
+          </g>
+          <g class="eco-node">
+            <rect x="410" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
+            <text x="490" y="228" text-anchor="middle" class="eco-label">Support</text>
+          </g>
+          <g class="eco-node">
+            <rect x="655" y="190" rx="12" ry="12" width="160" height="64" class="eco-card"/>
+            <text x="735" y="228" text-anchor="middle" class="eco-label">Learning</text>
+          </g>
+
+          <!-- Ebene 3 -->
+          <g class="eco-node">
+            <rect x="165" y="310" rx="12" ry="12" width="160" height="64" class="eco-card eco-planned"/>
+            <text x="245" y="348" text-anchor="middle" class="eco-label">Trade API</text>
+          </g>
+          <g class="eco-node">
+            <rect x="410" y="310" rx="12" ry="12" width="160" height="64" class="eco-card eco-planned"/>
+            <text x="490" y="348" text-anchor="middle" class="eco-label">Trade DEX</text>
+          </g>
+
+          <!-- TON / EMRD Badge rechts -->
+          <g class="eco-node">
+            <rect x="820" y="318" rx="10" ry="10" width="120" height="40" class="eco-badge"/>
+            <text x="880" y="344" text-anchor="middle" class="eco-badge-text">TON · EMRD</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="eco-legend">
+        <span class="chip online">ONLINE</span>
+        <span class="chip planned">GEPLANT</span>
+      </div>
+    </section>
+
     <!-- NEWS & UPDATES (statisch + optionaler JSON-Loader) -->
     <section class="content news" id="news">
       <h3>Aktuelles</h3>
+      <!-- Gepinnter Teaser: TON Network Integration -->
       <div class="news-grid" id="news-grid">
-        <article class="news-card near pinned">
+        <article class="news-card ton pinned">
           <div class="news-date">07.10.2025</div>
-          <div class="near-head">
-            <!-- Offizielles NEAR-Logo (lokal bevorzugt, offizieller Fallback aus dem Press Center) -->
-              <img
-                class="logo-near-img"
-                src="./assets/near-logo-black.svg"
-                alt="NEAR Protocol logo"
-                width="120" height="32"
-                onerror="this.onerror=null; this.src='https://pages.near.org/wp-content/themes/near-21/assets/img/relaunch/logo_near.svg'; this.classList.add('logo-near--fallback');"
-              />
-            <h4>NEAR Protocol Integration – angekündigt</h4>
+          <div class="ton-head">
+            <!-- TON-Logo: zwei Variants für Dark/Light -->
+            <img class="logo-ton logo-ton--dark"  src="./assets/ton-logo-dark.svg"  alt="TON Network" width="120" height="32" />
+            <img class="logo-ton logo-ton--light" src="./assets/ton-logo-light.svg" alt="TON Network" width="120" height="32" />
+            <h4>TON Network Integration – angekündigt</h4>
           </div>
           <ul>
-            <li><strong>Pro-Abo via NEAR</strong> (optional) – Krypto-freundliche Zahlungsoption</li>
-            <li><strong>On-Chain Verifizierung</strong> des Pro-Status (Wallet-basiert)</li>
-            <li><strong>Key/Wallet-Setup</strong> vorbereitet (Seed-Phrase-Support)</li>
-            <li><strong>Rollout:</strong> Start im Content Bot → später Suite-weit</li>
+            <li><strong>TON Connect:</strong> Wallet-Login & Payments</li>
+            <li><strong>On-Chain Verifizierung</strong> von Pro-Status/Lizenzen</li>
+            <li><strong>Rollout:</strong> Start im Content Bot → Suite-weit</li>
           </ul>
-          <p class="muted small">Kickoff: Q4 2025 · Erstes Ziel: bequeme Pro-Freischaltung + transparente Verifikation.</p>
-          <p class="muted small">
-            Brand-Quelle: <a href="https://pages.near.org/about/brand/" target="_blank" rel="noopener noreferrer">NEAR Brand</a> ·
-            <a href="https://pages.near.org/about/press-center/" target="_blank" rel="noopener noreferrer">Press Center</a>
-          </p>
         </article>
         <article class="news-card">
           <div class="news-date">05.09.2025</div>
@@ -284,6 +337,9 @@
       </ul>
     </section>
 
+    <section class="content cta">
+      <a class="button" href="https://t.me/emeraldegosystem" target="_blank" rel="noopener noreferrer">💬 Offizielle Telegramgruppe beitreten</a>
+    </section>
     
     <footer>
       <div class="donation">
@@ -298,9 +354,17 @@
             </button>
           </li>
           <li>
-            💎 <strong>PayPal:</strong>
+            💎 <strong>TON:</strong>
+            <code id="ton-addr">UQBPqGYFAAXbURZZ-iFkBM1Wech8RAQ52gPA3KK2Nt_OhZsY</code>
+            <button class="copy-btn" data-copy-target="#ton-addr" aria-label="TON-Adresse kopieren">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+              <span class="sr-only">Kopieren</span>
+            </button>
+          </li>
+          <li>
+            📩 <strong>PayPal:</strong>
             <a href="mailto:Emerald@mail.de" id="paypal-mail">Emerald@mail.de</a>
-            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal kopieren">
+            <button class="copy-btn" data-copy-text="Emerald@mail.de" aria-label="PayPal E-Mail kopieren">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
               <span class="sr-only">Kopieren</span>
             </button>

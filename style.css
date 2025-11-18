@@ -288,3 +288,43 @@ footer .donation li{
   box-shadow: var(--shadow);
   padding: 14px;
 }
+
+/* Ökosystem Grafik */
+.ecosystem h3{ margin:0 0 6px; }
+.ecosystem .ecosystem-viewport{
+  width:100%; overflow:auto; border:1px solid var(--border); border-radius:12px;
+  background: var(--card); padding:8px; margin-top:10px;
+}
+.ecosystem-svg{ width:100%; height:auto; display:block; }
+.eco-card{ fill: var(--card); stroke: var(--border); }
+.eco-badge{ fill: rgba(16,199,160,.14); stroke: rgba(16,199,160,.45); }
+.eco-title{ font-weight:700; font-size:16px; fill: var(--text); }
+.eco-label{ font-size:14px; fill: var(--text); }
+.eco-badge-text{ font-size:13px; fill: var(--text); }
+.eco-legend{ margin-top:10px; display:flex; gap:8px; }
+.chip{
+  display:inline-block; padding:4px 8px; border-radius:999px; font-size:.85rem; border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+}
+.chip.online{ background: linear-gradient(0deg, rgba(16,199,160,.12), rgba(16,199,160,.12)); border-color: rgba(16,199,160,.45); }
+.eco-planned{ opacity:.7 }
+
+/* TON Teaser + Logo */
+.news-card.ton{
+  border-color: rgba(16,199,160,.55);
+  background:
+    linear-gradient(0deg, rgba(16,199,160,.06), rgba(16,199,160,.06)),
+    var(--card);
+}
+.news-card.ton .ton-head{
+  display:flex; align-items:center; gap:10px; margin-bottom:6px;
+}
+/* Logo-Umschaltung nach Theme */
+.logo-ton{ height:auto; vertical-align:middle }
+.logo-ton--dark{  display:inline-block; }
+.logo-ton--light{ display:none; }
+body.light .logo-ton--dark{  display:none; }
+body.light .logo-ton--light{ display:inline-block; }
+
+/* CTA Abstand */
+.content.cta{ margin-top: 18px; text-align:center; }
