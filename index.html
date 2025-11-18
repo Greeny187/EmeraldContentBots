@@ -138,7 +138,7 @@
       <!-- Gepinnter Teaser: TON Network Integration -->
       <div class="news-grid" id="news-grid">
         <article class="news-card ton pinned">
-          <div class="news-date">07.10.2025</div>
+          <div class="news-date">07.11.2025</div>
           <div class="ton-head">
             <!-- TON-Logo: zwei Variants für Dark/Light -->
             <img class="logo-ton logo-ton--dark"  src="./assets/ton-logo-dark.svg"  alt="TON Network" width="120" height="32" />
@@ -287,7 +287,7 @@
             </tr>
           </tbody>
         </table>
-        <p class="muted small">Zahlungsoptionen vorbereitet: NEAR, Telegram Stars, PayPal, Coinbase Commerce.</p>
+        <p class="muted small">Zahlungsoptionen vorbereitet: TON, NEAR, PayPal, Coinbase Commerce.</p>
       </div>
     </section>
 
@@ -416,6 +416,8 @@
           card.className = 'news-card';
           card.innerHTML = `
             <div class="news-date">${n.date || ''}</div>
+            ${n.logo ? `<div class="news-media"><img class="news-logo" src="${n.logo}"
+                alt="" onerror="this.style.display='none'"/></div>` : ``}
             <h4>${n.title || ''}</h4>
             ${Array.isArray(n.points) ? `<ul>${n.points.map(p=>`<li>${p}</li>`).join('')}</ul>` : (n.text ? `<p>${n.text}</p>` : '')}
             ${n.link ? `<a class="news-link" href="${n.link}" target="_blank" rel="noopener noreferrer">Mehr</a>` : ''}

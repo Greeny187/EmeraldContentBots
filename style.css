@@ -328,3 +328,10 @@ body.light .logo-ton--light{ display:inline-block; }
 
 /* CTA Abstand */
 .content.cta{ margin-top: 18px; text-align:center; }
+
+/* News: optionales Logo */
+.news-media{ margin-bottom:6px; }
+.news-logo{
+  max-width: 140px; height:auto; display:block;
+  opacity:.95;
+}
