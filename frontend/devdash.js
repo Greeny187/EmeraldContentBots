@@ -91,10 +91,10 @@ const app = {
       console.log('📡 Server response status:', res.status);
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(`Auth failed: ${res.status} - ${errData.error || 'Unknown error'}`);
+        throw new Error(`Auth failed: ${res.status} - ${errData.detail || errData.error || 'Unknown error'}`);
       }
       const data = await res.json();
-      console.log('✅ Auth successful, token received');
+      console.log('✅ Auth successful, token received:', data.access_token ? 'YES' : 'NO');
       
       localStorage.setItem(TOKEN_KEY, data.access_token);
       this.token = data.access_token;
