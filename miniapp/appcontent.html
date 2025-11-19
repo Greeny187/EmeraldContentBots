@@ -96,6 +96,7 @@
     <button class="pill" data-tab="spam">Spam</button>
     <button class="pill" data-tab="rss">RSS</button>
     <button class="pill" data-tab="ai">KI</button>
+    <button class="pill" data-tab="mood">Mood</button>
     <button class="pill" data-tab="faq">FAQ</button>
     <button class="pill" data-tab="night">Nachtmodus</button>
     <button class="pill" data-tab="aimod">KI-Mod</button>
@@ -103,11 +104,14 @@
     <button class="pill" data-tab="stats">Statistik</button>
     <button class="pill" data-tab="rewards">Rewards</button>
     <button class="pill" data-tab="more">Sonstiges</button>
+    <button class="pill" data-tab="pro">PRO</button>
+    
   </div>
 
   <section class="card active" id="sec-welcome">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="welcome.on"> Begrüßung aktiv</label>
+      <label class="switch"><input type="checkbox" data-key="welcome.captcha"> Captcha aktiv</label>
     </div>
     <div class="row gap-6">
       <div style="flex:1">
@@ -221,6 +225,7 @@
     <div class="row">
       <label class="switch"><input type="checkbox" id="rss_postimg"> Beitragsbilder posten</label>
       <label class="switch"><input type="checkbox" id="rss_enabled" checked> Feed aktivieren</label>
+      <label class="switch"><input type="checkbox" id="rss_ai_analyze"> KI-Analyse aktivieren</label>
       <button class="btn small" id="rss_add">Hinzufügen</button>
     </div>
     <div class="sep"></div>
@@ -230,9 +235,30 @@
   <section class="card" id="sec-ai">
     <div class="row">
       <label class="switch"><input type="checkbox" data-key="ai.on"> KI/FAQ aktiv</label>
+      <label class="switch"><input type="checkbox" data-key="ai.rss_analysis"> RSS-KI-Analyse nutzen</label>
     </div>
     <label>FAQ-Hinweis (optional)</label>
     <textarea data-key="ai.faq" placeholder="Kurzer Hinweistext für Nutzer …"></textarea>
+  </section>
+
+  <section class="card" id="sec-mood">
+    <h3>😊 Stimmungs-Umfrage</h3>
+    <div class="row">
+      <label class="switch"><input type="checkbox" data-key="mood.on"> Stimmungs-Umfrage aktiv</label>
+    </div>
+    <label>Frage
+      <input type="text" data-key="mood.question" placeholder="Wie ist deine Stimmung?" />
+    </label>
+    <label>Topic (optional, 0 = Hauptchat)
+      <input type="text" data-key="mood.topic" data-validate="int" placeholder="0"/>
+      <div class="err" hidden id="err_moodtopic"></div>
+    </label>
+    <div class="row">
+      <button class="btn small" id="mood_send_now">Umfrage jetzt senden</button>
+    </div>
+    <div class="hint" style="margin-top:8px">
+      Nutzer können mit 👍 👎 🤔 abstimmen. Diese Umfrage wird regelmäßig (täglich/wöchentlich) versendet.
+    </div>
   </section>
 
   <section class="card" id="sec-faq">
@@ -254,6 +280,7 @@
   <section class="card" id="sec-night">
     <div class="grid">
       <label class="switch"><input type="checkbox" data-key="night.on"> Nachtmodus aktiv</label>
+      <label class="switch"><input type="checkbox" data-key="night.write_lock"> Schreiben sperren (nicht löschen)</label>
       <label>Start (HH:MM)
         <input type="text" data-key="night.start" data-validate="time" placeholder="22:00" />
         <div class="err" hidden id="err_nstart"></div>
@@ -263,8 +290,11 @@
         <div class="err" hidden id="err_nend"></div>
       </label>
     </div>
+    <label>Hinweistext (wenn Schreiben gesperrt)
+      <textarea data-key="night.lock_message" placeholder="Die Gruppe ist gerade im Nachtmodus. Schreiben ist nicht möglich."></textarea>
+    </label>
     <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Non-Admin Nachrichten löschen</label>
+      <label class="switch"><input type="checkbox" data-key="night.delete_non_admin_msgs"> Non-Admin Nachrichten löschen (Nachtzeiträume)</label>
       <label class="switch"><input type="checkbox" data-key="night.warn_once"> Warnung anzeigen</label>
       <label>Zeitzone
         <input type="text" data-key="night.timezone" placeholder="Europe/Berlin" />
@@ -342,7 +372,7 @@
     <div class="hint" style="margin:12px 0">
       Der <strong>EMRD-Token</strong> ist ein Utility-Token im TON-Netzwerk. 
       Nutzer erhalten EMRD als Belohnung für hilfreiche Beiträge in deiner Gruppe.
-      Sie können ihre EMRD-Rewards hier claimen und in ihrer TON-Wallet verwalten.
+      Sie können ihre EMRD-Rewards claimen und in ihrer TON-Wallet verwalten.
     </div>
     <div class="sep"></div>
     <div class="grid">
@@ -355,14 +385,17 @@
       </label>
     </div>
     <div class="grid">
-      <label>Rate pro Antwort
-        <input type="number" data-key="rewards.rate_answer" step="0.0001" min="0" placeholder="0.01"/>
+      <label>Rate pro Antwort (read-only)
+        <input type="text" disabled placeholder="0.01"/>
       </label>
-      <label>Rate pro Helpful-Vote
-        <input type="number" data-key="rewards.rate_helpful" step="0.0001" min="0" placeholder="0.05"/>
+      <label>Rate pro Helpful-Vote (read-only)
+        <input type="text" disabled placeholder="0.05"/>
       </label>
     </div>
     <div class="grid">
+      <label>Mindestbetrag zum Claimen (EMRD)
+        <input type="number" data-key="rewards.min_claim" step="0.001" min="0" placeholder="0.5"/>
+      </label>
       <label>Cap pro Nutzer/Tag
         <input type="number" data-key="rewards.cap_user" step="1" min="0" placeholder="0 = unbegrenzt"/>
       </label>
@@ -370,8 +403,76 @@
         <input type="number" data-key="rewards.cap_chat" step="1" min="0" placeholder="0 = unbegrenzt"/>
       </label>
     </div>
+    <div class="row">
+      <button class="btn small" id="reward_claim_test">Claim-Funktion testen</button>
+    </div>
     <div class="hint" style="margin-top:12px">
-      💡 Tipp: Nutzer müssen ein TON-Wallet verbunden haben, um Rewards zu claimen.
+      💡 Tipp: Die festen Rates können in der Konfiguration eingestellt werden. Nutzer können nur oberhalb des Mindestbetrags claimen.
+    </div>
+  </section>
+
+  <section class="card" id="sec-pro">
+    <h3>💰 PRO-Plan Zahlung</h3>
+    <div class="hint" style="margin:12px 0">
+      Ermögliche Zahlungen für den PRO-Plan deiner Gruppe über verschiedene Zahlungsanbieter.
+    </div>
+    <div class="sep"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">Blockchain Zahlungen</h4>
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="pro.payment_ton"> TON aktivieren
+      </label>
+      <label>TON Wallet-Adresse
+        <input type="text" data-key="pro.payment_ton_wallet" placeholder="Dev_TON_Adresse"/>
+      </label>
+    </div>
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="pro.payment_near"> NEAR aktivieren
+      </label>
+      <label>NEAR Wallet-Adresse
+        <input type="text" data-key="pro.payment_near_wallet" placeholder="emeraldcontent.near"/>
+      </label>
+    </div>
+    
+    <h4 style="margin:16px 0 8px; color:var(--brand)">Fiat Zahlungen</h4>
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="pro.payment_coinbase"> Coinbase Commerce
+      </label>
+      <label>Coinbase API-Key (optional)
+        <input type="text" data-key="pro.payment_coinbase_key" placeholder="pk_xxx"/>
+      </label>
+    </div>
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="pro.payment_paypal"> PayPal
+      </label>
+      <label>PayPal E-Mail
+        <input type="email" data-key="pro.payment_paypal_email" placeholder="emerald@mail.de"/>
+      </label>
+    </div>
+
+    <div class="sep"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">PRO-Plan Preise</h4>
+    <div class="grid">
+      <label>1 Monat (€)
+        <input type="number" data-key="pro.price_1m" step="0.01" min="0" placeholder="9.99"/>
+      </label>
+      <label>3 Monate (€)
+        <input type="number" data-key="pro.price_3m" step="0.01" min="0" placeholder="24.99"/>
+      </label>
+      <label>12 Monate (€)
+        <input type="number" data-key="pro.price_12m" step="0.01" min="0" placeholder="79.99"/>
+      </label>
+    </div>
+    
+    <div class="sep"></div>
+    <label>Beschreibung PRO-Features
+      <textarea data-key="pro.description" placeholder="Auflistung der PRO-Features für deine Gruppe..."></textarea>
+    </label>
+    <div class="hint">
+      Nutzer können ihre Zahlungen über die aktivierten Kanäle durchführen.
     </div>
   </section>
 
@@ -636,10 +737,18 @@ async function loadState() {
     
     setVal('ai.on', j.ai?.on ?? false);
     setVal('ai.faq', j.ai?.faq ?? '');
+    setVal('ai.rss_analysis', j.ai?.rss_analysis ?? false);
+    
+    // Load mood data
+    setVal('mood.on', j.mood?.on ?? false);
+    setVal('mood.question', j.mood?.question ?? 'Wie ist deine Stimmung?');
+    setVal('mood.topic', j.mood?.topic ?? 0);
     
     setVal('night.on', j.night?.on ?? false);
+    setVal('night.write_lock', j.night?.write_lock ?? false);
     setVal('night.start', j.night?.start || '22:00');
     setVal('night.end', j.night?.end || '07:00');
+    setVal('night.lock_message', j.night?.lock_message || '');
     setVal('night.delete_non_admin_msgs', j.night?.delete_non_admin_msgs);
     setVal('night.warn_once', j.night?.warn_once);
     setVal('night.timezone', j.night?.timezone || 'Europe/Berlin');
@@ -665,10 +774,24 @@ async function loadState() {
     const rewardData = j.rewards || {};
     setVal('rewards.enabled', rewardData.enabled || false);
     setVal('rewards.mode', rewardData.mode || 'claim');
-    setVal('rewards.rate_answer', rewardData.rate_answer || '');
-    setVal('rewards.rate_helpful', rewardData.rate_helpful || '');
+    setVal('rewards.min_claim', rewardData.min_claim || '0.5');
     setVal('rewards.cap_user', rewardData.cap_user || '');
     setVal('rewards.cap_chat', rewardData.cap_chat || '');
+    
+    // Load PRO payment data
+    const proData = j.pro || {};
+    setVal('pro.payment_ton', proData.payment_ton || false);
+    setVal('pro.payment_ton_wallet', proData.payment_ton_wallet || '');
+    setVal('pro.payment_near', proData.payment_near || false);
+    setVal('pro.payment_near_wallet', proData.payment_near_wallet || 'emeraldcontent.near');
+    setVal('pro.payment_coinbase', proData.payment_coinbase || false);
+    setVal('pro.payment_coinbase_key', proData.payment_coinbase_key || '');
+    setVal('pro.payment_paypal', proData.payment_paypal || false);
+    setVal('pro.payment_paypal_email', proData.payment_paypal_email || 'emerald@mail.de');
+    setVal('pro.price_1m', proData.price_1m || '9.99');
+    setVal('pro.price_3m', proData.price_3m || '24.99');
+    setVal('pro.price_12m', proData.price_12m || '79.99');
+    setVal('pro.description', proData.description || '');
     
     // Load clean_deleted settings
     const cleanData = j.clean_deleted || {};
@@ -746,7 +869,8 @@ qs('#rss_add')?.addEventListener('click', ()=>{
   const url = qs('#rss_url').value.trim();
   if(!url) return;
   const topic = parseInt(qs('#rss_topic').value || '0');
-  sendPayload({rss: {url, topic, post_images: qs('#rss_postimg').checked, enabled: qs('#rss_enabled').checked}});
+  const ai_analyze = qs('#rss_ai_analyze').checked;
+  sendPayload({rss: {url, topic, post_images: qs('#rss_postimg').checked, enabled: qs('#rss_enabled').checked, ai_analyze}});
 });
 
 qs('#faq_add')?.addEventListener('click', ()=>{
@@ -756,9 +880,19 @@ qs('#faq_add')?.addEventListener('click', ()=>{
   sendPayload({faq_add: {q, a}});
 });
 
+qs('#mood_send_now')?.addEventListener('click', ()=>{
+  const topic = parseInt(qs('[data-key="mood.topic"]').value || '0');
+  sendPayload({mood_send_now: {dest:'dm', topic}});
+});
+
 qs('#report_send_now')?.addEventListener('click', ()=>{
   const topic = parseInt(qs('[data-key="report.topic"]').value || '0');
   sendPayload({report_send_now: {dest:'dm', topic}});
+});
+
+qs('#reward_claim_test')?.addEventListener('click', ()=>{
+  const minClaim = parseFloat(qs('[data-key="rewards.min_claim"]').value || '0.5');
+  alert(`Claim-Funktion konfiguriert.\nMindestbetrag: ${minClaim} EMRD\n\nIn der Produktion werden Wallets hier verbunden.`);
 });
 
 // Image compression and preview function
