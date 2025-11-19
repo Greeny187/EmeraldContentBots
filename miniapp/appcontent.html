@@ -414,25 +414,17 @@
   <section class="card" id="sec-pro">
     <h3>💰 PRO-Plan Zahlung</h3>
     <div class="hint" style="margin:12px 0">
-      Aktiviere Zahlungen für PRO-Mitgliedschaften über mehrere Anbieter. Nutzer können via /buypro upgraden.
+      Aktiviere Zahlungsoptionen für PRO-Mitgliedschaften. Nutzer können via /buypro upgraden.
     </div>
     <div class="sep"></div>
     
-    <h4 style="margin:16px 0 8px; color:var(--brand)">🔗 Blockchain Zahlungen (WalletConnect)</h4>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">🔗 Blockchain Zahlungen</h4>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.ton_enabled"> TON/Telegram Wallet
+        <input type="checkbox" data-key="pro.ton_enabled"> TON Wallet
       </label>
-      <label>TON Wallet-Adresse
-        <input type="text" data-key="pro.ton_wallet" placeholder="UQBopac1WFJGC_K48T8T8..."/>
-      </label>
-    </div>
-    <div class="grid">
       <label class="switch">
         <input type="checkbox" data-key="pro.near_enabled"> NEAR Protocol
-      </label>
-      <label>NEAR Contract-Address
-        <input type="text" data-key="pro.near_wallet" placeholder="emeraldcontent.near"/>
       </label>
     </div>
     
@@ -441,38 +433,22 @@
       <label class="switch">
         <input type="checkbox" data-key="pro.coinbase_enabled"> Coinbase Commerce
       </label>
-      <label>Coinbase API-Key
-        <input type="password" data-key="pro.coinbase_key" placeholder="sk_live_..." title="Erhalten von https://commerce.coinbase.com/dashboard"/>
-      </label>
-    </div>
-    <div class="grid">
       <label class="switch">
         <input type="checkbox" data-key="pro.paypal_enabled"> PayPal
       </label>
-      <label>PayPal.me Link
-        <input type="text" data-key="pro.paypal_link" placeholder="https://paypal.me/username/10" title="Beispiel: https://paypal.me/deinname"/>
-      </label>
-    </div>
-    <div class="grid">
-      <label class="switch">
-        <input type="checkbox" data-key="pro.stars_enabled"> Telegram Stars
-      </label>
-      <label class="hint">Stars sind nativ in Telegram - kein Setup nötig</label>
     </div>
 
     <div class="sep"></div>
     <h4 style="margin:16px 0 8px; color:var(--brand)">💰 PRO-Plan Preise (€)</h4>
     <div class="grid">
-      <label>1 Monat (€)
-        <input type="number" data-key="pro.price_1m" step="0.01" min="0.01" placeholder="9.99" value="9.99"/>
+      <label>1 Monat
+        <input type="text" value="9,99 €" disabled style="background:var(--ring);opacity:0.7"/>
       </label>
-      <label>3 Monate (€)
-        <input type="number" data-key="pro.price_3m" step="0.01" min="0.01" placeholder="24.99" value="24.99"/>
+      <label>3 Monate
+        <input type="text" value="24,99 €" disabled style="background:var(--ring);opacity:0.7"/>
       </label>
-    </div>
-    <div class="grid">
-      <label>12 Monate (€)
-        <input type="number" data-key="pro.price_12m" step="0.01" min="0.01" placeholder="99.99" value="99.99"/>
+      <label>12 Monate
+        <input type="text" value="99,99 €" disabled style="background:var(--ring);opacity:0.7"/>
       </label>
     </div>
 
