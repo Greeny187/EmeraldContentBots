@@ -414,96 +414,77 @@
   <section class="card" id="sec-pro">
     <h3>💰 PRO-Plan Zahlung</h3>
     <div class="hint" style="margin:12px 0">
-      Aktiviere Zahlungen für PRO-Mitgliedschaften über mehrere Anbieter. Nach Aktivierung können Nutzer via /buypro upgraden.
+      Aktiviere Zahlungen für PRO-Mitgliedschaften über mehrere Anbieter. Nutzer können via /buypro upgraden.
     </div>
     <div class="sep"></div>
+    
     <h4 style="margin:16px 0 8px; color:var(--brand)">🔗 Blockchain Zahlungen (WalletConnect)</h4>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.payment_ton_enabled"> TON/Telegram Wallet
+        <input type="checkbox" data-key="pro.ton_enabled"> TON/Telegram Wallet
       </label>
       <label>TON Wallet-Adresse
-        <input type="text" data-key="pro.payment_ton_wallet" placeholder="UQBopac1WFJGC_K48T8T8..." readonly/>
+        <input type="text" data-key="pro.ton_wallet" placeholder="UQBopac1WFJGC_K48T8T8..."/>
       </label>
     </div>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.payment_near_enabled"> NEAR Protocol
+        <input type="checkbox" data-key="pro.near_enabled"> NEAR Protocol
       </label>
-      <label>NEAR Contract Address
-        <input type="text" data-key="pro.payment_near_wallet" placeholder="emeraldcontent.near" readonly/>
+      <label>NEAR Contract-Address
+        <input type="text" data-key="pro.near_wallet" placeholder="emeraldcontent.near"/>
       </label>
     </div>
     
     <h4 style="margin:16px 0 8px; color:var(--brand)">💳 Fiat Zahlungen</h4>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.payment_coinbase_enabled"> Coinbase Commerce
+        <input type="checkbox" data-key="pro.coinbase_enabled"> Coinbase Commerce
       </label>
-      <label>API-Key (erhalten von Coinbase Dashboard)
-        <input type="password" data-key="pro.payment_coinbase_key" placeholder="***"/>
-      </label>
-    </div>
-    <div class="grid">
-      <label class="switch">
-        <input type="checkbox" data-key="pro.payment_paypal_enabled"> PayPal
-      </label>
-      <label>PayPal E-Mail/Link
-        <input type="text" data-key="pro.payment_paypal_email" placeholder="deine-email@paypal.me oder Link"/>
+      <label>Coinbase API-Key
+        <input type="password" data-key="pro.coinbase_key" placeholder="sk_live_..." title="Erhalten von https://commerce.coinbase.com/dashboard"/>
       </label>
     </div>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.payment_stars_enabled"> Telegram Stars
+        <input type="checkbox" data-key="pro.paypal_enabled"> PayPal
       </label>
-      <label class="hint">Stars sind in Telegram nativ eingebunden - kein Setup nötig</label>
+      <label>PayPal.me Link
+        <input type="text" data-key="pro.paypal_link" placeholder="https://paypal.me/username/10" title="Beispiel: https://paypal.me/deinname"/>
+      </label>
+    </div>
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="pro.stars_enabled"> Telegram Stars
+      </label>
+      <label class="hint">Stars sind nativ in Telegram - kein Setup nötig</label>
     </div>
 
     <div class="sep"></div>
-    <h4 style="margin:16px 0 8px; color:var(--brand)">💰 PRO-Plan Preise</h4>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">💰 PRO-Plan Preise (€)</h4>
     <div class="grid">
       <label>1 Monat (€)
-        <input type="number" data-key="pro.price_1m" step="0.01" min="0" placeholder="9.99"/>
+        <input type="number" data-key="pro.price_1m" step="0.01" min="0.01" placeholder="9.99" value="9.99"/>
       </label>
       <label>3 Monate (€)
-        <input type="number" data-key="pro.price_3m" step="0.01" min="0" placeholder="24.99"/>
+        <input type="number" data-key="pro.price_3m" step="0.01" min="0.01" placeholder="24.99" value="24.99"/>
       </label>
     </div>
     <div class="grid">
       <label>12 Monate (€)
-        <input type="number" data-key="pro.price_12m" step="0.01" min="0" placeholder="99.99"/>
+        <input type="number" data-key="pro.price_12m" step="0.01" min="0.01" placeholder="99.99" value="99.99"/>
       </label>
     </div>
 
     <div class="sep"></div>
     <h4 style="margin:16px 0 8px; color:var(--brand)">📝 PRO-Features Beschreibung</h4>
-    <label>Beschreibung (wird im Menü angezeigt)
-      <textarea data-key="pro.description" placeholder="Beschreibe die PRO Features... z.B. unl. Regeln, KI ohne Limit, etc."></textarea>
+    <label>Beschreibung (wird im /buypro Menü angezeigt)
+      <textarea data-key="pro.description" placeholder="Beispiel: ✓ Unbegrenzte Custom-Regeln&#10;✓ KI-Moderation ohne Limit&#10;✓ Premium Support&#10;✓ Advanced Analytics"></textarea>
     </label>
-    <div class="hint">
-      Diese Beschreibung wird Usern gezeigt, wenn sie /buypro eingeben
-    </div>
-    
+
     <div class="sep"></div>
     <div class="row">
-      <button class="btn" id="pro_test" title="Öffne PRO Zahlung zum Test">Test PRO Zahlungsmenü</button>
-    </div>
-  </section>
-      </label>
-      <label>3 Monate (€)
-        <input type="number" data-key="pro.price_3m" step="0.01" min="0" placeholder="24.99"/>
-      </label>
-      <label>12 Monate (€)
-        <input type="number" data-key="pro.price_12m" step="0.01" min="0" placeholder="79.99"/>
-      </label>
-    </div>
-    
-    <div class="sep"></div>
-    <label>Beschreibung PRO-Features
-      <textarea data-key="pro.description" placeholder="Auflistung der PRO-Features für deine Gruppe..."></textarea>
-    </label>
-    <div class="hint">
-      Nutzer können ihre Zahlungen über die aktivierten Kanäle durchführen.
+      <button class="btn" id="pro_test">Test: PRO Payment Menü öffnen</button>
     </div>
   </section>
 
@@ -811,17 +792,18 @@ async function loadState() {
     
     // Load PRO payment data
     const proData = j.pro || {};
-    setVal('pro.payment_ton', proData.payment_ton || false);
-    setVal('pro.payment_ton_wallet', proData.payment_ton_wallet || '');
-    setVal('pro.payment_near', proData.payment_near || false);
-    setVal('pro.payment_near_wallet', proData.payment_near_wallet || 'emeraldcontent.near');
-    setVal('pro.payment_coinbase', proData.payment_coinbase || false);
-    setVal('pro.payment_coinbase_key', proData.payment_coinbase_key || '');
-    setVal('pro.payment_paypal', proData.payment_paypal || false);
-    setVal('pro.payment_paypal_email', proData.payment_paypal_email || 'emerald@mail.de');
+    setVal('pro.ton_enabled', proData.ton_enabled || false);
+    setVal('pro.ton_wallet', proData.ton_wallet || '');
+    setVal('pro.near_enabled', proData.near_enabled || false);
+    setVal('pro.near_wallet', proData.near_wallet || 'emeraldcontent.near');
+    setVal('pro.coinbase_enabled', proData.coinbase_enabled || false);
+    setVal('pro.coinbase_key', proData.coinbase_key || '');
+    setVal('pro.paypal_enabled', proData.paypal_enabled || false);
+    setVal('pro.paypal_link', proData.paypal_link || '');
+    setVal('pro.stars_enabled', proData.stars_enabled || false);
     setVal('pro.price_1m', proData.price_1m || '9.99');
     setVal('pro.price_3m', proData.price_3m || '24.99');
-    setVal('pro.price_12m', proData.price_12m || '79.99');
+    setVal('pro.price_12m', proData.price_12m || '99.99');
     setVal('pro.description', proData.description || '');
     
     // Load clean_deleted settings
