@@ -737,10 +737,10 @@ async function loadState() {
     setVal('night.start', j.night?.start || '22:00');
     setVal('night.end', j.night?.end || '07:00');
     setVal('night.lock_message', j.night?.lock_message || '');
-    setVal('night.delete_non_admin_msgs', j.night?.delete_non_admin_msgs);
-    setVal('night.warn_once', j.night?.warn_once);
+    setVal('night.delete_non_admin_msgs', j.night?.delete_non_admin_msgs ?? true);
+    setVal('night.warn_once', j.night?.warn_once ?? true);
     setVal('night.timezone', j.night?.timezone || 'Europe/Berlin');
-    setVal('night.hard_mode', j.night?.hard_mode);
+    setVal('night.hard_mode', j.night?.hard_mode ?? false);
     
     const am = j.aimod||{};
     setVal('ai_mod.enabled', am.enabled);
