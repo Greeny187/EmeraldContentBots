@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Program</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-label { font-size: 12px; opacity: 0.9; }
+        .stat-value { font-size: 18px; font-weight: bold; margin-top: 4px; }
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        .tab-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .link-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .link-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            background: #f9f9f9;
+        }
+        .btn-copy {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .tier-box {
+            padding: 12px;
+            background: linear-gradient(135deg, #ffd89b 0%, #ffc145 100%);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .tier-label { font-weight: 600; }
+        .tier-benefits { font-size: 12px; margin-top: 6px; opacity: 0.9; }
+        .referral-item {
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .referral-name { font-weight: 600; color: #333; }
+        .referral-status { font-size: 12px; color: #999; }
+        .referral-earn { color: #667eea; font-weight: 600; font-size: 14px; }
+        .payout-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f0f4ff;
+            border-radius: 8px;
+        }
+        .payout-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Affiliate Program</h1>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Earned</div>
+                    <div class="stat-value" id="totalEarned">2,450 EMRD</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Verfügbar</div>
+                    <div class="stat-value" id="pending">1,250 EMRD</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="link">Link</button>
+            <button class="tab-btn" data-tab="referrals">Referrals</button>
+            <button class="tab-btn" data-tab="payout">Payout</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="link" class="tab">
+                <div class="link-box">
+                    <input type="text" class="link-input" value="https://t.me/emerald_bot?start=aff_123456789" readonly>
+                    <button class="btn-copy" onclick="copyLink()">📋 Kopieren</button>
+                </div>
+
+                <div class="tier-box">
+                    <div class="tier-label">🥇 GOLD Tier</div>
+                    <div class="tier-benefits">
+                        ✓ 10 EMRD pro Referral<br>
+                        ✓ 10% Lifetime Rewards<br>
+                        ✓ Bonus bei 100+ Referrals
+                    </div>
+                </div>
+
+                <div style="font-size: 13px; color: #666; line-height: 1.6;">
+                    <strong>Wie es funktioniert:</strong><br>
+                    1. Teile deinen Link<br>
+                    2. Deine Referrals treten bei<br>
+                    3. Verdiene Provisionen & Rewards<br>
+                    4. Auszahlungen > 1000 EMRD
+                </div>
+            </div>
+
+            <div id="referrals" class="tab" style="display:none;">
+                <div style="margin-bottom: 12px; font-size: 13px; color: #666;">
+                    <strong>Aktive Referrals: 12</strong>
+                </div>
+
+                <div class="referral-item">
+                    <div>
+                        <div class="referral-name">@user_123</div>
+                        <div class="referral-status">Beigetreten: 2 Tage</div>
+                    </div>
+                    <div class="referral-earn">+50 EMRD</div>
+                </div>
+
+                <div class="referral-item">
+                    <div>
+                        <div class="referral-name">@trader_456</div>
+                        <div class="referral-status">Beigetreten: 5 Tage</div>
+                    </div>
+                    <div class="referral-earn">+120 EMRD</div>
+                </div>
+
+                <div class="referral-item">
+                    <div>
+                        <div class="referral-name">@crypto_789</div>
+                        <div class="referral-status">Beigetreten: 1 Woche</div>
+                    </div>
+                    <div class="referral-earn">+280 EMRD</div>
+                </div>
+            </div>
+
+            <div id="payout" class="tab" style="display:none;">
+                <div class="payout-section">
+                    <div class="payout-info">
+                        <span>Verfügbar zum Auszahlen</span>
+                        <strong id="payoutAmount">1,250 EMRD</strong>
+                    </div>
+                    <div class="payout-info">
+                        <span>Minimum Payout</span>
+                        <strong>1,000 EMRD</strong>
+                    </div>
+                    <button class="btn">Auszahlung Anfordern</button>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Ausstehende Auszahlungen</div>
+                    <div class="referral-item">
+                        <div>
+                            <div class="referral-name">Auszahlung #1</div>
+                            <div class="referral-status">Angefordert: 3 Tage</div>
+                        </div>
+                        <div style="color: #667eea; font-weight: 600;">1000 EMRD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+                document.getElementById(tabName).style.display = 'block';
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        function copyLink() {
+            const link = document.querySelector('.link-input').value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Link kopiert!');
+            });
+        }
+    </script>
+</body>
+</html>

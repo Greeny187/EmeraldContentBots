@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAO Governance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+        .voting-power {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .vp-value { font-size: 20px; font-weight: bold; margin-top: 4px; }
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        .tab-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .proposal-item {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .proposal-title { font-weight: 600; color: #333; margin-bottom: 8px; }
+        .proposal-desc { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .vote-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .vote-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .vote-option.for { background: #d4edda; color: #155724; }
+        .vote-option.against { background: #f8d7da; color: #721c24; }
+        .vote-progress {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .vote-for { flex: 1; height: 4px; background: #28a745; border-radius: 2px; }
+        .vote-against { flex: 1; height: 4px; background: #dc3545; border-radius: 2px; }
+        .vote-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ DAO Governance</h1>
+            <div class="voting-power">
+                <div>Deine Voting Power</div>
+                <div class="vp-value" id="votingPower">100,000 EMRD</div>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="proposals">Abstimmungen</button>
+            <button class="tab-btn" data-tab="new">Neue Proposal</button>
+            <button class="tab-btn" data-tab="treasury">Treasury</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="proposals" class="tab">
+                <div class="proposal-item">
+                    <div class="proposal-title">🔄 Mint neue EMRD Tokens</div>
+                    <div class="proposal-desc">Erhöhe Treasury um 1M EMRD für Marketing</div>
+                    <div class="vote-progress">
+                        <div class="vote-for" style="flex: 0.65;"></div>
+                        <div class="vote-against" style="flex: 0.35;"></div>
+                    </div>
+                    <div class="vote-stats">
+                        <span>65% JA (6.5K)</span>
+                        <span>35% NEIN (3.5K)</span>
+                    </div>
+                    <div class="vote-bar">
+                        <div class="vote-option for">👍 JA</div>
+                        <div class="vote-option against">👎 NEIN</div>
+                    </div>
+                </div>
+
+                <div class="proposal-item">
+                    <div class="proposal-title">💰 Grants für Entwickler</div>
+                    <div class="proposal-desc">Bewillige 500K EMRD für Entwicklungsgrants</div>
+                    <div class="vote-progress">
+                        <div class="vote-for" style="flex: 0.45;"></div>
+                        <div class="vote-against" style="flex: 0.55;"></div>
+                    </div>
+                    <div class="vote-stats">
+                        <span>45% JA (4.5K)</span>
+                        <span>55% NEIN (5.5K)</span>
+                    </div>
+                    <div class="vote-bar">
+                        <div class="vote-option for">👍 JA</div>
+                        <div class="vote-option against">👎 NEIN</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="new" class="tab" style="display:none;">
+                <div class="form-group">
+                    <label>Titel</label>
+                    <input type="text" placeholder="Proposal Titel">
+                </div>
+                <div class="form-group">
+                    <label>Beschreibung</label>
+                    <textarea placeholder="Detaillierte Erklärung..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Typ</label>
+                    <select>
+                        <option>Parameter Change</option>
+                        <option>Treasury Spend</option>
+                        <option>Governance</option>
+                    </select>
+                </div>
+                <button class="btn">Proposal Erstellen</button>
+            </div>
+
+            <div id="treasury" class="tab" style="display:none;">
+                <div style="padding: 16px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">💰</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #333;">5,250,000 EMRD</div>
+                    <div style="color: #999; font-size: 13px; margin-top: 8px;">Verfügbar für neue Proposals</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+                document.getElementById(tabName).style.display = 'block';
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
