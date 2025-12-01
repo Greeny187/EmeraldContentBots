@@ -453,15 +453,26 @@
     </div>
 
     <div class="sep"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">🛒 Direkt aus der Mini-App kaufen</h4>
+    <div class="grid">
+      <button class="btn" id="pro_buy_1m_ton">
+        1 Monat · 4,95 € · TonConnect
+      </button>
+      <button class="btn ghost" id="pro_buy_1m_coinbase">
+        1 Monat · 4,95 € · Coinbase
+      </button>
+      <button class="btn ghost" id="pro_buy_1m_paypal">
+        1 Monat · 4,95 € · PayPal
+      </button>
+    </div>
+
+    <div class="sep"></div>
     <h4 style="margin:16px 0 8px; color:var(--brand)">📝 PRO-Features Beschreibung</h4>
     <label>Beschreibung (wird im /buypro Menü angezeigt)
       <textarea data-key="pro.description" placeholder="Beispiel: ✓ Unbegrenzte Custom-Regeln&#10;✓ KI-Moderation ohne Limit&#10;✓ Premium Support&#10;✓ Advanced Analytics"></textarea>
     </label>
 
     <div class="sep"></div>
-    <div class="row">
-      <button class="btn" id="pro_test">Test: PRO Payment Menü öffnen</button>
-    </div>
   </section>
 
   <section class="card" id="sec-more">
@@ -695,6 +706,52 @@ function renderFaq(list) {
     item.append(left, del);
     box.append(item);
   });
+}
+
+async function startProCheckout(plan, provider) {
+  try {
+    // optional: prüfen, ob der Provider in der PRO-Konfig aktiviert ist
+    const enabledKey = {
+      "walletconnect_ton": "pro.ton_enabled",
+      "coinbase": "pro.coinbase_enabled",
+      "paypal": "pro.paypal_enabled",
+    }[provider];
+
+    if (enabledKey) {
+      const el = qs(`[data-key="${enabledKey}"]`);
+      if (el && !el.checked) {
+        alert("Diese Zahlungsoption ist für diese Gruppe nicht aktiviert.");
+        return;
+      }
+    }
+
+    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan,
+        provider,
+        init_data: INIT_DATA || null,
+      }),
+    });
+
+    const data = await res.json();
+    if (!data.ok || !data.url) {
+      console.error("Payment error", data);
+      alert("Konnte keinen Zahlungslink erstellen. Bitte prüfe die Payment-Konfiguration.");
+      return;
+    }
+
+    const url = data.url;
+    if (tg?.openLink) {
+      tg.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Fehler beim Starten des Checkouts.");
+  }
 }
 
 async function loadState() {
@@ -1053,9 +1110,17 @@ qs('#clean_now')?.addEventListener('click', async ()=>{
   sendPayload({clean_delete_now: {demote, notify}});
 });
 
-// PRO Payment Test Button
-qs('#pro_test')?.addEventListener('click', async ()=>{
-  alert('📱 Zahlung Menü öffnet sich im Bot. Nutze /buypro in der Gruppe um die Zahlungsoptionen zu testen.');
+// PRO Checkout Buttons
+qs('#pro_buy_1m_ton')?.addEventListener('click', ()=>{
+  startProCheckout('pro_monthly', 'walletconnect_ton');
+});
+
+qs('#pro_buy_1m_coinbase')?.addEventListener('click', ()=>{
+  startProCheckout('pro_monthly', 'coinbase');
+});
+
+qs('#pro_buy_1m_paypal')?.addEventListener('click', ()=>{
+  startProCheckout('pro_monthly', 'paypal');
 });
 
 qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
