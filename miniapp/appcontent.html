@@ -467,6 +467,8 @@
   <section class="card" id="sec-more">
     <h3>⚙️ Sonstiges</h3>
     <div class="sep"></div>
+
+    <!-- Clean Deleted Accounts -->
     <div>
       <h4 style="margin:12px 0 8px; color:var(--brand)">Gelöschte Accounts aufräumen</h4>
       <div class="grid">
@@ -495,9 +497,26 @@
       </div>
       <div class="row">
         <button class="btn small" id="clean_now" type="button">Jetzt ausführen</button>
+      </div>>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Patchnotes -->
+    <div>
+      <h4 style="margin:12px 0 8px; color:var(--brand)">📦 Version & Patchnotes</h4>
+      <div id="patchnotesBox" class="hint">
+        Patchnotes werden geladen …
       </div>
-      <div class="hint" style="margin-top:8px">
-        Entfernt Admins/Moderatoren, deren Telegram-Accounts gelöscht wurden.
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Handbuch -->
+    <div>
+      <h4 style="margin:12px 0 8px; color:var(--brand)">📚 Handbuch</h4>
+      <div id="manualBox" class="hint">
+        Handbuch-Hinweis wird geladen …
       </div>
     </div>
   </section>
@@ -790,6 +809,33 @@ async function loadState() {
     setVal('clean_deleted.demote', cleanData.demote || false);
     setVal('clean_deleted.notify', cleanData.notify !== false);
     
+    // Misc: Patchnotes & Handbuch
+    const misc = j.misc || {};
+    const pn = misc.patchnotes || {};
+    const manual = misc.manual || {};
+
+    const pnBox = qs('#patchnotesBox');
+    if (pnBox) {
+      if (pn.content) {
+        const version = pn.version ? `Version <b>${pn.version}</b><br>` : '';
+        pnBox.innerHTML = version + (pn.content || '').replace(/\n/g, '<br>');
+      } else {
+        pnBox.textContent = 'Keine Patchnotes hinterlegt.';
+      }
+    }
+
+    const manualBox = qs('#manualBox');
+    if (manualBox) {
+      const cmd = manual.command || '/help';
+      const desc = manual.description || 'Öffne das vollständige Benutzerhandbuch im Bot.';
+      manualBox.innerHTML = `Befehl im Bot: <span class="kbd">${cmd}</span><br>${desc}`;
+    }
+    
+    qs('#out').textContent = 'Bereit.';
+    STATE_READY = true;
+    validateAll();
+
+
     qs('#out').textContent = 'Bereit.';
     STATE_READY = true;
     validateAll();
