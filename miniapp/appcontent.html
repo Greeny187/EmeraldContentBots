@@ -103,6 +103,7 @@
     <button class="pill" data-tab="report">Report</button>
     <button class="pill" data-tab="stats">Statistik</button>
     <button class="pill" data-tab="rewards">Rewards</button>
+    <button class="pill" data-tab="sharing">🔗 Sharing</button>
     <button class="pill" data-tab="more">Sonstiges</button>
     <button class="pill" data-tab="pro">PRO</button>
     
@@ -411,6 +412,115 @@
     </div>
   </section>
 
+  <section class="card" id="sec-sharing">
+    <h3>✨ Story-Sharing & Referrals</h3>
+    <div class="hint" style="margin:12px 0">
+      Nutzer können Geschichten über ihre Gruppe teilen und erhalten Rewards für Referrals.
+    </div>
+    <div class="sep"></div>
+
+    <div class="grid">
+      <label class="switch">
+        <input type="checkbox" data-key="sharing.enabled" checked> Story-Sharing aktiviert
+      </label>
+      <label class="switch">
+        <input type="checkbox" data-key="sharing.referral_tracking" checked> Referral-Tracking
+      </label>
+    </div>
+
+    <div class="grid">
+      <label>Story-Templates
+        <div class="list" id="sharing_templates" style="margin-top:8px">
+          <div class="item">
+            <div class="left">
+              <div class="title">✨ Emerald nutzen – Story teilen</div>
+              <div class="hint">Grundtemplate</div>
+            </div>
+            <input type="checkbox" checked disabled />
+          </div>
+          <div class="item">
+            <div class="left">
+              <div class="title">📊 Meine Stats teilen</div>
+              <div class="hint">Statistiken der Gruppe</div>
+            </div>
+            <input type="checkbox" checked disabled />
+          </div>
+          <div class="item">
+            <div class="left">
+              <div class="title">📝 Content Bot nutzen</div>
+              <div class="hint">Automatische Posts</div>
+            </div>
+            <input type="checkbox" checked disabled />
+          </div>
+          <div class="item">
+            <div class="left">
+              <div class="title">💎 EMRD erhalten – Story teilen</div>
+              <div class="hint">Rewards-fokussiert</div>
+            </div>
+            <input type="checkbox" checked disabled />
+          </div>
+          <div class="item">
+            <div class="left">
+              <div class="title">🔥 Zeig deinen Gruppen-Bot</div>
+              <div class="hint">Affiliate-Link</div>
+            </div>
+            <input type="checkbox" checked disabled />
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <div class="sep"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">💰 Reward-Einstellungen</h4>
+    <div class="grid">
+      <label>Reward für Story-Share (Punkte)
+        <input type="number" data-key="sharing.reward_share" value="50" step="10" min="0"/>
+      </label>
+      <label>Reward für Referral-Konversion (Punkte)
+        <input type="number" data-key="sharing.reward_referral" value="100" step="10" min="0"/>
+      </label>
+      <label>Reward für 10 Clicks
+        <input type="number" data-key="sharing.reward_clicks" value="25" step="5" min="0"/>
+      </label>
+    </div>
+
+    <div class="sep"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">🎯 Leaderboard & Statistiken</h4>
+    <div class="row">
+      <label class="switch">
+        <input type="checkbox" data-key="sharing.leaderboard_enabled"> Story-Sharing Leaderboard
+      </label>
+      <label class="switch">
+        <input type="checkbox" data-key="sharing.show_analytics"> Detaillierte Statistiken zeigen
+      </label>
+    </div>
+
+    <div class="hint" style="margin-top:12px">
+      💡 Mit Story-Sharing können Nutzer ihre Gruppe teilen und neue Mitglieder werben. Jeder Share wird mit automatischem Branding versehen.
+    </div>
+
+    <div class="sep" style="margin-top:16px"></div>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">🚀 Story-Templates zum Teilen (für Nutzer)</h4>
+    <div class="grid">
+      <button class="btn primary" data-story-action="group_bot" style="width:100%">✨ Emerald nutzen</button>
+      <button class="btn primary" data-story-action="stats" style="width:100%">📊 Stats teilen</button>
+      <button class="btn primary" data-story-action="content" style="width:100%">📝 Content Bot</button>
+      <button class="btn primary" data-story-action="emrd_rewards" style="width:100%">💎 EMRD verdienen</button>
+      <button class="btn primary" data-story-action="affiliate" style="width:100%">🔥 Gruppen-Bot</button>
+      <button class="btn" data-load-user-shares style="width:100%">📈 Meine Shares</button>
+    </div>
+
+    <div id="user_shares_list" style="margin-top:12px; display:none">
+      <h5>Deine Story-Shares:</h5>
+      <div class="list"></div>
+    </div>
+
+    <div id="top_shares_list" style="margin-top:12px; display:none">
+      <h5>🏆 Leaderboard:</h5>
+      <div class="list"></div>
+    </div>
+  </section>
+
   <section class="card" id="sec-pro">
     <h3>💰 PRO-Plan Zahlung</h3>
     <div class="hint" style="margin:12px 0">
@@ -468,7 +578,7 @@
 
     <div class="sep"></div>
     <h4 style="margin:16px 0 8px; color:var(--brand)">📝 PRO-Features Beschreibung</h4>
-    <label>Beschreibung (wird im /buypro Menü angezeigt)
+    <label>Beschreibung
       <textarea data-key="pro.description" placeholder="Beispiel: ✓ Unbegrenzte Custom-Regeln&#10;✓ KI-Moderation ohne Limit&#10;✓ Premium Support&#10;✓ Advanced Analytics"></textarea>
     </label>
 
@@ -1131,5 +1241,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   else { showStartPage(); }
 });
 </script>
+<script src="story-sharing.js"></script>
 </body>
 </html>
