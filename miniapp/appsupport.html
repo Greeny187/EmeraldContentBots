@@ -123,8 +123,14 @@
       </div>
     </section>
 
-    <!-- TAB: SETUP (Content‑Bot‑Style Settings) -->
-    <section id="tab-setup" class="tab">
+    <!-- TAB: STATS -->
+    <section id="tab-stats" class="tab">
+      <div class="card">
+        <div class="row"><label>Zeitraum (Tage)</label><input type="number" id="stats-days" min="1" max="60" value="14" /></div>
+        <div class="actions"><button id="btn-load-stats" class="btn primary">Laden</button></div>
+      </div>
+      <div id="stats-container" style="margin-top:12px"></div>
+    </section>
       <div class="grid2">
         <div class="card">
           <div class="row inline"><label>Welcome aktivieren</label><label class="switch"><input id="welcome_on" type="checkbox"><span class="slider"></span></label></div>
@@ -173,126 +179,341 @@
     const tg = window.Telegram.WebApp;
     try { tg.expand(); } catch (e) {}
 
-    // API Basis ermitteln
-    const metaBackend = document.querySelector('meta[name="backend"]').content;
-    const apiBase = (new URLSearchParams(location.search).get('api') || metaBackend || (location.hostname.includes('localhost') ? 'http://localhost:8000' : 'https://YOUR-API-DOMAIN')).replace(/\/$/, '') + '/api/support';
+    // ============ API Configuration ============
+    // Bestimme API-Basis: Meta-Tag > Query-Param > Default
+    const metaBackend = document.querySelector('meta[name="backend"]')?.content || '';
+    const queryApi = new URLSearchParams(location.search).get('api');
+    const defaultApi = location.hostname.includes('localhost') 
+      ? 'http://localhost:8000' 
+      : 'https://emerald-bots.herokuapp.com';  // TODO: Anpassen
+    
+    const apiBase = (queryApi || metaBackend || defaultApi).replace(/\/$/, '') + '/api/support';
 
-    // Hilfen
+    // ============ Helpers ============
     const qs = sel => document.querySelector(sel);
     const qsa = sel => Array.from(document.querySelectorAll(sel));
-    const h = () => ({ 'X-Telegram-Init-Data': tg.initData || '' , 'Content-Type': 'application/json' });
+    const h = () => ({ 
+      'X-Telegram-Init-Data': tg.initData || '',
+      'Content-Type': 'application/json' 
+    });
+    
     const param = k => new URLSearchParams(location.search).get(k);
-    const cid = param('cid');
+    const cid = param('cid');  // Chat ID (optional)
     const title = param('title') ? decodeURIComponent(param('title')) : '';
-    const uid = (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) ? tg.initDataUnsafe.user.id : 0;
+    const uid = tg.initDataUnsafe?.user?.id || 0;
 
-    // Tabs
+    // ============ Tabs ============
     qsa('.tabs button').forEach(b => b.addEventListener('click', () => {
       qsa('.tabs button').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       qsa('.tab').forEach(t => t.classList.remove('active'));
-      qs('#tab-' + b.dataset.tab).classList.add('active');
+      qs('#tab-' + b.dataset.tab)?.classList.add('active');
+      
       if (b.dataset.tab === 'stats') loadStats();
+      if (b.dataset.tab === 'setup') loadSettings();
     }));
 
-    // Subtabs (Support)
+    // ============ Subtabs (Support) ============
     qsa('.subtabs .chip').forEach(c => c.addEventListener('click', () => {
       qsa('.subtabs .chip').forEach(x => x.classList.remove('active'));
       c.classList.add('active');
-      ['create','mine','kb'].forEach(k => qs('#sub-' + k).style.display = 'none');
-      qs('#sub-' + c.dataset.subtab).style.display = 'block';
+      ['create','mine','kb'].forEach(k => {
+        const el = qs('#sub-' + k);
+        if (el) el.style.display = 'none';
+      });
+      const el = qs('#sub-' + c.dataset.subtab);
+      if (el) el.style.display = 'block';
       if (c.dataset.subtab === 'mine') loadMyTickets();
     }));
 
-    // Tickets – erstellen
+    // ============ CREATE TICKET ============
     async function createTicket(){
       const category = qs('#new-category').value;
       const subject = qs('#new-subject').value.trim();
       const body = qs('#new-body').value.trim();
-      if (subject.length < 4 || body.length < 10){
-        alert('Bitte Betreff (≥4) und Beschreibung (≥10) ausfüllen.');
+      
+      if (subject.length < 4) {
+        alert('Betreff muss mindestens 4 Zeichen lang sein.');
         return;
       }
+      if (body.length < 10) {
+        alert('Beschreibung muss mindestens 10 Zeichen lang sein.');
+        return;
+      }
+      
       try {
         tg.MainButton.showProgress?.();
-        const r = await fetch(`${apiBase}/tickets`, { method: 'POST', headers: h(), body: JSON.stringify({category, subject, body}) });
-        if (!r.ok) throw new Error(await r.text());
+        const r = await fetch(`${apiBase}/tickets`, { 
+          method: 'POST', 
+          headers: h(), 
+          body: JSON.stringify({category, subject, body}) 
+        });
+        
+        if (!r.ok) {
+          const err = await r.text();
+          throw new Error(err || `HTTP ${r.status}`);
+        }
+        
         const data = await r.json();
-        tg.HapticFeedback.notificationOccurred('success');
+        tg.HapticFeedback.notificationOccurred?.('success');
         alert('✅ Ticket #' + data.ticket_id + ' erstellt.');
+        
+        // Clear form
         qs('#new-subject').value='';
         qs('#new-body').value='';
         qs('#suggest').innerHTML='';
       } catch(e){
-        tg.HapticFeedback.notificationOccurred('error');
+        tg.HapticFeedback.notificationOccurred?.('error');
         alert('Fehler: ' + e.message);
       } finally {
         tg.MainButton.hideProgress?.();
       }
     }
-    qs('#btn-create').addEventListener('click', createTicket);
-    qs('#btn-clear').addEventListener('click', () => { qs('#new-subject').value=''; qs('#new-body').value=''; qs('#suggest').innerHTML=''; });
+    
+    qs('#btn-create')?.addEventListener('click', createTicket);
+    qs('#btn-clear')?.addEventListener('click', () => { 
+      qs('#new-subject').value='';
+      qs('#new-body').value='';
+      qs('#suggest').innerHTML='';
+    });
 
-    // KB‑Live‑Vorschläge beim Tippen
+    // ============ KB LIVE-Vorschläge ============
     let kbTimer;
     function scheduleKbSuggest(){
       clearTimeout(kbTimer);
       const q = (qs('#new-subject').value + ' ' + qs('#new-body').value).trim();
-      if (q.length < 3){ qs('#suggest').innerHTML=''; return; }
+      if (q.length < 3){ 
+        qs('#suggest').innerHTML=''; 
+        return; 
+      }
+      
       kbTimer = setTimeout(async () => {
         try {
-          const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { headers: h() });
+          const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { 
+            headers: h() 
+          });
           if (!r.ok) return;
+          
           const data = await r.json();
-          const items = (data.results||[]).map(x => `
-            <div class="card" style="border-style:dashed">
-              <div class="inline"><strong>${x.title}</strong></div>
-              <div class="muted">Tags: ${(x.tags||[]).join(', ')}</div>
-              <div class="muted">${(x.snippet||'').replace(/</g,'&lt;')}</div>
+          const items = (data.results||[]).slice(0,3).map(x => `
+            <div class="card" style="border-style:dashed;border-color:var(--muted)">
+              <div style="font-weight:600;margin-bottom:4px">${x.title}</div>
+              <div class="muted" style="font-size:11px">${(x.snippet||'').replace(/</g,'&lt;').substring(0,100)}...</div>
             </div>`).join('');
-          qs('#suggest').innerHTML = items;
-        } catch(e) {}
+          qs('#suggest').innerHTML = items ? '<div class="muted" style="margin-bottom:6px">💡 Ähnliche KB-Artikel:</div>' + items : '';
+        } catch(e) { 
+          console.log('KB search error', e); 
+        }
       }, 400);
     }
-    qs('#new-subject').addEventListener('input', scheduleKbSuggest);
-    qs('#new-body').addEventListener('input', scheduleKbSuggest);
+    
+    qs('#new-subject')?.addEventListener('input', scheduleKbSuggest);
+    qs('#new-body')?.addEventListener('input', scheduleKbSuggest);
 
-    // Eigene Tickets laden
+    // ============ LOAD MY TICKETS ============
     async function loadMyTickets(){
       const cont = qs('#mine-list');
+      if (!cont) return;
+      
       cont.innerHTML = '<div class="card">Lade …</div>';
       try {
-        const r = await fetch(`${apiBase}/tickets`, { headers: h() });
+        const url = cid ? `${apiBase}/tickets?cid=${cid}` : `${apiBase}/tickets`;
+        const r = await fetch(url, { headers: h() });
+        
         if (!r.ok) throw new Error(await r.text());
+        
         const data = await r.json();
-        if (!data.tickets?.length){ cont.innerHTML = '<div class="card">Keine Tickets.</div>'; return; }
-        cont.innerHTML = data.tickets.map(t => `
-          <div class="ticket">
-            <div class="meta">#${t.id} • ${new Date(t.created_at).toLocaleString()} • <span class="status">${t.status}</span></div>
-            <div class="subject">${t.subject}</div>
-            <div class="meta">Kategorie: ${t.category}</div>
-          </div>`).join('');
+        if (!data.tickets?.length){ 
+          cont.innerHTML = '<div class="card">Keine Tickets.</div>'; 
+          return; 
+        }
+        
+        cont.innerHTML = data.tickets.map(t => {
+          const created = new Date(t.created_at).toLocaleDateString('de-DE', {month:'short', day:'numeric'});
+          const statusEmoji = t.status === 'geloest' ? '✅' : t.status === 'in_bearbeitung' ? '⏳' : '📋';
+          return `
+            <div class="ticket">
+              <div class="meta">#${t.id} • ${created} • <span class="status">${statusEmoji} ${t.status}</span></div>
+              <div class="subject">${t.subject}</div>
+              <div class="meta">Kategorie: ${t.category}</div>
+            </div>`;
+        }).join('');
       } catch(e){
+        console.error('Error loading tickets:', e);
         cont.innerHTML = '<div class="card">Fehler beim Laden.</div>';
       }
     }
 
-    // KB Suche
-    qs('#kb-q').addEventListener('input', async () => {
+    // ============ KB SEARCH ============
+    qs('#kb-q')?.addEventListener('input', async () => {
       const q = qs('#kb-q').value.trim();
       const list = qs('#kb-results');
-      if (q.length < 2){ list.innerHTML = ''; return; }
+      if (!list) return;
+      
+      if (q.length < 2){ 
+        list.innerHTML = ''; 
+        return; 
+      }
+      
       try {
-        const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { headers: h() });
+        const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { 
+          headers: h() 
+        });
+        
         if (!r.ok) throw new Error(await r.text());
+        
         const data = await r.json();
         list.innerHTML = (data.results||[]).map(x => `
           <div class="card">
-            <div><strong>${x.title}</strong></div>
-            <div class="muted">${(x.snippet||'').replace(/</g,'&lt;')}</div>
+            <div style="font-weight:600;margin-bottom:4px">${x.title}</div>
+            <div class="muted" style="font-size:12px">${(x.snippet||'').replace(/</g,'&lt;')}</div>
           </div>`).join('');
-      } catch(e){ list.innerHTML = '<div class="card">Fehler.</div>'; }
+      } catch(e){ 
+        console.error('KB search error:', e);
+        list.innerHTML = '<div class="card">Fehler.</div>'; 
+      }
     });
+
+    // ============ SETUP TAB (Group Settings) ============
+    async function loadSettings(){
+      if (!cid) {
+        qs('#tab-setup').innerHTML = '<div class="card">Diese Funktion benötigt eine Gruppen-ID (cid).</div>';
+        return;
+      }
+      
+      try {
+        const r = await fetch(`${apiBase}/miniapp/state?cid=${cid}&uid=${uid}`, { 
+          headers: h() 
+        });
+        
+        if (!r.ok) throw new Error('Konnte Einstellungen nicht laden');
+        
+        const data = await r.json();
+        
+        // Map settings to form fields
+        qs('#welcome_on').checked = data.welcome?.on || false;
+        qs('#welcome_text').value = data.welcome?.text || '';
+        qs('#farewell_on').checked = data.farewell?.on || false;
+        qs('#farewell_text').value = data.farewell?.text || '';
+        qs('#rules_on').checked = data.rules?.on || false;
+        qs('#rules_text').value = data.rules?.text || '';
+        qs('#admins_only').checked = data.links?.only_admin_links || false;
+        qs('#warning_on').checked = data.links?.warning_enabled || false;
+        qs('#warning_text').value = data.links?.warning_text || '';
+        qs('#exceptions_on').checked = data.links?.exceptions_enabled || false;
+        qs('#ai_faq').checked = data.ai?.faq !== false;
+        qs('#ai_rss').checked = data.ai?.rss || false;
+        qs('#mood_topic').value = data.mood?.topic || '';
+        qs('#mood_question').value = data.mood?.question || 'Wie war dein Tag von 1–5?';
+        qs('#daily_stats').checked = data.daily_stats || false;
+        
+        console.log('Settings loaded');
+      } catch(e){
+        console.error('Error loading settings:', e);
+        qs('#save-status').textContent = '❌ Fehler beim Laden';
+      }
+    }
+
+    // ============ SAVE SETTINGS ============
+    qs('#btn-save')?.addEventListener('click', async () => {
+      if (!cid) {
+        alert('Gruppe erforderlich');
+        return;
+      }
+      
+      const payload = {
+        cid,
+        title: title || 'Support Group',
+        welcome_on: qs('#welcome_on').checked,
+        welcome_text: qs('#welcome_text').value,
+        farewell_on: qs('#farewell_on').checked,
+        farewell_text: qs('#farewell_text').value,
+        rules_on: qs('#rules_on').checked,
+        rules_text: qs('#rules_text').value,
+        admins_only: qs('#admins_only').checked,
+        warning_on: qs('#warning_on').checked,
+        warning_text: qs('#warning_text').value,
+        exceptions_on: qs('#exceptions_on').checked,
+        ai_faq: qs('#ai_faq').checked,
+        ai_rss: qs('#ai_rss').checked,
+        mood_topic: qs('#mood_topic').value,
+        mood_question: qs('#mood_question').value,
+        daily_stats: qs('#daily_stats').checked
+      };
+      
+      try {
+        qs('#save-status').textContent = '⏳ Speichert…';
+        
+        const r = await fetch(`${apiBase}/miniapp/state?cid=${cid}`, {
+          method: 'POST',
+          headers: h(),
+          body: JSON.stringify(payload)
+        });
+        
+        if (!r.ok) throw new Error(await r.text());
+        
+        qs('#save-status').textContent = '✅ Gespeichert!';
+        setTimeout(() => qs('#save-status').textContent = '', 2000);
+        
+        tg.HapticFeedback.notificationOccurred?.('success');
+      } catch(e){
+        console.error('Save error:', e);
+        qs('#save-status').textContent = '❌ ' + e.message;
+        tg.HapticFeedback.notificationOccurred?.('error');
+      }
+    });
+
+    // ============ STATS TAB ============
+    async function loadStats(){
+      if (!cid) {
+        qs('#stats-container').innerHTML = '<div class="card">Diese Funktion benötigt eine Gruppen-ID (cid).</div>';
+        return;
+      }
+      
+      const days = parseInt(qs('#stats-days').value) || 14;
+      try {
+        qs('#stats-container').innerHTML = '<div class="card">Lade …</div>';
+        
+        const r = await fetch(`${apiBase}/miniapp/stats?cid=${cid}&uid=${uid}&days=${days}`, { 
+          headers: h() 
+        });
+        
+        if (!r.ok) throw new Error('Konnte Statistiken nicht laden');
+        
+        const data = await r.json();
+        
+        if (!data.agg || data.agg.length === 0) {
+          qs('#stats-container').innerHTML = '<div class="card">Keine Daten verfügbar.</div>';
+          return;
+        }
+        
+        // Render stats
+        const html = '<div class="card"><strong>📊 Statistiken (letzte ' + days + ' Tage)</strong></div>' +
+          data.agg.map(s => `
+            <div class="card" style="margin-top:8px">
+              <div class="inline" style="justify-content:space-between">
+                <strong>${s.date}</strong>
+                <span class="muted">${s.messages} Messages</span>
+              </div>
+              <div class="muted" style="font-size:11px">
+                👥 ${s.active} aktiv | ➕ ${s.joins} beigetreten | ➖ ${s.leaves} verlassen
+              </div>
+            </div>`).join('');
+        
+        qs('#stats-container').innerHTML = html;
+      } catch(e){
+        console.error('Stats error:', e);
+        qs('#stats-container').innerHTML = '<div class="card">❌ Fehler: ' + e.message + '</div>';
+      }
+    }
+    
+    qs('#btn-load-stats')?.addEventListener('click', loadStats);
+
+    // ============ Init ============
+    console.log('Support MiniApp initialized');
+    console.log('API Base:', apiBase);
+    console.log('Chat ID:', cid);
+    console.log('User ID:', uid);
   </script>
 </body>
 </html>
