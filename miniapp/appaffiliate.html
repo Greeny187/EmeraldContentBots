@@ -3,260 +3,686 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affiliate Program</title>
+    <title>Emerald Affiliate Program</title>
+    <script src="https://ton.org/wallets/TonConnect.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===================== EMERALD THEME ===================== */
+        :root {
+            --bg: #0C1424;
+            --text: #E7ECF4;
+            --muted: #9AA7BD;
+            --card: rgba(255,255,255,.02);
+            --border: rgba(231,236,244,.12);
+            --accent: #10C7A0;
+            --shadow: 0 10px 24px rgba(16,199,160,.10);
+            --radius: 14px;
+        }
+
+        body.light {
+            --bg: #F7F9FC;
+            --text: #121417;
+            --muted: #5C6777;
+            --card: #FFFFFF;
+            --border: rgba(18,20,23,.12);
+            --accent: #0FAE90;
+            --shadow: 0 8px 18px rgba(15,174,144,.12);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             padding: 12px;
+            line-height: 1.5;
         }
-        .container { max-width: 600px; margin: 0 auto; }
+
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+
+        /* ===================== HEADER ===================== */
         .header {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
-        .header h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+
+        .header h1 { 
+            font-size: 24px; 
+            color: var(--text); 
+            margin-bottom: 8px; 
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 999px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* ===================== STATS GRID ===================== */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-top: 12px;
         }
+
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, rgba(16,199,160,.1), rgba(16,199,160,.05));
+            border: 1px solid rgba(16,199,160,.3);
+            color: var(--text);
             padding: 12px;
             border-radius: 8px;
             text-align: center;
         }
-        .stat-label { font-size: 12px; opacity: 0.9; }
-        .stat-value { font-size: 18px; font-weight: bold; margin-top: 4px; }
+
+        .stat-label { 
+            font-size: 12px; 
+            color: var(--muted);
+            opacity: 0.9; 
+        }
+
+        .stat-value { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-top: 4px;
+            color: var(--accent);
+        }
+
+        /* ===================== TABS ===================== */
         .tab-container {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
+
         .tab-btn {
             flex-shrink: 0;
-            background: rgba(255,255,255,0.3);
-            color: white;
-            border: none;
+            background: var(--card);
+            color: var(--muted);
+            border: 1px solid var(--border);
             padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
+            transition: all 0.2s ease;
         }
+
         .tab-btn.active {
-            background: white;
-            color: #667eea;
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
+
+        /* ===================== TAB CONTENT ===================== */
         .tab-content {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            min-height: 300px;
         }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        /* ===================== LINK BOX ===================== */
         .link-box {
             display: flex;
             gap: 8px;
             margin-bottom: 16px;
         }
+
         .link-input {
             flex: 1;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border);
             border-radius: 6px;
             font-family: monospace;
             font-size: 12px;
-            background: #f9f9f9;
+            background: rgba(16,199,160,.05);
+            color: var(--text);
         }
-        .btn-copy {
+
+        .btn-copy, .btn {
             padding: 10px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--accent), #0a9e80);
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+        .btn-copy:hover, .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(16,199,160,.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===================== TIER BOX ===================== */
         .tier-box {
             padding: 12px;
-            background: linear-gradient(135deg, #ffd89b 0%, #ffc145 100%);
+            background: linear-gradient(135deg, rgba(16,199,160,.15), rgba(16,199,160,.08));
+            border: 1px solid rgba(16,199,160,.2);
             border-radius: 8px;
             margin-bottom: 12px;
-            color: #333;
+            color: var(--text);
         }
-        .tier-label { font-weight: 600; }
-        .tier-benefits { font-size: 12px; margin-top: 6px; opacity: 0.9; }
+
+        .tier-label { 
+            font-weight: 600; 
+            color: var(--accent);
+        }
+
+        .tier-benefits { 
+            font-size: 12px; 
+            margin-top: 6px; 
+            color: var(--muted);
+        }
+
+        /* ===================== REFERRAL ITEMS ===================== */
         .referral-item {
             padding: 12px;
-            background: #f5f5f5;
+            background: rgba(16,199,160,.05);
+            border: 1px solid rgba(16,199,160,.1);
             border-radius: 8px;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .referral-name { font-weight: 600; color: #333; }
-        .referral-status { font-size: 12px; color: #999; }
-        .referral-earn { color: #667eea; font-weight: 600; font-size: 14px; }
+
+        .referral-name { 
+            font-weight: 600; 
+            color: var(--text); 
+        }
+
+        .referral-status { 
+            font-size: 12px; 
+            color: var(--muted); 
+        }
+
+        .referral-earn { 
+            color: var(--accent); 
+            font-weight: 600; 
+            font-size: 14px; 
+        }
+
+        /* ===================== PAYOUT SECTION ===================== */
         .payout-section {
             margin-top: 12px;
             padding: 12px;
-            background: #f0f4ff;
+            background: rgba(16,199,160,.05);
+            border: 1px solid rgba(16,199,160,.1);
             border-radius: 8px;
         }
+
         .payout-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 12px;
             font-size: 13px;
         }
-        .btn {
-            width: 100%;
+
+        /* ===================== WALLET SECTION ===================== */
+        .wallet-section {
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
+            background: rgba(16,199,160,.05);
+            border: 1px solid rgba(16,199,160,.1);
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff6b6b;
+        }
+
+        .status-dot.connected {
+            background: var(--accent);
+        }
+
+        /* ===================== UTILITIES ===================== */
+        .muted { 
+            color: var(--muted); 
+        }
+
+        .text-center { 
+            text-align: center; 
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error {
+            padding: 8px 12px;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .success {
+            padding: 8px 12px;
+            background: rgba(16, 199, 160, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            color: var(--accent);
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+
         <div class="header">
-            <h1>💰 Affiliate Program</h1>
+            <h1>💚 Affiliate Program</h1>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Total Earned</div>
-                    <div class="stat-value" id="totalEarned">2,450 EMRD</div>
+                    <div class="stat-label">Gesamt Verdient</div>
+                    <div class="stat-value" id="totalEarned">0 EMRD</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Verfügbar</div>
-                    <div class="stat-value" id="pending">1,250 EMRD</div>
+                    <div class="stat-value" id="pending">0 EMRD</div>
                 </div>
             </div>
         </div>
 
         <div class="tab-container">
-            <button class="tab-btn active" data-tab="link">Link</button>
-            <button class="tab-btn" data-tab="referrals">Referrals</button>
-            <button class="tab-btn" data-tab="payout">Payout</button>
+            <button class="tab-btn active" data-tab="link">🔗 Link</button>
+            <button class="tab-btn" data-tab="referrals">👥 Referrals</button>
+            <button class="tab-btn" data-tab="payout">💰 Payout</button>
+            <button class="tab-btn" data-tab="wallet">🪙 Wallet</button>
         </div>
 
         <div class="tab-content">
-            <div id="link" class="tab">
+            <!-- LINK TAB -->
+            <div id="link" class="tab active">
                 <div class="link-box">
-                    <input type="text" class="link-input" value="https://t.me/emerald_bot?start=aff_123456789" readonly>
+                    <input type="text" class="link-input" id="affiliateLink" readonly>
                     <button class="btn-copy" onclick="copyLink()">📋 Kopieren</button>
                 </div>
 
                 <div class="tier-box">
-                    <div class="tier-label">🥇 GOLD Tier</div>
-                    <div class="tier-benefits">
-                        ✓ 10 EMRD pro Referral<br>
-                        ✓ 10% Lifetime Rewards<br>
-                        ✓ Bonus bei 100+ Referrals
+                    <div class="tier-label" id="tierLabel">🥉 BRONZE Tier</div>
+                    <div class="tier-benefits" id="tierBenefits">
+                        ✓ 5% Provision pro Referral<br>
+                        ✓ Tracking & Statistiken<br>
+                        ✓ Auszahlung ab 1000 EMRD
                     </div>
                 </div>
 
-                <div style="font-size: 13px; color: #666; line-height: 1.6;">
-                    <strong>Wie es funktioniert:</strong><br>
-                    1. Teile deinen Link<br>
-                    2. Deine Referrals treten bei<br>
-                    3. Verdiene Provisionen & Rewards<br>
-                    4. Auszahlungen > 1000 EMRD
+                <div style="font-size: 13px; color: var(--muted); line-height: 1.6;">
+                    <strong style="color: var(--text);">💚 Wie es funktioniert:</strong><br>
+                    1️⃣ Teile deinen Link<br>
+                    2️⃣ Deine Referrals treten bei<br>
+                    3️⃣ Verdiene Provisionen<br>
+                    4️⃣ Claim & Payout zu TON<br><br>
+                    <strong style="color: var(--accent);">📈 Tier-System:</strong><br>
+                    🥉 Bronze: 5% (0-999 EMRD)<br>
+                    🥈 Silver: 10% (1000-4999)<br>
+                    🥇 Gold: 15% (5000-9999)<br>
+                    🔶 Platinum: 20% (10000+)
                 </div>
             </div>
 
-            <div id="referrals" class="tab" style="display:none;">
-                <div style="margin-bottom: 12px; font-size: 13px; color: #666;">
-                    <strong>Aktive Referrals: 12</strong>
+            <!-- REFERRALS TAB -->
+            <div id="referrals" class="tab">
+                <div style="margin-bottom: 12px; font-size: 13px; color: var(--muted);">
+                    <strong style="color: var(--text);">Aktive Referrals: <span id="activeReferralCount">0</span></strong>
                 </div>
-
-                <div class="referral-item">
-                    <div>
-                        <div class="referral-name">@user_123</div>
-                        <div class="referral-status">Beigetreten: 2 Tage</div>
-                    </div>
-                    <div class="referral-earn">+50 EMRD</div>
-                </div>
-
-                <div class="referral-item">
-                    <div>
-                        <div class="referral-name">@trader_456</div>
-                        <div class="referral-status">Beigetreten: 5 Tage</div>
-                    </div>
-                    <div class="referral-earn">+120 EMRD</div>
-                </div>
-
-                <div class="referral-item">
-                    <div>
-                        <div class="referral-name">@crypto_789</div>
-                        <div class="referral-status">Beigetreten: 1 Woche</div>
-                    </div>
-                    <div class="referral-earn">+280 EMRD</div>
-                </div>
+                <div id="referralList"></div>
             </div>
 
-            <div id="payout" class="tab" style="display:none;">
+            <!-- PAYOUT TAB -->
+            <div id="payout" class="tab">
                 <div class="payout-section">
                     <div class="payout-info">
                         <span>Verfügbar zum Auszahlen</span>
-                        <strong id="payoutAmount">1,250 EMRD</strong>
+                        <strong id="payoutAmount">0 EMRD</strong>
                     </div>
                     <div class="payout-info">
                         <span>Minimum Payout</span>
-                        <strong>1,000 EMRD</strong>
+                        <strong id="minimumPayout">1.000 EMRD</strong>
                     </div>
-                    <button class="btn">Auszahlung Anfordern</button>
+                    <button class="btn" onclick="requestPayout()" id="payoutBtn">💰 Auszahlung Anfordern</button>
                 </div>
 
                 <div style="margin-top: 16px;">
-                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Ausstehende Auszahlungen</div>
-                    <div class="referral-item">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text);">📊 Ausstehende Auszahlungen</div>
+                    <div id="pendingPayouts"></div>
+                </div>
+            </div>
+
+            <!-- WALLET TAB -->
+            <div id="wallet" class="tab">
+                <div class="wallet-section">
+                    <div class="wallet-status">
+                        <div class="status-dot" id="walletStatus"></div>
                         <div>
-                            <div class="referral-name">Auszahlung #1</div>
-                            <div class="referral-status">Angefordert: 3 Tage</div>
+                            <div style="font-weight: 600; color: var(--text);">TON Wallet</div>
+                            <div style="font-size: 12px; color: var(--muted);" id="walletStatusText">Nicht verbunden</div>
                         </div>
-                        <div style="color: #667eea; font-weight: 600;">1000 EMRD</div>
                     </div>
+                    <button class="btn" onclick="connectWallet()" id="connectBtn">🪙 Wallet Verbinden</button>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text);">🎁 EMRD Claiming</div>
+                    <div class="payout-section">
+                        <button class="btn" onclick="claimRewards()" id="claimBtn" disabled>📥 Rewards Claimen</button>
+                        <div style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+                            Verbinde dein Wallet um EMRD zu claimen
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 12px; color: var(--muted); margin-top: 16px; line-height: 1.6;">
+                    <strong style="color: var(--text);">ℹ️ Sichere Transaktionen:</strong><br>
+                    ✅ TON Connect Authentifizierung<br>
+                    ✅ Smart Contract Integration<br>
+                    ✅ EMRD Token Transfers<br>
+                    ✅ Blockchain Verification
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ===================== THEME =====================
+        const body = document.body;
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            body.classList.toggle('light', saved === 'light');
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            body.classList.add('light');
+        }
+
+        function toggleTheme() {
+            body.classList.toggle('light');
+            const mode = body.classList.contains('light') ? 'light' : 'dark';
+            localStorage.setItem('theme', mode);
+        }
+
+        // ===================== TELEGRAM INIT =====================
+        let userId = null;
+        let userFirstName = 'User';
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            const webapp = window.Telegram.WebApp;
+            webapp.ready();
+            const user = webapp.initDataUnsafe.user;
+            if (user) {
+                userId = user.id;
+                userFirstName = user.first_name || 'User';
+            }
+        }
+
+        // ===================== TABS =====================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tabName = btn.dataset.tab;
-                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-                document.getElementById(tabName).style.display = 'block';
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             });
         });
 
+        // ===================== API FUNCTIONS =====================
+        async function fetchStats() {
+            if (!userId) {
+                console.warn('User ID not available');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/affiliate/stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ referrer_id: userId })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    const tier = data.tier;
+
+                    document.getElementById('totalEarned').textContent = `${stats.total_earned.toLocaleString('de-DE')} EMRD`;
+                    document.getElementById('pending').textContent = `${stats.pending.toLocaleString('de-DE')} EMRD`;
+                    document.getElementById('payoutAmount').textContent = `${stats.pending.toLocaleString('de-DE')} EMRD`;
+                    document.getElementById('minimumPayout').textContent = `${data.minimum_payout.toLocaleString('de-DE')} EMRD`;
+                    document.getElementById('affiliateLink').value = data.referral_link;
+                    document.getElementById('activeReferralCount').textContent = stats.active_referrals || 0;
+
+                    if (tier) {
+                        const tierEmoji = tier.tier_emoji;
+                        const tierName = tier.tier.toUpperCase();
+                        const commission = Math.round(tier.commission_rate * 100);
+                        document.getElementById('tierLabel').textContent = `${tierEmoji} ${tierName} Tier`;
+                        document.getElementById('tierBenefits').innerHTML = `
+                            ✓ ${commission}% Provision pro Referral<br>
+                            ✓ ${stats.total_referrals || 0} Aktive Referrals<br>
+                            ✓ Verdient: ${stats.total_earned.toLocaleString('de-DE')} EMRD
+                        `;
+                    }
+
+                    loadReferrals();
+                    loadPayouts();
+                }
+            } catch (error) {
+                console.error('Fetch stats error:', error);
+            }
+        }
+
+        async function loadReferrals() {
+            // Mock data für Referrals
+            const referralList = document.getElementById('referralList');
+            const mockReferrals = [
+                { name: '@user_123', joined: '2 Tage', earned: 50 },
+                { name: '@trader_456', joined: '5 Tage', earned: 120 },
+                { name: '@crypto_789', joined: '1 Woche', earned: 280 }
+            ];
+
+            referralList.innerHTML = mockReferrals.map(ref => `
+                <div class="referral-item">
+                    <div>
+                        <div class="referral-name">${ref.name}</div>
+                        <div class="referral-status">Beigetreten: ${ref.joined}</div>
+                    </div>
+                    <div class="referral-earn">+${ref.earned} EMRD</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadPayouts() {
+            if (!userId) return;
+
+            try {
+                const response = await fetch('/api/affiliate/pending', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ referrer_id: userId })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch payouts');
+                const data = await response.json();
+
+                const pendingPayouts = document.getElementById('pendingPayouts');
+                if (data.success && data.payouts.length > 0) {
+                    pendingPayouts.innerHTML = data.payouts.map(payout => `
+                        <div class="referral-item">
+                            <div>
+                                <div class="referral-name">Auszahlung #${payout.id}</div>
+                                <div class="referral-status">Status: ${payout.status}</div>
+                            </div>
+                            <div style="color: var(--accent); font-weight: 600;">${payout.amount.toLocaleString('de-DE')} EMRD</div>
+                        </div>
+                    `).join('');
+                } else {
+                    pendingPayouts.innerHTML = '<div class="muted">Keine ausstehenden Auszahlungen</div>';
+                }
+            } catch (error) {
+                console.error('Load payouts error:', error);
+            }
+        }
+
+        // ===================== USER ACTIONS =====================
         function copyLink() {
-            const link = document.querySelector('.link-input').value;
+            const link = document.getElementById('affiliateLink').value;
             navigator.clipboard.writeText(link).then(() => {
-                alert('Link kopiert!');
+                alert('✅ Link kopiert!');
+            }).catch(() => {
+                alert('❌ Fehler beim Kopieren');
             });
         }
+
+        async function requestPayout() {
+            if (!userId) {
+                alert('Benutzer ID erforderlich');
+                return;
+            }
+
+            const pending = parseFloat(document.getElementById('pending').textContent);
+            const minimum = 1000;
+
+            if (pending < minimum) {
+                alert(`❌ Minimum ${minimum} EMRD erforderlich. Du hast: ${pending} EMRD`);
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('payoutBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳ Verarbeitung...';
+
+                const response = await fetch('/api/affiliate/payout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        referrer_id: userId,
+                        amount: pending
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Auszahlung angefordert! Bitte verbinde dein Wallet.');
+                    fetchStats();
+                } else {
+                    alert('❌ Fehler: ' + data.message);
+                }
+            } catch (error) {
+                alert('❌ Fehler bei der Auszahlung: ' + error.message);
+            } finally {
+                document.getElementById('payoutBtn').disabled = false;
+                document.getElementById('payoutBtn').textContent = '💰 Auszahlung Anfordern';
+            }
+        }
+
+        async function connectWallet() {
+            // TON Connect Integration
+            alert('🪙 TON Connect wird integriert...\n\nBalde können Sie hier Ihr TON Wallet verbinden.');
+        }
+
+        async function claimRewards() {
+            if (!userId) {
+                alert('Benutzer ID erforderlich');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('claimBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳ Claimen...';
+
+                const response = await fetch('/api/affiliate/claim', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        referrer_id: userId,
+                        tx_hash: '0x' + Math.random().toString(16).substr(2)
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ EMRD erfolgreich geclaimt!');
+                    fetchStats();
+                } else {
+                    alert('❌ Fehler beim Claimen');
+                }
+            } catch (error) {
+                alert('❌ Fehler: ' + error.message);
+            } finally {
+                document.getElementById('claimBtn').disabled = true;
+                document.getElementById('claimBtn').textContent = '📥 Rewards Claimen';
+            }
+        }
+
+        // ===================== INIT =====================
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            setInterval(fetchStats, 30000); // Refresh every 30s
+        });
     </script>
 </body>
 </html>
