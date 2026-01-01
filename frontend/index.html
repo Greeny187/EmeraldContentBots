@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emerald Dashboard Pro</title>
+  <script async src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #00D084;
+      --primary-dark: #0A2E1F;
+      --primary-light: #E8F5F0;
+      --accent: #00B06A;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --bg-dark: #0f172a;
+      --bg-medium: #1e293b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #cbd5e1;
+      --border: #334155;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ============= LOGIN PAGE ============= */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .login-box h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-box p {
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .telegram-login-btn {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: var(--primary-dark);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+    }
+
+    .telegram-login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 208, 132, 0.3);
+    }
+
+    .login-box small {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    /* ============= DASHBOARD LAYOUT ============= */
+    .dashboard {
+      display: none;
+    }
+
+    .dashboard.active {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+    }
+
+    /* Header */
+    header {
+      background: rgba(30, 41, 59, 0.6);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      font-size: 24px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .user-box img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .user-role {
+      color: var(--text-secondary);
+      font-size: 11px;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      background: rgba(30, 41, 59, 0.4);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    nav button {
+      background: rgba(51, 65, 85, 0.5);
+      color: var(--text-secondary);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    nav button:hover,
+    nav button.active {
+      background: var(--primary);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    /* Content Tabs */
+    .content {
+      display: none;
+    }
+
+    .content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Card Styles */
+    .card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .card .subtext {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .card .progress {
+      width: 100%;
+      height: 6px;
+      background: rgba(51, 65, 85, 0.5);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .card .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 3px;
+    }
+
+    /* List Items */
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .list-item {
+      background: rgba(51, 65, 85, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .list-item:hover {
+      border-color: var(--primary);
+      background: rgba(0, 208, 132, 0.05);
+    }
+
+    .list-item-content {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .item-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .item-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .item-status.inactive {
+      background: rgba(107, 114, 128, 0.2);
+      color: var(--text-secondary);
+    }
+
+    .item-status.warning {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    /* Buttons */
+    button {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      color: var(--primary-dark);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 208, 132, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(148, 163, 184, 0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      padding: 40px;
+      text-align: center;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert.success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: var(--success);
+    }
+
+    .alert.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: var(--danger);
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table th {
+      background: rgba(51, 65, 85, 0.5);
+      padding: 12px;
+      text-align: left;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    table tr:hover {
+      background: rgba(0, 208, 132, 0.05);
+    }
+
+    /* Stats Section */
+    .stats-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-medium);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 12px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      nav {
+        overflow-x: auto;
+      }
+
+      .user-section {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .logout-btn {
+        width: 100%;
+      }
+
+      .stats-header {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="login-container">
+    <div class="login-box">
+      <h1>🌿 Emerald</h1>
+      <p>Professional Dashboard</p>
+      <button class="telegram-login-btn" id="telegramLoginBtn">
+        Login with Telegram
+      </button>
+      <p><small>Secure login via Telegram Web App</small></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="dashboard">
+    <!-- Header -->
+    <header>
+      <h1>🌿 Emerald Dashboard Pro</h1>
+      <div class="user-section">
+        <div id="userBox" class="user-box">
+          <div class="user-info">
+            <div class="user-name">Loading...</div>
+            <div class="user-role">dev • pro</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Navigation -->
+      <nav>
+        <button class="nav-btn active" data-tab="overview">📊 Overview</button>
+        <button class="nav-btn" data-tab="bots">🤖 Bots</button>
+        <button class="nav-btn" data-tab="token">💎 Token</button>
+        <button class="nav-btn" data-tab="ads">📢 Ads</button>
+        <button class="nav-btn" data-tab="users">👥 Users</button>
+        <button class="nav-btn" data-tab="monitoring">🔍 Monitoring</button>
+      </nav>
+
+      <!-- OVERVIEW TAB -->
+      <div id="overview" class="content active">
+        <div class="stats-header">
+          <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="stat_users">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Bots</div>
+            <div class="stat-value" id="stat_bots">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Ads</div>
+            <div class="stat-value" id="stat_ads">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Token Holders</div>
+            <div class="stat-value" id="stat_holders">-</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>📈 Bot Activity</h3>
+            <div id="botActivityChart" class="list"></div>
+          </div>
+          <div class="card">
+            <h3>👥 User Growth (7d)</h3>
+            <div id="userGrowthChart" class="list"></div>
+          </div>
+          <div class="card">
+            <h3>💰 Revenue</h3>
+            <div id="revenueStats"></div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card" style="grid-column: 1 / -1;">
+            <h3>🚨 System Health</h3>
+            <table>
+              <tr>
+                <td>Status</td>
+                <td id="health_status"><span class="spinner"></span></td>
+              </tr>
+              <tr>
+                <td>Uptime</td>
+                <td id="health_uptime">-</td>
+              </tr>
+              <tr>
+                <td>Response Time</td>
+                <td id="health_response">-</td>
+              </tr>
+              <tr>
+                <td>Database</td>
+                <td id="health_db">-</td>
+              </tr>
+              <tr>
+                <td>Last Backup</td>
+                <td id="health_backup">-</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTS TAB -->
+      <div id="bots" class="content">
+        <div class="grid" style="margin-bottom: 20px;">
+          <button onclick="showModal('addBotModal')" style="width: 100%;">➕ Add New Bot</button>
+        </div>
+
+        <div class="card">
+          <h3>🤖 Registered Bots</h3>
+          <div id="botsList" class="list"></div>
+        </div>
+      </div>
+
+      <!-- TOKEN TAB -->
+      <div id="token" class="content">
+        <div class="grid">
+          <div class="card">
+            <h3>💎 EMRD Token</h3>
+            <div id="tokenInfo"></div>
+          </div>
+          <div class="card">
+            <h3>📊 Token Stats</h3>
+            <div id="tokenStats"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>💰 Top Holders</h3>
+          <div id="tokenHolders" class="list"></div>
+        </div>
+
+        <div class="card">
+          <h3>📝 Recent Transactions</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="tokenTransactions"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADS TAB -->
+      <div id="ads" class="content">
+        <div class="grid" style="margin-bottom: 20px;">
+          <button onclick="showModal('addAdModal')" style="width: 100%;">➕ Create Ad Campaign</button>
+        </div>
+
+        <div class="card">
+          <h3>📢 Ad Campaigns</h3>
+          <div id="adsList" class="list"></div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>📈 Ad Performance</h3>
+            <div id="adsPerformance"></div>
+          </div>
+          <div class="card">
+            <h3>💳 Ad Revenue</h3>
+            <div id="adsRevenue"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="users" class="content">
+        <div class="card">
+          <h3>👥 User Management</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Tier</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MONITORING TAB -->
+      <div id="monitoring" class="content">
+        <div class="grid">
+          <div class="card" style="grid-column: 1 / -1;">
+            <h3>🔍 System Logs</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Message</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="systemLogs"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>🌐 Bot Groups</h3>
+            <div id="botGroups" class="list"></div>
+          </div>
+          <div class="card">
+            <h3>📰 RSS Feeds</h3>
+            <div id="rssFeeds" class="list"></div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>🛡️ Moderation</h3>
+            <div id="moderationStats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <!-- Add Bot Modal -->
+  <div id="addBotModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Bot</h2>
+        <button class="modal-close" onclick="closeModal('addBotModal')">×</button>
+      </div>
+      <form onsubmit="submitAddBot(event)">
+        <div class="form-group">
+          <label>Bot Name</label>
+          <input type="text" id="botName" required>
+        </div>
+        <div class="form-group">
+          <label>Slug (identifier)</label>
+          <input type="text" id="botSlug" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="botDescription" rows="3"></textarea>
+        </div>
+        <button type="submit" style="width: 100%;">Create Bot</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Ad Modal -->
+  <div id="addAdModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Ad Campaign</h2>
+        <button class="modal-close" onclick="closeModal('addAdModal')">×</button>
+      </div>
+      <form onsubmit="submitAddAd(event)">
+        <div class="form-group">
+          <label>Campaign Name</label>
+          <input type="text" id="adName" required>
+        </div>
+        <div class="form-group">
+          <label>Bot (optional)</label>
+          <select id="adBot">
+            <option value="">All Bots</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Placement Type</label>
+          <select id="adPlacement" required>
+            <option value="banner">Banner</option>
+            <option value="inline">Inline</option>
+            <option value="popup">Popup</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <textarea id="adContent" rows="3" required></textarea>
+        </div>
+        <button type="submit" style="width: 100%;">Create Campaign</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // GLOBAL VARIABLES
+    // ============================================
+    const API_BASE = '/api';
+    let authToken = localStorage.getItem('auth_token');
+    let currentUser = null;
+    let TelegramWebApp = window.Telegram?.WebApp;
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (authToken) {
+        await initDashboard();
+      } else {
+        setupLoginButton();
+      }
+    });
+
+    // ============================================
+    // TELEGRAM LOGIN
+    // ============================================
+    function setupLoginButton() {
+      const btn = document.getElementById('telegramLoginBtn');
+      if (TelegramWebApp) {
+        btn.onclick = () => {
+          TelegramWebApp.ready();
+          const initData = TelegramWebApp.initData;
+          if (!initData) {
+            alert('Please open this link from Telegram');
+            return;
+          }
+          performTelegramAuth(initData);
+        };
+      } else {
+        btn.onclick = () => {
+          // Fallback: Open in Telegram
+          window.location.href = `https://t.me/YourBotUsername?startapp=dashboard`;
+        };
+      }
+    }
+
+    async function performTelegramAuth(initData) {
+      try {
+        const params = new URLSearchParams(initData);
+        const payload = {
+          id: parseInt(params.get('user')
+            ? JSON.parse(decodeURIComponent(params.get('user'))).id
+            : 0),
+          auth_date: parseInt(params.get('auth_date')),
+          hash: params.get('hash'),
+          username: params.get('user')
+            ? JSON.parse(decodeURIComponent(params.get('user'))).username
+            : undefined,
+          first_name: params.get('user')
+            ? JSON.parse(decodeURIComponent(params.get('user'))).first_name
+            : undefined,
+          last_name: params.get('user')
+            ? JSON.parse(decodeURIComponent(params.get('user'))).last_name
+            : undefined,
+          photo_url: params.get('user')
+            ? JSON.parse(decodeURIComponent(params.get('user'))).photo_url
+            : undefined
+        };
+
+        const response = await fetch(`${API_BASE}/auth/telegram`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error('Auth failed');
+        
+        const data = await response.json();
+        authToken = data.access_token;
+        localStorage.setItem('auth_token', authToken);
+        
+        await initDashboard();
+      } catch (error) {
+        console.error('Telegram auth failed:', error);
+        alert('Authentication failed: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // API HELPER
+    // ============================================
+    async function apiCall(endpoint, options = {}) {
+      const defaultOptions = {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...defaultOptions,
+        ...options,
+        headers: {
+          ...defaultOptions.headers,
+          ...(options.headers || {})
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          logout();
+          throw new Error('Not authenticated');
+        }
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.detail || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    // ============================================
+    // DASHBOARD INITIALIZATION
+    // ============================================
+    async function initDashboard() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+
+      try {
+        await loadUserProfile();
+        await refreshOverview();
+        setupNavigation();
+        setInterval(refreshOverview, 30000); // Auto-refresh every 30s
+      } catch (error) {
+        console.error('Failed to initialize dashboard:', error);
+        logout();
+      }
+    }
+
+    // ============================================
+    // USER PROFILE
+    // ============================================
+    async function loadUserProfile() {
+      try {
+        const data = await apiCall('/me');
+        currentUser = data;
+
+        const userBox = document.getElementById('userBox');
+        const profile = data.profile || {};
+        const img = profile.photo_url ? `<img src="${profile.photo_url}" alt="Avatar">` : '';
+
+        userBox.innerHTML = `
+          ${img}
+          <div class="user-info">
+            <div class="user-name">@${profile.username || profile.id}</div>
+            <div class="user-role">${data.role} • ${data.tier}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load user:', error);
+      }
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    function setupNavigation() {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabName = btn.dataset.tab;
+          switchTab(tabName);
+        });
+      });
+    }
+
+    function switchTab(tabName) {
+      // Hide all
+      document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      // Show selected
+      const tab = document.getElementById(tabName);
+      const btn = document.querySelector(`[data-tab="${tabName}"]`);
+      
+      if (tab && btn) {
+        tab.classList.add('active');
+        btn.classList.add('active');
+        
+        // Load tab data
+        switch (tabName) {
+          case 'bots':
+            loadBots();
+            break;
+          case 'token':
+            loadTokenData();
+            break;
+          case 'ads':
+            loadAds();
+            break;
+          case 'users':
+            loadUsers();
+            break;
+          case 'monitoring':
+            loadMonitoring();
+            break;
+        }
+      }
+    }
+
+    // ============================================
+    // OVERVIEW
+    // ============================================
+    async function refreshOverview() {
+      try {
+        const data = await apiCall('/metrics/overview');
+        document.getElementById('stat_users').textContent = data.users_total;
+        document.getElementById('stat_bots').textContent = data.bots_active;
+        document.getElementById('stat_ads').textContent = data.ads_active;
+        document.getElementById('stat_holders').textContent = '1.2k';
+
+        // Load health
+        const health = await apiCall('/system/health');
+        document.getElementById('health_status').innerHTML = `<span style="color: var(--success);">✓ ${health.status}</span>`;
+        document.getElementById('health_uptime').textContent = `${health.uptime_days}d (${health.uptime_percent}%)`;
+        document.getElementById('health_response').textContent = `${health.response_time_ms}ms`;
+        document.getElementById('health_db').textContent = health.database;
+        document.getElementById('health_backup').textContent = health.last_backup;
+
+        // Load analytics
+        await loadAnalytics();
+      } catch (error) {
+        console.error('Failed to load overview:', error);
+      }
+    }
+
+    async function loadAnalytics() {
+      try {
+        const botActivity = await apiCall('/analytics/bot-activity');
+        const userGrowth = await apiCall('/analytics/user-growth');
+
+        // Bot Activity
+        const botActivityHtml = botActivity.bot_activity
+          .slice(0, 5)
+          .map(item => `
+            <div class="list-item">
+              <div class="list-item-content">
+                <div class="item-title">${item.slug}</div>
+                <div class="item-desc">${item.events} events</div>
+              </div>
+            </div>
+          `).join('');
+        document.getElementById('botActivityChart').innerHTML = botActivityHtml || '<p style="color: var(--text-secondary);">No data</p>';
+
+        // User Growth
+        const userGrowthHtml = userGrowth.weekly_growth
+          .slice(0, 5)
+          .map(item => `
+            <div class="list-item">
+              <div class="list-item-content">
+                <div class="item-title">${item.week}</div>
+                <div class="item-desc">${item.users} new users</div>
+              </div>
+            </div>
+          `).join('');
+        document.getElementById('userGrowthChart').innerHTML = userGrowthHtml || '<p style="color: var(--text-secondary);">No data</p>';
+
+        // Revenue
+        const payment = await apiCall('/payment/stats');
+        document.getElementById('revenueStats').innerHTML = `
+          <div class="item-title">$${payment.total_revenue_usd.toFixed(2)}</div>
+          <div class="item-desc">${payment.transactions_total} transactions</div>
+          <div class="item-desc">Avg: $${payment.avg_transaction.toFixed(2)}</div>
+        `;
+      } catch (error) {
+        console.error('Failed to load analytics:', error);
+      }
+    }
+
+    // ============================================
+    // BOTS
+    // ============================================
+    async function loadBots() {
+      try {
+        const data = await apiCall('/bots');
+        const botsList = document.getElementById('botsList');
+
+        if (!data.bots || data.bots.length === 0) {
+          botsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤖</div><div class="empty-state-text">No bots yet</div></div>';
+          return;
+        }
+
+        botsList.innerHTML = data.bots.map(bot => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">🤖 ${bot.name}</div>
+              <div class="item-desc">${bot.slug}${bot.description ? ' • ' + bot.description : ''}</div>
+            </div>
+            <span class="item-status ${bot.is_active ? '' : 'inactive'}">
+              ${bot.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load bots:', error);
+      }
+    }
+
+    // ============================================
+    // TOKEN
+    // ============================================
+    async function loadTokenData() {
+      try {
+        const tokenInfo = await apiCall('/token/emrd');
+        const holders = await apiCall('/token/holders?limit=10');
+        const transactions = await apiCall('/token/transactions?limit=10');
+
+        // Token Info
+        document.getElementById('tokenInfo').innerHTML = `
+          <div class="item-title">${tokenInfo.name} (${tokenInfo.symbol})</div>
+          <div class="item-desc">Chain: ${tokenInfo.chain}</div>
+          <div style="margin-top: 10px;">
+            <strong>Price:</strong> $${tokenInfo.price_usd}<br>
+            <strong>Market Cap:</strong> $${(tokenInfo.market_cap / 1000000).toFixed(1)}M<br>
+            <strong>Holders:</strong> ${tokenInfo.holders.toLocaleString()}
+          </div>
+        `;
+
+        // Token Stats
+        document.getElementById('tokenStats').innerHTML = `
+          <strong>Total Supply:</strong> ${tokenInfo.total_supply}<br>
+          <strong>Circulating:</strong> ${tokenInfo.circulating_supply}<br>
+          <strong>Decimals:</strong> ${tokenInfo.decimals}
+        `;
+
+        // Top Holders
+        const holdersHtml = holders.holders.map(h => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">${h.ton_address.substring(0, 10)}...</div>
+              <div class="item-desc">${h.balance} (${h.percentage}%)</div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('tokenHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holders</p>';
+
+        // Transactions
+        const txHtml = transactions.transactions.map(tx => `
+          <tr>
+            <td>${tx.type}</td>
+            <td>${tx.amount}</td>
+            <td>${tx.from_address?.substring(0, 10) || '-'}...</td>
+            <td>${tx.to_address?.substring(0, 10) || '-'}...</td>
+            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+        document.getElementById('tokenTransactions').innerHTML = txHtml || '<tr><td colspan="5" style="text-align: center;">No transactions</td></tr>';
+      } catch (error) {
+        console.error('Failed to load token data:', error);
+      }
+    }
+
+    // ============================================
+    // ADS
+    // ============================================
+    async function loadAds() {
+      try {
+        const data = await apiCall('/ads');
+        const adsList = document.getElementById('adsList');
+
+        if (!data.ads || data.ads.length === 0) {
+          adsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📢</div><div class="empty-state-text">No ads yet</div></div>';
+          return;
+        }
+
+        adsList.innerHTML = data.ads.map(ad => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">📢 ${ad.name}</div>
+              <div class="item-desc">${ad.placement}${ad.bot_slug ? ' • ' + ad.bot_slug : ''}</div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">${ad.content.substring(0, 100)}...</div>
+            </div>
+            <span class="item-status ${ad.is_active ? '' : 'inactive'}">
+              ${ad.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+        `).join('');
+
+        // Load bots for dropdown
+        const bots = await apiCall('/bots');
+        const botSelect = document.getElementById('adBot');
+        botSelect.innerHTML = '<option value="">All Bots</option>' + 
+          bots.bots.map(b => `<option value="${b.slug}">${b.name}</option>`).join('');
+      } catch (error) {
+        console.error('Failed to load ads:', error);
+      }
+    }
+
+    // ============================================
+    // USERS
+    // ============================================
+    async function loadUsers() {
+      try {
+        const data = await apiCall('/tiers?limit=50');
+        const usersList = document.getElementById('usersList');
+
+        if (!data.users || data.users.length === 0) {
+          usersList.innerHTML = '<tr><td colspan="5" style="text-align: center;">No users</td></tr>';
+          return;
+        }
+
+        usersList.innerHTML = data.users.map(user => `
+          <tr>
+            <td>${user.username || `#${user.telegram_id}`}</td>
+            <td>${user.role}</td>
+            <td>${user.tier}</td>
+            <td>${new Date(user.created_at).toLocaleDateString()}</td>
+            <td><button onclick="editUserTier(${user.telegram_id})">Edit</button></td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load users:', error);
+      }
+    }
+
+    // ============================================
+    // MONITORING
+    // ============================================
+    async function loadMonitoring() {
+      try {
+        const logs = await apiCall('/system/logs?limit=50');
+        const groups = await apiCall('/bot-groups');
+        const feeds = await apiCall('/content/feeds');
+        const moderation = await apiCall('/moderation/stats');
+
+        // System Logs
+        const logsHtml = logs.logs.map(log => `
+          <tr>
+            <td><span style="color: ${log.level === 'error' ? 'var(--danger)' : log.level === 'warning' ? 'var(--warning)' : 'var(--success)'};">${log.level.toUpperCase()}</span></td>
+            <td>${log.message}</td>
+            <td>${new Date(log.created_at).toLocaleString()}</td>
+          </tr>
+        `).join('');
+        document.getElementById('systemLogs').innerHTML = logsHtml || '<tr><td colspan="3" style="text-align: center;">No logs</td></tr>';
+
+        // Bot Groups
+        const groupsHtml = groups.groups.map(g => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">🌐 ${g.chat_title}</div>
+              <div class="item-desc">${g.member_count} members</div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('botGroups').innerHTML = groupsHtml || '<p style="color: var(--text-secondary);">No groups</p>';
+
+        // RSS Feeds
+        const feedsHtml = feeds.feeds.map(f => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">📰 ${f.name}</div>
+              <div class="item-desc">${f.item_count} items</div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('rssFeeds').innerHTML = feedsHtml || '<p style="color: var(--text-secondary);">No feeds</p>';
+
+        // Moderation
+        document.getElementById('moderationStats').innerHTML = `
+          <strong>🚨 Spam Detected:</strong> ${moderation.spam_detected}<br>
+          <strong>🗑️ Messages Deleted:</strong> ${moderation.messages_deleted}<br>
+          <strong>🚫 Users Banned:</strong> ${moderation.users_banned}
+        `;
+      } catch (error) {
+        console.error('Failed to load monitoring:', error);
+      }
+    }
+
+    // ============================================
+    // MODALS
+    // ============================================
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    async function submitAddBot(event) {
+      event.preventDefault();
+      try {
+        const response = await apiCall('/bots', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('botName').value,
+            slug: document.getElementById('botSlug').value,
+            description: document.getElementById('botDescription').value,
+            is_active: true
+          })
+        });
+
+        closeModal('addBotModal');
+        event.target.reset();
+        await loadBots();
+        alert('Bot created successfully!');
+      } catch (error) {
+        alert('Failed to create bot: ' + error.message);
+      }
+    }
+
+    async function submitAddAd(event) {
+      event.preventDefault();
+      try {
+        const response = await apiCall('/ads', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('adName').value,
+            placement: document.getElementById('adPlacement').value,
+            content: document.getElementById('adContent').value,
+            bot_slug: document.getElementById('adBot').value || null,
+            is_active: true
+          })
+        });
+
+        closeModal('addAdModal');
+        event.target.reset();
+        await loadAds();
+        alert('Ad campaign created successfully!');
+      } catch (error) {
+        alert('Failed to create ad: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // LOGOUT
+    // ============================================
+    function logout() {
+      localStorage.removeItem('auth_token');
+      authToken = null;
+      document.getElementById('dashboard').classList.remove('active');
+      document.getElementById('loginPage').style.display = 'flex';
+      setupLoginButton();
+    }
+  </script>
+</body>
+</html>
