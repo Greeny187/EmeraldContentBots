@@ -3,45 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning</title>
+    <title>Emerald Academy - Learning</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --success: #48bb78;
+            --warning: #f6ad55;
+            --danger: #f56565;
+            --bg: #f7fafc;
+            --card: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             min-height: 100vh;
             padding: 12px;
+            color: var(--text);
         }
+        
         .container { max-width: 600px; margin: 0 auto; }
+        
         .header {
-            background: rgba(255,255,255,0.95);
+            background: var(--card);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .header h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
-        .progress-stat {
+        
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-top: 12px;
         }
+        
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             padding: 12px;
             border-radius: 8px;
             text-align: center;
         }
+        
         .stat-label { font-size: 12px; opacity: 0.9; }
         .stat-value { font-size: 18px; font-weight: bold; margin-top: 4px; }
-        .tab-container {
+        
+        .tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
             overflow-x: auto;
+            padding-bottom: 4px;
         }
+        
         .tab-btn {
             flex-shrink: 0;
             background: rgba(255,255,255,0.3);
@@ -52,139 +76,583 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
+            transition: all 0.3s;
         }
-        .tab-btn.active {
-            background: white;
-            color: #667eea;
-        }
-        .tab-content {
-            background: rgba(255,255,255,0.95);
+        
+        .tab-btn:hover { background: rgba(255,255,255,0.5); }
+        .tab-btn.active { background: white; color: var(--primary); }
+        
+        .content {
+            background: var(--card);
             border-radius: 12px;
             padding: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+        
+        .tab { display: none; }
+        .tab.active { display: block; }
+        
         .course-item {
             display: flex;
             gap: 12px;
             padding: 12px;
-            background: #f5f5f5;
+            background: var(--bg);
             border-radius: 8px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .course-item:hover { background: #efefef; }
+        
+        .course-item:hover { background: #e2e8f0; }
+        .course-item.active { background: #e0e7ff; border-left: 4px solid var(--primary); }
+        
         .course-icon { font-size: 32px; }
         .course-info { flex: 1; }
-        .course-title { font-weight: 600; color: #333; margin-bottom: 4px; }
-        .course-meta { font-size: 12px; color: #999; }
+        .course-title { font-weight: 600; margin-bottom: 4px; }
+        .course-meta { font-size: 12px; color: var(--text-light); }
+        
         .progress-bar {
             width: 100%;
             height: 4px;
-            background: #ddd;
+            background: #cbd5e0;
             border-radius: 2px;
             margin-top: 8px;
             overflow: hidden;
         }
+        
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            width: 0%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: width 0.3s;
         }
+        
+        .module-section {
+            margin-bottom: 16px;
+        }
+        
+        .module-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        
+        .quiz-container {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .quiz-question {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .quiz-option {
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-option:hover { border-color: var(--primary); background: #f0f4ff; }
+        .quiz-option.selected { border-color: var(--primary); background: #f0f4ff; }
+        .quiz-option.correct { border-color: var(--success); background: #f0fdf4; }
+        .quiz-option.wrong { border-color: var(--danger); background: #fef2f2; }
+        
         .btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 12px;
+            transition: all 0.3s;
         }
-        .badge { display: inline-block; padding: 6px 12px; background: #e0e0ff; color: #667eea; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(102,126,234,0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .badge { display: inline-block; padding: 6px 12px; background: #e0e7ff; color: var(--primary); border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; }
+        
+        .achievement-icon { font-size: 40px; margin-bottom: 8px; }
+        
+        .loading {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-light);
+        }
+        
+        .spinner {
+            border: 3px solid rgba(102,126,234,0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .message.success { background: #f0fdf4; color: var(--success); border-left: 4px solid var(--success); }
+        .message.error { background: #fef2f2; color: var(--danger); border-left: 4px solid var(--danger); }
+        .message.info { background: #f0f4ff; color: var(--primary); border-left: 4px solid var(--primary); }
+        
+        .explanation {
+            background: #f0f4ff;
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📚 Learning</h1>
-            <div class="progress-stat">
+            <h1>📚 Emerald Academy</h1>
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Kurse</div>
-                    <div class="stat-value" id="courses">0/12</div>
+                    <div class="stat-value" id="courseCount">0/5</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Verdient</div>
-                    <div class="stat-value" id="earned">0 EMRD</div>
+                    <div class="stat-value" id="emrdEarned">0 EMRD</div>
                 </div>
             </div>
         </div>
 
-        <div class="tab-container">
-            <button class="tab-btn active" data-tab="available">Verfügbar</button>
-            <button class="tab-btn" data-tab="progress">Fortschritt</button>
-            <button class="tab-btn" data-tab="certificates">Zertifikate</button>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="courses">📚 Kurse</button>
+            <button class="tab-btn" data-tab="learning">📖 Lernen</button>
+            <button class="tab-btn" data-tab="certificates">🎓 Zertifikate</button>
+            <button class="tab-btn" data-tab="achievements">🏆 Erfolge</button>
         </div>
 
-        <div class="tab-content">
-            <div id="available" class="tab">
-                <div class="course-item">
-                    <div class="course-icon">🔗</div>
-                    <div class="course-info">
-                        <div class="course-title">Blockchain Basics</div>
-                        <div class="course-meta">5 Module • 2h 30min</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                    </div>
-                </div>
-                <div class="course-item">
-                    <div class="course-icon">🪙</div>
-                    <div class="course-info">
-                        <div class="course-title">Smart Contracts 101</div>
-                        <div class="course-meta">6 Module • 3h 15min</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                    </div>
-                </div>
-                <div class="course-item">
-                    <div class="course-icon">🏦</div>
-                    <div class="course-info">
-                        <div class="course-title">DeFi Protokolle</div>
-                        <div class="course-meta">7 Module • 4h</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                    </div>
-                </div>
-                <button class="btn">Weiter</button>
+        <div class="content">
+            <!-- COURSES TAB -->
+            <div id="courses" class="tab active">
+                <div id="coursesList"></div>
+                <button class="btn" onclick="loadCoursesTab()">🔄 Aktualisieren</button>
             </div>
 
-            <div id="progress" class="tab" style="display:none;">
-                <div class="course-item">
-                    <div class="course-icon">✅</div>
-                    <div class="course-info">
-                        <div class="course-title">Web3 Intro</div>
-                        <div class="course-meta">Fertiggestellt • 100 EMRD</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                    </div>
-                </div>
+            <!-- LEARNING TAB -->
+            <div id="learning" class="tab">
+                <div id="learningContent"></div>
             </div>
 
-            <div id="certificates" class="tab" style="display:none;">
-                <div style="text-align: center; padding: 32px 0; color: #999;">
-                    <div style="font-size: 40px; margin-bottom: 12px;">🏅</div>
-                    <p>Keine Zertifikate vorhanden</p>
-                </div>
+            <!-- CERTIFICATES TAB -->
+            <div id="certificates" class="tab">
+                <div id="certificatesList"></div>
+            </div>
+
+            <!-- ACHIEVEMENTS TAB -->
+            <div id="achievements" class="tab">
+                <div id="achievementsList"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // ===== CONFIG =====
+        const API_BASE = "http://localhost:3000/api/learning"; // Change in production
+        const TG = window.Telegram.WebApp;
+        const USER_ID = TG.initDataUnsafe?.user?.id || 123456789;
+
+        // Initialize Telegram WebApp
+        if (TG) {
+            TG.ready();
+            TG.expand();
+            TG.setHeaderColor("#667eea");
+        }
+
+        // ===== STATE =====
+        let currentCourse = null;
+        let currentModule = null;
+        let userStats = null;
+
+        // ===== TAB SWITCHING =====
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const tabName = btn.dataset.tab;
-                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-                document.getElementById(tabName).style.display = 'block';
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+
+                // Load tab content
+                switch(tabName) {
+                    case 'courses':
+                        await loadCoursesTab();
+                        break;
+                    case 'learning':
+                        await loadLearningTab();
+                        break;
+                    case 'certificates':
+                        await loadCertificatesTab();
+                        break;
+                    case 'achievements':
+                        await loadAchievementsTab();
+                        break;
+                }
             });
+        });
+
+        // ===== COURSES TAB =====
+        async function loadCoursesTab() {
+            try {
+                const container = document.getElementById('coursesList');
+                container.innerHTML = '<div class="loading"><div class="spinner"></div>Kurse werden geladen...</div>';
+
+                const response = await fetch(`${API_BASE}/courses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID })
+                });
+
+                const data = await response.json();
+                if (!data.data) throw new Error('No courses found');
+
+                container.innerHTML = '';
+                const allCourses = data.data;
+
+                if (allCourses.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color: #718096;">Keine Kurse verfügbar</p>';
+                    return;
+                }
+
+                allCourses.forEach((course, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'course-item';
+                    div.innerHTML = `
+                        <div class="course-icon">${course.icon || '📖'}</div>
+                        <div class="course-info">
+                            <div class="course-title">${course.title}</div>
+                            <div class="course-meta">${course.total_modules || 5} Module • ${course.duration_minutes || 60} Min</div>
+                            <div class="course-meta">🏆 ${course.reward_points || 100} EMRD</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${course.progress_percentage || 0}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    div.addEventListener('click', async () => {
+                        currentCourse = course;
+                        await enrollCourse(course.id);
+                        await loadLearningTab();
+                        document.querySelector('[data-tab="learning"]').click();
+                    });
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error loading courses:', err);
+                document.getElementById('coursesList').innerHTML = `<div class="message error">Fehler beim Laden: ${err.message}</div>`;
+            }
+        }
+
+        async function enrollCourse(courseId) {
+            try {
+                const response = await fetch(`${API_BASE}/enroll`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID, course_id: courseId })
+                });
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    showMessage('Erfolgreich eingeschrieben!', 'success');
+                }
+            } catch (err) {
+                console.error('Enrollment error:', err);
+            }
+        }
+
+        // ===== LEARNING TAB =====
+        async function loadLearningTab() {
+            try {
+                const container = document.getElementById('learningContent');
+                if (!currentCourse) {
+                    container.innerHTML = '<div class="message info">Wähle einen Kurs aus der Übersicht</div>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="loading"><div class="spinner"></div>Kursmaterial wird geladen...</div>';
+
+                const response = await fetch(`${API_BASE}/modules`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course_id: currentCourse.id })
+                });
+
+                const data = await response.json();
+                const modules = data.data || [];
+
+                container.innerHTML = `<h2 style="margin-bottom: 12px;">${currentCourse.title}</h2>`;
+
+                if (modules.length === 0) {
+                    container.innerHTML += '<p style="color: #718096;">Keine Module verfügbar</p>';
+                    return;
+                }
+
+                for (const module of modules) {
+                    const moduleDiv = document.createElement('div');
+                    moduleDiv.className = 'module-section';
+                    moduleDiv.innerHTML = `
+                        <div class="module-title">${module.order_index}. ${module.title}</div>
+                        <div style="font-size: 14px; color: #718096; margin-bottom: 12px;">${module.content}</div>
+                    `;
+
+                    // Load quizzes for this module
+                    const quizResponse = await fetch(`${API_BASE}/quiz`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'get', module_id: module.id })
+                    });
+
+                    const quizData = await quizResponse.json();
+                    const quizzes = quizData.data || [];
+
+                    if (quizzes.length > 0) {
+                        quizzes.forEach((quiz, qIdx) => {
+                            const quizDiv = document.createElement('div');
+                            quizDiv.className = 'quiz-container';
+                            quizDiv.id = `quiz-${quiz.id}`;
+
+                            const options = quiz.options;
+                            let optionsHtml = '';
+                            options.forEach((opt, i) => {
+                                const label = String.fromCharCode(65 + i); // A, B, C, D
+                                optionsHtml += `
+                                    <div class="quiz-option" onclick="selectAnswer(${quiz.id}, '${label}', this)">
+                                        <strong>${label})</strong> ${opt}
+                                    </div>
+                                `;
+                            });
+
+                            quizDiv.innerHTML = `
+                                <div class="quiz-question">❓ ${quiz.question}</div>
+                                <div class="quiz-options">${optionsHtml}</div>
+                                <button class="btn" onclick="submitQuiz(${quiz.id}, ${module.id}, ${currentCourse.id})">✓ Antwort prüfen</button>
+                            `;
+                            moduleDiv.appendChild(quizDiv);
+                        });
+                    }
+
+                    container.appendChild(moduleDiv);
+                }
+
+                const completeBtn = document.createElement('button');
+                completeBtn.className = 'btn';
+                completeBtn.textContent = '✅ Modul abgeschlossen';
+                completeBtn.onclick = async () => {
+                    await markModuleComplete(currentModule?.id || 1, currentCourse.id);
+                };
+                container.appendChild(completeBtn);
+            } catch (err) {
+                console.error('Error loading learning:', err);
+                document.getElementById('learningContent').innerHTML = `<div class="message error">Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ===== QUIZ HANDLING =====
+        let selectedAnswer = null;
+
+        function selectAnswer(quizId, answer, element) {
+            document.querySelectorAll(`#quiz-${quizId} .quiz-option`).forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedAnswer = answer;
+        }
+
+        async function submitQuiz(quizId, moduleId, courseId) {
+            if (!selectedAnswer) {
+                showMessage('Bitte wähle eine Antwort!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/quiz`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submit',
+                        user_id: USER_ID,
+                        quiz_id: quizId,
+                        answer: selectedAnswer
+                    })
+                });
+
+                const data = await response.json();
+                const quizDiv = document.getElementById(`quiz-${quizId}`);
+
+                if (data.is_correct) {
+                    document.querySelectorAll(`#quiz-${quizId} .quiz-option.selected`).forEach(el => {
+                        el.classList.add('correct');
+                    });
+                    showMessage(`✅ Richtig! +${data.points} Punkte`, 'success');
+                } else {
+                    document.querySelectorAll(`#quiz-${quizId} .quiz-option.selected`).forEach(el => {
+                        el.classList.add('wrong');
+                    });
+                    showMessage('❌ Leider falsch. Versuche es erneut!', 'error');
+                }
+
+                if (data.explanation) {
+                    const explDiv = document.createElement('div');
+                    explDiv.className = 'explanation';
+                    explDiv.textContent = data.explanation;
+                    quizDiv.appendChild(explDiv);
+                }
+
+                document.querySelectorAll(`#quiz-${quizId} .btn`).forEach(btn => btn.disabled = true);
+            } catch (err) {
+                console.error('Submit error:', err);
+                showMessage('Fehler beim Absenden', 'error');
+            }
+        }
+
+        // ===== CERTIFICATES TAB =====
+        async function loadCertificatesTab() {
+            try {
+                const container = document.getElementById('certificatesList');
+                container.innerHTML = '<div class="loading"><div class="spinner"></div>Zertifikate werden geladen...</div>';
+
+                const response = await fetch(`${API_BASE}/progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID })
+                });
+
+                const data = await response.json();
+                const certificates = data.certificates || [];
+
+                container.innerHTML = '';
+
+                if (certificates.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 32px;"><div style="font-size: 40px; margin-bottom: 12px;">🎓</div><p>Noch keine Zertifikate</p><p style="font-size: 12px; color: #718096; margin-top: 8px;">Schließe Kurse ab um Zertifikate zu verdienen!</p></div>';
+                    return;
+                }
+
+                certificates.forEach(cert => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'padding: 16px; background: #f0f4ff; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #667eea;';
+                    div.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">🏆 ${cert.title}</div>
+                        <div style="font-size: 12px; color: #718096;">Ausgestellt: ${new Date(cert.issued_at).toLocaleDateString('de-DE')}</div>
+                        <div style="font-size: 12px; font-family: monospace; margin-top: 8px; word-break: break-all;">Hash: ${cert.certificate_hash.substring(0, 20)}...</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error loading certificates:', err);
+                document.getElementById('certificatesList').innerHTML = `<div class="message error">Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ===== ACHIEVEMENTS TAB =====
+        async function loadAchievementsTab() {
+            try {
+                const container = document.getElementById('achievementsList');
+                container.innerHTML = '<div class="loading"><div class="spinner"></div>Erfolge werden geladen...</div>';
+
+                const response = await fetch(`${API_BASE}/progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID })
+                });
+
+                const data = await response.json();
+                const achievements = data.achievements || [];
+
+                container.innerHTML = '';
+
+                if (achievements.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 32px;"><div style="font-size: 40px; margin-bottom: 12px;">🎯</div><p>Noch keine Erfolge</p></div>';
+                    return;
+                }
+
+                achievements.forEach(ach => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'padding: 16px; background: #f0fdf4; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #48bb78;';
+                    div.innerHTML = `
+                        <div style="font-size: 24px; margin-bottom: 8px;">${ach.achievement_icon}</div>
+                        <div style="font-weight: 600;">${ach.achievement_name}</div>
+                        <div style="font-size: 12px; color: #718096; margin-top: 4px;">Verdient: ${new Date(ach.earned_at).toLocaleDateString('de-DE')}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error loading achievements:', err);
+                document.getElementById('achievementsList').innerHTML = `<div class="message error">Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ===== HELPER FUNCTIONS =====
+        async function markModuleComplete(moduleId, courseId) {
+            try {
+                const response = await fetch(`${API_BASE}/mark_complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        module_id: moduleId,
+                        course_id: courseId,
+                        time_spent: 300
+                    })
+                });
+
+                const data = await response.json();
+                showMessage(`✅ Modul abgeschlossen! Fortschritt: ${data.progress}%`, 'success');
+
+                if (data.achievements_unlocked && data.achievements_unlocked.length > 0) {
+                    data.achievements_unlocked.forEach(ach => {
+                        showMessage(`🏆 Achievement freigeschaltet: ${ach}`, 'success');
+                    });
+                }
+
+                await loadCoursesTab();
+            } catch (err) {
+                console.error('Error marking complete:', err);
+            }
+        }
+
+        function showMessage(text, type = 'info') {
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.textContent = text;
+            document.querySelector('.content').insertBefore(msg, document.querySelector('.content').firstChild);
+            setTimeout(() => msg.remove(), 4000);
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadCoursesTab();
+            await loadAchievementsTab();
         });
     </script>
 </body>

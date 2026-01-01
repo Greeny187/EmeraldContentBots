@@ -3,213 +3,615 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAO Governance</title>
+    <title>🏛️ Emerald DAO Governance</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        :root {
+            --emerald-primary: #00D084;
+            --emerald-dark: #0A2E1F;
+            --emerald-light: #E8F5F0;
+            --emerald-bg: #0F3D2B;
+            --emerald-accent: #00B06A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A8D5C8;
+            --bg-overlay: rgba(15, 61, 43, 0.95);
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0A2E1F 0%, #0F3D2B 100%);
             min-height: 100vh;
             padding: 12px;
+            color: var(--text-primary);
         }
-        .container { max-width: 600px; margin: 0 auto; }
+        
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 0 12px;
+        }
+        
         .header {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--emerald-accent) 0%, var(--emerald-primary) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 208, 132, 0.3);
+            color: var(--emerald-dark);
         }
-        .header h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+        
+        .header h1 { 
+            font-size: 28px; 
+            margin-bottom: 12px; 
+            font-weight: 700;
+        }
+        
         .voting-power {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 16px;
+            border-radius: 12px;
             margin-top: 12px;
-            font-size: 14px;
+            border-left: 4px solid var(--text-primary);
         }
-        .vp-value { font-size: 20px; font-weight: bold; margin-top: 4px; }
+        
+        .voting-power label {
+            font-size: 13px;
+            opacity: 0.9;
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .vp-value { 
+            font-size: 24px; 
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .vp-details {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.85;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .vp-detail {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
         .tab-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             overflow-x: auto;
+            padding-bottom: 4px;
         }
+        
         .tab-btn {
             flex-shrink: 0;
-            background: rgba(255,255,255,0.3);
-            color: white;
-            border: none;
-            padding: 8px 16px;
+            background: rgba(0, 208, 132, 0.2);
+            color: var(--emerald-primary);
+            border: 2px solid rgba(0, 208, 132, 0.3);
+            padding: 10px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
+        
+        .tab-btn:hover {
+            background: rgba(0, 208, 132, 0.3);
+            border-color: var(--emerald-primary);
+        }
+        
         .tab-btn.active {
-            background: white;
-            color: #667eea;
+            background: var(--emerald-primary);
+            color: var(--emerald-dark);
+            border-color: var(--emerald-primary);
         }
+        
         .tab-content {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: var(--bg-overlay);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 208, 132, 0.15);
+            border: 1px solid rgba(0, 208, 132, 0.2);
         }
+        
+        .tab {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .proposal-item {
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid rgba(0, 208, 132, 0.3);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: rgba(0, 208, 132, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .proposal-item:hover {
+            background: rgba(0, 208, 132, 0.1);
+            border-color: var(--emerald-primary);
+            transform: translateX(4px);
+        }
+        
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
             margin-bottom: 12px;
         }
-        .proposal-title { font-weight: 600; color: #333; margin-bottom: 8px; }
-        .proposal-desc { font-size: 13px; color: #666; margin-bottom: 8px; }
-        .vote-bar {
-            display: flex;
-            gap: 8px;
+        
+        .proposal-title { 
+            font-weight: 700; 
+            color: var(--emerald-primary);
             margin-bottom: 8px;
+            font-size: 16px;
         }
-        .vote-option {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            background: #f5f5f5;
-            border-radius: 6px;
+        
+        .proposal-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
+            font-weight: 600;
         }
-        .vote-option.for { background: #d4edda; color: #155724; }
-        .vote-option.against { background: #f8d7da; color: #721c24; }
+        
+        .status-active {
+            background: rgba(0, 208, 132, 0.3);
+            color: var(--emerald-primary);
+        }
+        
+        .status-closed {
+            background: rgba(168, 85, 247, 0.3);
+            color: #D8B4FE;
+        }
+        
+        .proposal-desc { 
+            font-size: 14px; 
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .proposal-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
         .vote-progress {
             display: flex;
             gap: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
         }
-        .vote-for { flex: 1; height: 4px; background: #28a745; border-radius: 2px; }
-        .vote-against { flex: 1; height: 4px; background: #dc3545; border-radius: 2px; }
+        
+        .vote-for { 
+            background: var(--emerald-primary);
+            border-radius: 8px;
+        }
+        
+        .vote-against { 
+            background: #FF6B6B;
+            border-radius: 8px;
+        }
+        
         .vote-stats {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            color: #999;
+            font-size: 13px;
+            margin-bottom: 12px;
+            gap: 12px;
         }
-        .btn {
-            width: 100%;
+        
+        .vote-stat {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .vote-stat-value {
+            font-weight: 700;
+            color: var(--emerald-primary);
+        }
+        
+        .vote-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .vote-option {
+            flex: 1;
+            text-align: center;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
+            background: rgba(0, 208, 132, 0.2);
+            border: 1px solid rgba(0, 208, 132, 0.4);
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--emerald-primary);
         }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-        .form-group input, .form-group textarea {
+        
+        .vote-option:hover {
+            background: rgba(0, 208, 132, 0.3);
+            border-color: var(--emerald-primary);
+            transform: translateY(-2px);
+        }
+        
+        .vote-option.for { 
+            background: rgba(0, 208, 132, 0.3);
+            border-color: var(--emerald-primary);
+        }
+        
+        .vote-option.against { 
+            background: rgba(255, 107, 107, 0.2);
+            border-color: #FF6B6B;
+            color: #FF8A8A;
+        }
+        
+        .btn {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--emerald-primary) 0%, var(--emerald-accent) 100%);
+            color: var(--emerald-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 208, 132, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 208, 132, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: rgba(0, 208, 132, 0.2);
+            color: var(--emerald-primary);
+            border: 1px solid rgba(0, 208, 132, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0, 208, 132, 0.3);
+        }
+        
+        .form-group { 
+            margin-bottom: 16px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            font-size: 14px; 
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--emerald-primary);
+        }
+        
+        .form-group input, 
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(0, 208, 132, 0.3);
+            border-radius: 8px;
+            font-family: inherit;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--emerald-primary);
+            background: rgba(0, 208, 132, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.2);
+        }
+        
+        .form-group textarea { 
+            resize: vertical; 
+            min-height: 100px;
             font-family: inherit;
         }
-        .form-group textarea { resize: vertical; min-height: 100px; }
+        
+        .form-group select {
+            cursor: pointer;
+        }
+        
+        .form-group select option {
+            background: var(--emerald-dark);
+            color: var(--text-primary);
+        }
+        
+        .treasury-display {
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .treasury-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .treasury-balance {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--emerald-primary);
+            margin-bottom: 8px;
+        }
+        
+        .treasury-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .delegations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .delegation-item {
+            padding: 12px;
+            background: rgba(0, 208, 132, 0.05);
+            border: 1px solid rgba(0, 208, 132, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delegation-info {
+            flex: 1;
+        }
+        
+        .delegation-power {
+            font-weight: 700;
+            color: var(--emerald-primary);
+            font-size: 16px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            border: 3px solid rgba(0, 208, 132, 0.2);
+            border-top: 3px solid var(--emerald-primary);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #FF8A8A;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .success {
+            background: rgba(0, 208, 132, 0.1);
+            border: 1px solid rgba(0, 208, 132, 0.3);
+            color: var(--emerald-primary);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--emerald-bg);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 208, 132, 0.3);
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--emerald-primary);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        
+        .badge-new {
+            background: rgba(59, 130, 246, 0.3);
+            color: #93C5FD;
+        }
+        
+        .badge-trending {
+            background: rgba(250, 204, 21, 0.3);
+            color: #FCD34D;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏛️ DAO Governance</h1>
+            <h1>🏛️ Emerald DAO</h1>
+            <p style="font-size: 14px; margin-bottom: 12px; opacity: 0.95;">
+                Dezentralisierte Governance des Emerald Ökosystems
+            </p>
             <div class="voting-power">
-                <div>Deine Voting Power</div>
-                <div class="vp-value" id="votingPower">100,000 EMRD</div>
+                <label>Deine Voting Power</label>
+                <div class="vp-value" id="votingPower">Lädt...</div>
+                <div class="vp-details" id="votingDetails" style="display: none;">
+                    <div class="vp-detail">
+                        <span>💚</span>
+                        <span id="vpBalance">0 EMRD</span>
+                    </div>
+                    <div class="vp-detail">
+                        <span>➡️</span>
+                        <span id="vpDelegated">0</span>
+                    </div>
+                    <div class="vp-detail">
+                        <span>⬅️</span>
+                        <span id="vpReceived">0</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="tab-container">
-            <button class="tab-btn active" data-tab="proposals">Abstimmungen</button>
-            <button class="tab-btn" data-tab="new">Neue Proposal</button>
-            <button class="tab-btn" data-tab="treasury">Treasury</button>
+            <button class="tab-btn active" data-tab="proposals">📋 Abstimmungen</button>
+            <button class="tab-btn" data-tab="new">📝 Neue Proposal</button>
+            <button class="tab-btn" data-tab="delegate">🤝 Delegieren</button>
+            <button class="tab-btn" data-tab="treasury">💰 Treasury</button>
         </div>
 
         <div class="tab-content">
-            <div id="proposals" class="tab">
-                <div class="proposal-item">
-                    <div class="proposal-title">🔄 Mint neue EMRD Tokens</div>
-                    <div class="proposal-desc">Erhöhe Treasury um 1M EMRD für Marketing</div>
-                    <div class="vote-progress">
-                        <div class="vote-for" style="flex: 0.65;"></div>
-                        <div class="vote-against" style="flex: 0.35;"></div>
-                    </div>
-                    <div class="vote-stats">
-                        <span>65% JA (6.5K)</span>
-                        <span>35% NEIN (3.5K)</span>
-                    </div>
-                    <div class="vote-bar">
-                        <div class="vote-option for">👍 JA</div>
-                        <div class="vote-option against">👎 NEIN</div>
-                    </div>
-                </div>
-
-                <div class="proposal-item">
-                    <div class="proposal-title">💰 Grants für Entwickler</div>
-                    <div class="proposal-desc">Bewillige 500K EMRD für Entwicklungsgrants</div>
-                    <div class="vote-progress">
-                        <div class="vote-for" style="flex: 0.45;"></div>
-                        <div class="vote-against" style="flex: 0.55;"></div>
-                    </div>
-                    <div class="vote-stats">
-                        <span>45% JA (4.5K)</span>
-                        <span>55% NEIN (5.5K)</span>
-                    </div>
-                    <div class="vote-bar">
-                        <div class="vote-option for">👍 JA</div>
-                        <div class="vote-option against">👎 NEIN</div>
-                    </div>
+            <!-- Proposals Tab -->
+            <div id="proposals" class="tab active">
+                <div id="proposalsList"></div>
+                <div style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                    <div class="spinner" id="proposalsSpinner"></div>
+                    <div>Proposals werden geladen...</div>
                 </div>
             </div>
 
-            <div id="new" class="tab" style="display:none;">
+            <!-- New Proposal Tab -->
+            <div id="new" class="tab">
+                <div id="proposalMessage"></div>
                 <div class="form-group">
-                    <label>Titel</label>
-                    <input type="text" placeholder="Proposal Titel">
+                    <label>Proposal Titel</label>
+                    <input id="proposalTitle" type="text" placeholder="z.B. Erhöhung Marketing Budget">
                 </div>
                 <div class="form-group">
                     <label>Beschreibung</label>
-                    <textarea placeholder="Detaillierte Erklärung..."></textarea>
+                    <textarea id="proposalDesc" placeholder="Detaillierte Erklärung der Proposal..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Typ</label>
-                    <select>
-                        <option>Parameter Change</option>
-                        <option>Treasury Spend</option>
-                        <option>Governance</option>
+                    <label>Proposal Typ</label>
+                    <select id="proposalType">
+                        <option value="governance">🏛️ Governance</option>
+                        <option value="treasury">💰 Treasury Spend</option>
+                        <option value="parameter">🔄 Parameter Change</option>
+                        <option value="analytics">📊 Analytics</option>
                     </select>
                 </div>
-                <button class="btn">Proposal Erstellen</button>
+                <button class="btn" onclick="createProposal()">📝 Proposal Erstellen</button>
             </div>
 
-            <div id="treasury" class="tab" style="display:none;">
-                <div style="padding: 16px; text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 8px;">💰</div>
-                    <div style="font-size: 20px; font-weight: bold; color: #333;">5,250,000 EMRD</div>
-                    <div style="color: #999; font-size: 13px; margin-top: 8px;">Verfügbar für neue Proposals</div>
+            <!-- Delegate Tab -->
+            <div id="delegate" class="tab">
+                <div id="delegateMessage"></div>
+                <div class="form-group">
+                    <label>Delegate zu User ID</label>
+                    <input id="delegateId" type="number" placeholder="Telegram User ID">
                 </div>
+                <div class="form-group">
+                    <label>Voting Power zum Delegieren</label>
+                    <input id="delegateAmount" type="number" placeholder="z.B. 1000" min="0">
+                </div>
+                <button class="btn" onclick="delegateVotingPower()">🤝 Delegieren</button>
+                <div id="delegationsList" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- Treasury Tab -->
+            <div id="treasury" class="tab">
+                <div class="treasury-display">
+                    <div class="treasury-icon">💰</div>
+                    <div class="treasury-balance" id="treasuryBalance">Lädt...</div>
+                    <div class="treasury-label">Verfügbar für Proposals</div>
+                </div>
+                <div id="transactionsList" style="margin-top: 20px;"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabName = btn.dataset.tab;
-                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-                document.getElementById(tabName).style.display = 'block';
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-    </script>
+    <script src="story-dao.js"></script>
 </body>
 </html>
