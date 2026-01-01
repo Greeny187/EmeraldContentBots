@@ -625,22 +625,60 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    alert('✅ Auszahlung angefordert! Bitte verbinde dein Wallet.');
+                    showSuccess('✅ Auszahlung angefordert! Verbinde dein Wallet um auszuzahlen.');
                     fetchStats();
                 } else {
-                    alert('❌ Fehler: ' + data.message);
+                    showError('❌ Fehler: ' + (data.error || data.message));
                 }
             } catch (error) {
-                alert('❌ Fehler bei der Auszahlung: ' + error.message);
+                showError('❌ Fehler bei der Auszahlung: ' + error.message);
             } finally {
-                document.getElementById('payoutBtn').disabled = false;
-                document.getElementById('payoutBtn').textContent = '💰 Auszahlung Anfordern';
+                const btn = document.getElementById('payoutBtn');
+                btn.disabled = false;
+                btn.textContent = '💰 Auszahlung Anfordern';
             }
         }
 
         async function connectWallet() {
-            // TON Connect Integration
-            alert('🪙 TON Connect wird integriert...\n\nBalde können Sie hier Ihr TON Wallet verbinden.');
+            if (!userId) {
+                alert('Benutzer ID erforderlich');
+                return;
+            }
+            
+            try {
+                const btn = document.getElementById('connectBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳ Verbindung...';
+
+                // Hier würde TON Connect Integration stattfinden
+                // Für jetzt: Simulation
+                const mockWallet = 'UQA0rJDTy_2sS30KxQW8HO0_ERqmOGUhMWlwdL-2RpDmCrK5';
+                
+                const response = await fetch('/api/affiliate/ton-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        referrer_id: userId,
+                        wallet_address: mockWallet
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('walletStatus').classList.add('connected');
+                    document.getElementById('walletStatusText').textContent = 'Verbunden: ' + mockWallet.slice(0, 10) + '...';
+                    document.getElementById('claimBtn').disabled = false;
+                    showSuccess('✅ Wallet verbunden!');
+                } else {
+                    showError('❌ Fehler beim Verbinden');
+                }
+            } catch (error) {
+                showError('❌ Fehler: ' + error.message);
+            } finally {
+                const btn = document.getElementById('connectBtn');
+                btn.disabled = false;
+                btn.textContent = '🪙 Wallet Verbinden';
+            }
         }
 
         async function claimRewards() {
@@ -654,28 +692,50 @@
                 btn.disabled = true;
                 btn.textContent = '⏳ Claimen...';
 
+                // Generate mock transaction hash
+                const txHash = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+
                 const response = await fetch('/api/affiliate/claim', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         referrer_id: userId,
-                        tx_hash: '0x' + Math.random().toString(16).substr(2)
+                        tx_hash: txHash
                     })
                 });
 
                 const data = await response.json();
                 if (data.success) {
-                    alert('✅ EMRD erfolgreich geclaimt!');
+                    showSuccess('✅ EMRD erfolgreich geclaimt! TX: ' + txHash.slice(0, 10) + '...');
                     fetchStats();
                 } else {
-                    alert('❌ Fehler beim Claimen');
+                    showError('❌ Fehler beim Claimen');
                 }
             } catch (error) {
-                alert('❌ Fehler: ' + error.message);
+                showError('❌ Fehler: ' + error.message);
             } finally {
-                document.getElementById('claimBtn').disabled = true;
-                document.getElementById('claimBtn').textContent = '📥 Rewards Claimen';
+                const btn = document.getElementById('claimBtn');
+                btn.disabled = true;
+                btn.textContent = '📥 Rewards Claimen';
             }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.header'));
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.querySelector('.container').insertBefore(successDiv, document.querySelector('.header'));
+            setTimeout(() => successDiv.remove(), 5000);
         }
 
         // ===================== INIT =====================

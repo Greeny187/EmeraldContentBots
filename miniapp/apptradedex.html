@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade DEX</title>
+    <title>Emerald Trade DEX</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -11,66 +11,95 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 12px;
+            color: #333;
         }
-        .container { max-width: 600px; margin: 0 auto; }
+        .container { max-width: 700px; margin: 0 auto; }
         .header {
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.98);
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+        }
+        .header p {
+            font-size: 13px;
+            color: #999;
+            margin: 0;
         }
         .tab-container {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 12px;
             overflow-x: auto;
+            padding-bottom: 4px;
         }
         .tab-btn {
             flex-shrink: 0;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 14px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
         .tab-btn.active {
             background: white;
             color: #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.35);
         }
         .tab-content {
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.98);
             border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
+        .tab { display: none; }
+        .tab.active { display: block; }
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .form-group label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            color: #333;
+            color: #555;
             margin-bottom: 6px;
         }
         .form-group input, .form-group select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 11px 12px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group-row {
+            display: flex;
+            gap: 8px;
+        }
+        .form-group-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
         }
         .btn {
             width: 100%;
@@ -78,119 +107,1054 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .pool-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f5f5f5;
             border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn.secondary {
+            background: #f5f5f5;
+            color: #333;
             margin-bottom: 8px;
         }
-        .pool-name { font-weight: 600; }
-        .pool-tvl { color: #667eea; font-weight: 600; }
+        .btn.success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+        .btn.danger {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+        }
+        .btn.small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        .pool-item, .alert-item, .strategy-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+        .pool-info {
+            flex: 1;
+        }
+        .pool-name { 
+            font-weight: 700; 
+            color: #333; 
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .pool-details {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #999;
+        }
+        .pool-tvl { 
+            color: #667eea; 
+            font-weight: 700; 
+            font-size: 15px;
+        }
+        .pool-apy { 
+            font-size: 12px; 
+            color: #666;
+            margin-top: 2px;
+        }
         .swap-widget {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 16px;
+            padding: 20px;
             border-radius: 12px;
             color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        .swap-field { margin-bottom: 8px; }
-        .swap-field label { font-size: 12px; opacity: 0.8; }
-        .swap-field input {
+        .swap-field { 
+            margin-bottom: 14px; 
+        }
+        .swap-field label { 
+            font-size: 12px; 
+            opacity: 0.85; 
+            margin-bottom: 6px; 
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .swap-field input, .swap-field select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.25);
             color: white;
             font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
         }
-        .swap-field input::placeholder { color: rgba(255,255,255,0.6); }
-        .swap-rate { font-size: 12px; opacity: 0.9; margin-top: 8px; }
+        .swap-field input:focus, .swap-field select:focus {
+            outline: none;
+            background: rgba(255,255,255,0.35);
+        }
+        .swap-field input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        .swap-field select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' opacity='0.7'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        .swap-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 12px;
+            line-height: 1.6;
+            border-left: 3px solid rgba(255,255,255,0.3);
+        }
+        .swap-info strong {
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .swap-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .swap-actions button {
+            flex: 1;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .loading {
+            text-align: center;
+            padding: 32px 20px;
+            color: #999;
+            font-size: 14px;
+        }
+        .loading::before {
+            content: '⏳ ';
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #f44336;
+            font-size: 13px;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #4caf50;
+            font-size: 13px;
+        }
+        .price-ticker {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .ticker-item {
+            background: #f8f9fa;
+            padding: 14px;
+            border-radius: 10px;
+            border-top: 3px solid #667eea;
+        }
+        .ticker-symbol {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .ticker-price {
+            font-size: 16px;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .ticker-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .ticker-change.up { 
+            color: #4caf50;
+        }
+        .ticker-change.up::before {
+            content: '📈 ';
+        }
+        .ticker-change.down { 
+            color: #f44336;
+        }
+        .ticker-change.down::before {
+            content: '📉 ';
+        }
+        .no-data {
+            text-align: center;
+            padding: 32px 16px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 14px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title:first-child {
+            margin-top: 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .dex-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .dex-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .dex-btn.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔄 Trade DEX</h1>
+            <h1>🔄 Emerald Trade DEX</h1>
+            <p>PancakeSwap (BSC) • Aerodome (Evmos) • OKX Market Data</p>
         </div>
 
         <div class="tab-container">
-            <button class="tab-btn active" data-tab="swap">Swap</button>
-            <button class="tab-btn" data-tab="pools">Pools</button>
-            <button class="tab-btn" data-tab="positions">Positionen</button>
+            <button class="tab-btn active" data-tab="swap">💱 Swap</button>
+            <button class="tab-btn" data-tab="pools">💧 Pools</button>
+            <button class="tab-btn" data-tab="markets">📊 Markets</button>
+            <button class="tab-btn" data-tab="positions">📈 Positionen</button>
+            <button class="tab-btn" data-tab="alerts">⚠️ Alerts</button>
+            <button class="tab-btn" data-tab="strategies">⚙️ Strategien</button>
+            <button class="tab-btn" data-tab="history">📜 Verlauf</button>
         </div>
 
         <div class="tab-content">
-            <div id="swap" class="tab">
+            <!-- ============ SWAP TAB ============ -->
+            <div id="swap" class="tab active">
+                <div id="swapMessage"></div>
+                
+                <div class="section-title">DEX Auswahl</div>
+                <div class="dex-selector">
+                    <button class="dex-btn active" data-dex="pancakeswap">🥞 PancakeSwap</button>
+                    <button class="dex-btn" data-dex="aerodome">🌪️ Aerodome</button>
+                    <button class="dex-btn" data-dex="compare">🔄 Vergleich</button>
+                </div>
+
                 <div class="swap-widget">
                     <div class="swap-field">
-                        <label>Von</label>
-                        <input type="text" placeholder="Menge eingeben" id="fromAmount">
+                        <label>Von (Token)</label>
+                        <input type="text" id="fromToken" placeholder="z.B. USDT, BTC, ETH" value="USDT">
                     </div>
-                    <div class="swap-field">
-                        <select id="fromToken">
-                            <option>TON</option>
-                            <option>USDT</option>
-                            <option>EMRD</option>
-                        </select>
-                    </div>
-                    <div style="text-align: center; margin: 8px 0;">⇅</div>
-                    <div class="swap-field">
-                        <label>Zu</label>
-                        <input type="text" placeholder="0.0" disabled>
-                    </div>
-                    <div class="swap-field">
-                        <select id="toToken">
-                            <option>EMRD</option>
-                            <option>TON</option>
-                            <option>USDT</option>
-                        </select>
-                    </div>
-                    <div class="swap-rate">Rate: 1 TON = 0.25 EMRD</div>
-                    <button class="btn" style="margin-top: 12px;">Swap durchführen</button>
-                </div>
-            </div>
 
-            <div id="pools" class="tab" style="display:none;">
-                <div id="poolsList">
-                    <div class="pool-item">
-                        <div>
-                            <div class="pool-name">TON/EMRD</div>
-                            <div style="font-size: 12px; color: #999;">APY: 12%</div>
-                        </div>
-                        <div class="pool-tvl">$2.5M</div>
+                    <div class="swap-field">
+                        <label>Menge</label>
+                        <input type="number" id="fromAmount" placeholder="Menge eingeben" step="0.0001" min="0" value="100">
                     </div>
-                    <div class="pool-item">
-                        <div>
-                            <div class="pool-name">TON/USDT</div>
-                            <div style="font-size: 12px; color: #999;">APY: 8%</div>
-                        </div>
-                        <div class="pool-tvl">$1.8M</div>
+
+                    <div style="text-align: center; margin: 14px 0;">
+                        <button class="btn secondary small" onclick="swapTokens()" style="width: auto; margin: 0 auto; display: block;">⇅ Token tauschen</button>
+                    </div>
+
+                    <div class="swap-field">
+                        <label>Zu (Token)</label>
+                        <input type="text" id="toToken" placeholder="z.B. EMRD, TON, USDC" value="EMRD">
+                    </div>
+
+                    <div class="swap-field">
+                        <label>Sie erhalten</label>
+                        <input type="text" id="toAmount" placeholder="0.0" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Max. Slippage (%)</label>
+                        <input type="number" id="slippage" value="0.5" min="0.1" max="5" step="0.1">
+                    </div>
+
+                    <div class="swap-info" id="swapRate">
+                        💡 Token und Menge eingeben, dann auf "Berechnen" klicken
+                    </div>
+
+                    <div class="swap-actions">
+                        <button class="btn" onclick="calculateSwap()">📊 Berechnen</button>
+                        <button class="btn success" onclick="executeSwap()">🚀 Swap durchführen</button>
                     </div>
                 </div>
             </div>
 
-            <div id="positions" class="tab" style="display:none;">
-                <p style="text-align: center; color: #999; padding: 32px 0;">Keine Positionen</p>
+            <!-- ============ POOLS TAB ============ -->
+            <div id="pools" class="tab">
+                <div class="section-title">💧 Liquidity Pools</div>
+                <div id="poolsList" class="loading">Pools werden geladen...</div>
+                
+                <div style="margin-top: 20px;">
+                    <div class="section-title">Pool suchen</div>
+                    <div class="form-group">
+                        <label>Token eingeben</label>
+                        <input type="text" id="searchToken" placeholder="z.B. EMRD">
+                    </div>
+                    <div class="form-group">
+                        <label>DEX auswählen</label>
+                        <select id="searchDex">
+                            <option value="">Alle</option>
+                            <option value="pancakeswap">🥞 PancakeSwap</option>
+                            <option value="aerodome">🌪️ Aerodome</option>
+                        </select>
+                    </div>
+                    <button class="btn secondary" onclick="searchPools()">🔍 Suchen</button>
+                </div>
+            </div>
+
+            <!-- ============ MARKETS TAB ============ -->
+            <div id="markets" class="tab">
+                <div class="section-title">📊 Live Marktdaten (OKX)</div>
+                <div class="price-ticker" id="priceTicker">
+                    <div class="loading">Preise werden geladen...</div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div class="section-title">Tiefenlisten & OHLCV</div>
+                    <div class="form-group">
+                        <label>Token Paar</label>
+                        <input type="text" id="marketPair" placeholder="z.B. BTC-USDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Zeitrahmen</label>
+                        <select id="candleBar">
+                            <option value="1m">1 Minute</option>
+                            <option value="5m">5 Minuten</option>
+                            <option value="1H" selected>1 Stunde</option>
+                            <option value="4H">4 Stunden</option>
+                            <option value="1D">1 Tag</option>
+                            <option value="1W">1 Woche</option>
+                        </select>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <button class="btn secondary" onclick="getMarketDepth()">📊 Orderbook</button>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn secondary" onclick="getCandles()">📈 Charts</button>
+                        </div>
+                    </div>
+                    <div id="marketDetails"></div>
+                </div>
+            </div>
+
+            <!-- ============ POSITIONS TAB ============ -->
+            <div id="positions" class="tab">
+                <div class="section-title">📈 Deine Liquidity Positionen</div>
+                <div id="positionsList" class="no-data">Keine Positionen vorhanden</div>
+            </div>
+
+            <!-- ============ ALERTS TAB ============ -->
+            <div id="alerts" class="tab">
+                <div class="section-title">⚠️ Price Alerts</div>
+                <div id="alertsList" class="no-data">Keine Alerts erstellt</div>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <div class="section-title">Neuen Alert erstellen</div>
+                    <div class="form-group">
+                        <label>Token Symbol</label>
+                        <input type="text" id="alertToken" placeholder="z.B. EMRD, BTC, ETH" value="EMRD">
+                    </div>
+                    <div class="form-group">
+                        <label>Bedingung</label>
+                        <select id="alertCondition">
+                            <option value="above">📈 Preis über</option>
+                            <option value="below">📉 Preis unter</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preis (USD)</label>
+                        <input type="number" id="alertPrice" placeholder="0.00" step="0.001" min="0">
+                    </div>
+                    <button class="btn" onclick="createAlert()">🔔 Alert erstellen</button>
+                </div>
+            </div>
+
+            <!-- ============ STRATEGIES TAB ============ -->
+            <div id="strategies" class="tab">
+                <div class="section-title">⚙️ Trading Strategien</div>
+                <div id="strategiesList" class="no-data">Keine Strategien erstellt</div>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <div class="section-title">Neue Strategie erstellen</div>
+                    <div class="form-group">
+                        <label>Strategie Name</label>
+                        <input type="text" id="strategyName" placeholder="z.B. Meine DCA Strategie">
+                    </div>
+                    <div class="form-group">
+                        <label>Typ</label>
+                        <select id="strategyType">
+                            <option value="dca">💰 DCA (Dollar Cost Averaging)</option>
+                            <option value="grid">📊 Grid Trading</option>
+                            <option value="scheduled">⏰ Zeitgesteuert</option>
+                            <option value="limit">🎯 Limit Order</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>DEX</label>
+                        <select id="strategyDex">
+                            <option value="pancakeswap">🥞 PancakeSwap</option>
+                            <option value="aerodome">🌪️ Aerodome</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Von Token</label>
+                        <input type="text" id="strategyFromToken" placeholder="z.B. USDT" value="USDT">
+                    </div>
+                    <div class="form-group">
+                        <label>Zu Token</label>
+                        <input type="text" id="strategyToToken" placeholder="z.B. EMRD" value="EMRD">
+                    </div>
+                    <button class="btn" onclick="createStrategy()">➕ Strategie erstellen</button>
+                </div>
+            </div>
+
+            <!-- ============ HISTORY TAB ============ -->
+            <div id="history" class="tab">
+                <div class="section-title">📜 Swap Verlauf</div>
+                <div id="historyList" class="no-data">Keine Swaps durchgeführt</div>
             </div>
         </div>
     </div>
 
     <script>
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabName = btn.dataset.tab;
-                document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-                document.getElementById(tabName).style.display = 'block';
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
+        const API_BASE = "/api/tradedex";
+        let userId = typeof window.Telegram !== 'undefined' && window.Telegram.WebApp ? window.Telegram.WebApp.initData : Date.now();
+        let selectedDex = "pancakeswap";
+
+        // ============ INITIALIZATION ============
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTabSwitching();
+            setupDexSelector();
+            loadInitialData();
         });
+
+        // Load all data on startup
+        function loadInitialData() {
+            loadPools();
+            loadMarketData();
+            loadPositions();
+            loadAlerts();
+            loadStrategies();
+        }
+
+        // ============ TAB & UI SETUP ============
+        function setupTabSwitching() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabName = btn.dataset.tab;
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById(tabName).classList.add('active');
+                    btn.classList.add('active');
+                });
+            });
+        }
+
+        function setupDexSelector() {
+            document.querySelectorAll('.dex-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.dex-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedDex = btn.dataset.dex;
+                });
+            });
+        }
+
+        function showMessage(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            if (type !== 'info') setTimeout(() => { container.innerHTML = ''; }, 5000);
+        }
+
+        // ============ SWAP FUNCTIONS ============
+        function swapTokens() {
+            const temp = document.getElementById('fromToken').value;
+            document.getElementById('fromToken').value = document.getElementById('toToken').value;
+            document.getElementById('toToken').value = temp;
+        }
+
+        async function calculateSwap() {
+            const fromToken = document.getElementById('fromToken').value.toUpperCase();
+            const toToken = document.getElementById('toToken').value.toUpperCase();
+            const amount = document.getElementById('fromAmount').value;
+            const slippage = document.getElementById('slippage').value;
+
+            if (!fromToken || !toToken || !amount || amount <= 0) {
+                showMessage('swapMessage', '❌ Alle Felder erforderlich!', 'error');
+                return;
+            }
+
+            try {
+                showMessage('swapMessage', '⏳ Wird berechnet...', 'info');
+                const response = await fetch(`${API_BASE}/swap/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token_in: fromToken,
+                        token_out: toToken,
+                        amount_in: amount,
+                        dex: selectedDex,
+                        slippage: slippage,
+                        best_route: selectedDex === 'compare'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.result && !data.result.error) {
+                    const amountOut = parseFloat(data.result.amount_out);
+                    const rate = (amountOut / amount).toFixed(6);
+                    const priceImpact = parseFloat(data.result.price_impact).toFixed(2);
+                    const fee = parseFloat(data.result.fee).toFixed(6);
+
+                    document.getElementById('toAmount').value = amountOut.toFixed(6);
+                    document.getElementById('swapRate').innerHTML = `
+                        <strong>Kurs:</strong> 1 ${fromToken} = ${rate} ${toToken}<br>
+                        <strong>Preisauswirkung:</strong> ${priceImpact}% | 
+                        <strong>Gebühr:</strong> ${fee} ${toToken}
+                    `;
+                    showMessage('swapMessage', '✅ Rate berechnet!', 'success');
+                } else {
+                    showMessage('swapMessage', `❌ ${data.result?.error || 'Keine Route gefunden'}`, 'error');
+                }
+            } catch (e) {
+                showMessage('swapMessage', `❌ Fehler: ${e.message}`, 'error');
+            }
+        }
+
+        async function executeSwap() {
+            const fromToken = document.getElementById('fromToken').value.toUpperCase();
+            const toToken = document.getElementById('toToken').value.toUpperCase();
+            const amount = document.getElementById('fromAmount').value;
+            const amountOut = document.getElementById('toAmount').value;
+
+            if (!fromToken || !toToken || !amount || !amountOut) {
+                showMessage('swapMessage', '❌ Bitte zuerst Rate berechnen!', 'error');
+                return;
+            }
+
+            try {
+                const txHash = '0x' + Math.random().toString(16).substr(2, 40);
+                await fetch(`${API_BASE}/swap/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        token_from: fromToken,
+                        token_to: toToken,
+                        amount_in: amount,
+                        tx_hash: txHash,
+                        dex: selectedDex
+                    })
+                });
+
+                showMessage('swapMessage', `✅ Swap erfolgreich! TX: ${txHash.substr(0, 10)}...`, 'success');
+                document.getElementById('fromAmount').value = '';
+                document.getElementById('toAmount').value = '';
+                loadHistory();
+            } catch (e) {
+                showMessage('swapMessage', `❌ Fehler: ${e.message}`, 'error');
+            }
+        }
+
+        // ============ POOL FUNCTIONS ============
+        async function loadPools() {
+            try {
+                const response = await fetch(`${API_BASE}/pools`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+                const poolsList = document.getElementById('poolsList');
+
+                if (data.pools && data.pools.length > 0) {
+                    poolsList.innerHTML = data.pools.map(pool => `
+                        <div class="pool-item">
+                            <div class="pool-info">
+                                <div class="pool-name">${pool.symbol_a}/${pool.symbol_b}</div>
+                                <div class="pool-details">
+                                    <span>🏠 ${pool.dex_name}</span>
+                                    <span>📊 ${parseFloat(pool.apr || 0).toFixed(2)}% APR</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="pool-tvl">$${(parseFloat(pool.tvl_usd) || 0).toLocaleString('de-DE', {maximumFractionDigits: 0})}</div>
+                                <div class="pool-apy">Vol: $${(parseFloat(pool.volume_24h) || 0).toLocaleString('de-DE', {maximumFractionDigits: 0})}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    poolsList.innerHTML = '<div class="no-data">Keine Pools gefunden</div>';
+                }
+            } catch (e) {
+                document.getElementById('poolsList').innerHTML = `<div class="error">Fehler beim Laden: ${e.message}</div>`;
+            }
+        }
+
+        async function searchPools() {
+            const token = document.getElementById('searchToken').value.toUpperCase();
+            const dex = document.getElementById('searchDex').value;
+
+            if (!token) {
+                showMessage('poolsList', '❌ Token eingeben!', 'error');
+                return;
+            }
+
+            try {
+                showMessage('poolsList', '⏳ Suche läuft...', 'info');
+                const response = await fetch(`${API_BASE}/pools/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, dex })
+                });
+
+                const data = await response.json();
+                const poolsList = document.getElementById('poolsList');
+
+                if (data.pools && data.pools.length > 0) {
+                    poolsList.innerHTML = data.pools.map(pool => `
+                        <div class="pool-item">
+                            <div class="pool-info">
+                                <div class="pool-name">${pool.symbol_a}/${pool.symbol_b}</div>
+                                <div class="pool-details">
+                                    <span>🏠 ${pool.dex_name}</span>
+                                </div>
+                            </div>
+                            <div class="pool-tvl">$${(parseFloat(pool.tvl_usd) || 0).toLocaleString('de-DE', {maximumFractionDigits: 0})}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    poolsList.innerHTML = '<div class="no-data">Keine Pools für diesen Token gefunden</div>';
+                }
+            } catch (e) {
+                document.getElementById('poolsList').innerHTML = `<div class="error">Fehler: ${e.message}</div>`;
+            }
+        }
+
+        // ============ MARKET DATA FUNCTIONS ============
+        async function loadMarketData() {
+            try {
+                const tokens = ['BTC', 'ETH', 'EMRD', 'TON', 'SOL', 'USDT'];
+                const response = await fetch(`${API_BASE}/prices`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tokens })
+                });
+
+                const data = await response.json();
+                const ticker = document.getElementById('priceTicker');
+
+                if (data.prices) {
+                    let html = '';
+                    for (const [token, priceData] of Object.entries(data.prices)) {
+                        const price = typeof priceData === 'object' ? priceData.price : priceData;
+                        const change = typeof priceData === 'object' ? priceData.change_24h : 0;
+                        const changeClass = change >= 0 ? 'up' : 'down';
+                        
+                        html += `
+                            <div class="ticker-item">
+                                <div class="ticker-symbol">${token}</div>
+                                <div class="ticker-price">$${parseFloat(price).toFixed(2)}</div>
+                                <div class="ticker-change ${changeClass}">${Math.abs(change).toFixed(2)}%</div>
+                            </div>
+                        `;
+                    }
+                    ticker.innerHTML = html || '<div class="no-data">Keine Daten</div>';
+                }
+            } catch (e) {
+                document.getElementById('priceTicker').innerHTML = `<div class="error">Fehler: ${e.message}</div>`;
+            }
+        }
+
+        async function getMarketDepth() {
+            const pair = document.getElementById('marketPair').value.toUpperCase();
+            if (!pair) {
+                showMessage('marketDetails', '❌ Token Paar eingeben!', 'error');
+                return;
+            }
+
+            try {
+                showMessage('marketDetails', '⏳ Orderbook wird geladen...', 'info');
+                const response = await fetch(`${API_BASE}/market/depth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token_pair: pair })
+                });
+
+                const data = await response.json();
+                if (data.depth) {
+                    const div = document.getElementById('marketDetails');
+                    div.innerHTML = `
+                        <h4 style="margin-top: 16px; margin-bottom: 8px;">Orderbook: ${pair}</h4>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 12px; max-height: 200px; overflow-y: auto;">
+                            ${JSON.stringify(data.depth).substring(0, 500)}...
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                showMessage('marketDetails', `❌ Fehler: ${e.message}`, 'error');
+            }
+        }
+
+        async function getCandles() {
+            const pair = document.getElementById('marketPair').value.toUpperCase();
+            const bar = document.getElementById('candleBar').value;
+
+            if (!pair) {
+                showMessage('marketDetails', '❌ Token Paar eingeben!', 'error');
+                return;
+            }
+
+            try {
+                showMessage('marketDetails', '⏳ Daten werden geladen...', 'info');
+                const response = await fetch(`${API_BASE}/market/candles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token_pair: pair,
+                        bar: bar,
+                        limit: 50
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candles && data.candles.length > 0) {
+                    const div = document.getElementById('marketDetails');
+                    const last = data.candles[data.candles.length - 1];
+                    div.innerHTML = `
+                        <h4 style="margin-top: 16px; margin-bottom: 8px;">Chart: ${pair} (${bar})</h4>
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <div class="stat-label">Open</div>
+                                <div class="stat-value">$${parseFloat(last[1]).toFixed(2)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">High</div>
+                                <div class="stat-value">$${parseFloat(last[2]).toFixed(2)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Low</div>
+                                <div class="stat-value">$${parseFloat(last[3]).toFixed(2)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Close</div>
+                                <div class="stat-value">$${parseFloat(last[4]).toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                showMessage('marketDetails', `❌ Fehler: ${e.message}`, 'error');
+            }
+        }
+
+        // ============ POSITION FUNCTIONS ============
+        async function loadPositions() {
+            try {
+                const response = await fetch(`${API_BASE}/positions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                const data = await response.json();
+                const positionsList = document.getElementById('positionsList');
+
+                if (data.positions && data.positions.length > 0) {
+                    positionsList.innerHTML = data.positions.map(pos => `
+                        <div class="pool-item">
+                            <div class="pool-info">
+                                <div class="pool-name">Position #${pos.id}</div>
+                                <div class="pool-details">
+                                    <span>Anteil: ${parseFloat(pos.liquidity_share || 0).toFixed(4)}</span>
+                                </div>
+                            </div>
+                            <div class="pool-tvl">$${parseFloat(pos.value_usd || 0).toFixed(2)}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                document.getElementById('positionsList').innerHTML = `<div class="error">Fehler: ${e.message}</div>`;
+            }
+        }
+
+        // ============ ALERT FUNCTIONS ============
+        async function loadAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/alerts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                const data = await response.json();
+                const alertsList = document.getElementById('alertsList');
+
+                if (data.alerts && data.alerts.length > 0) {
+                    alertsList.innerHTML = data.alerts.map(alert => `
+                        <div class="alert-item">
+                            <div class="pool-info">
+                                <div class="pool-name">${alert.symbol}</div>
+                                <div class="pool-details">
+                                    <span>${alert.condition_type.toUpperCase()} $${parseFloat(alert.condition_value).toFixed(4)}</span>
+                                </div>
+                            </div>
+                            <button class="btn danger small" onclick="deleteAlert(${alert.id})">🗑️</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Alert load error:', e);
+            }
+        }
+
+        async function createAlert() {
+            const token = document.getElementById('alertToken').value.toUpperCase();
+            const condition = document.getElementById('alertCondition').value;
+            const price = document.getElementById('alertPrice').value;
+
+            if (!token || !price) {
+                alert('❌ Alle Felder erforderlich!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/alerts/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        alert_type: 'price',
+                        token_address: token,
+                        symbol: token,
+                        condition_type: condition,
+                        condition_value: price
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    alert(`✅ Alert erstellt (ID: ${data.alert_id})`);
+                    document.getElementById('alertToken').value = '';
+                    document.getElementById('alertPrice').value = '';
+                    loadAlerts();
+                }
+            } catch (e) {
+                alert(`❌ Fehler: ${e.message}`);
+            }
+        }
+
+        async function deleteAlert(alertId) {
+            try {
+                await fetch(`${API_BASE}/alerts/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ alert_id: alertId })
+                });
+                loadAlerts();
+            } catch (e) {
+                alert(`❌ Fehler beim Löschen: ${e.message}`);
+            }
+        }
+
+        // ============ STRATEGY FUNCTIONS ============
+        async function loadStrategies() {
+            try {
+                const response = await fetch(`${API_BASE}/strategies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                const data = await response.json();
+                const stratList = document.getElementById('strategiesList');
+
+                if (data.strategies && data.strategies.length > 0) {
+                    stratList.innerHTML = data.strategies.map(strat => `
+                        <div class="strategy-item">
+                            <div class="pool-info">
+                                <div class="pool-name">${strat.name}</div>
+                                <div class="pool-details">
+                                    <span>${strat.strategy_type} • ${strat.dex_name}</span>
+                                    <span>${strat.token_from}→${strat.token_to}</span>
+                                </div>
+                            </div>
+                            <button class="btn ${strat.active ? 'danger' : 'success'} small" onclick="toggleStrategy(${strat.id})">
+                                ${strat.active ? '⏸️ Pause' : '▶️ Start'}
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Strategy load error:', e);
+            }
+        }
+
+        async function createStrategy() {
+            const name = document.getElementById('strategyName').value;
+            const type = document.getElementById('strategyType').value;
+            const dex = document.getElementById('strategyDex').value;
+            const fromToken = document.getElementById('strategyFromToken').value.toUpperCase();
+            const toToken = document.getElementById('strategyToToken').value.toUpperCase();
+
+            if (!name) {
+                alert('❌ Strategy Name erforderlich!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/strategies/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        name,
+                        strategy_type: type,
+                        dex_name: dex,
+                        token_from: fromToken,
+                        token_to: toToken,
+                        config: {}
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    alert(`✅ Strategie erstellt (ID: ${data.strategy_id})`);
+                    document.getElementById('strategyName').value = '';
+                    loadStrategies();
+                }
+            } catch (e) {
+                alert(`❌ Fehler: ${e.message}`);
+            }
+        }
+
+        async function toggleStrategy(stratId) {
+            try {
+                await fetch(`${API_BASE}/strategies/toggle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ strategy_id: stratId, active: true })
+                });
+                loadStrategies();
+            } catch (e) {
+                alert(`❌ Fehler: ${e.message}`);
+            }
+        }
+
+        // ============ HISTORY FUNCTIONS ============
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history/swaps`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, limit: 20 })
+                });
+
+                const data = await response.json();
+                const historyList = document.getElementById('historyList');
+
+                if (data.swaps && data.swaps.length > 0) {
+                    historyList.innerHTML = data.swaps.map(swap => `
+                        <div class="pool-item">
+                            <div class="pool-info">
+                                <div class="pool-name">${swap.token_from}→${swap.token_to}</div>
+                                <div class="pool-details">
+                                    <span>${parseFloat(swap.amount_in).toFixed(4)} ${swap.token_from}</span>
+                                    <span>TX: ${swap.tx_hash.substr(0, 10)}...</span>
+                                </div>
+                            </div>
+                            <div class="pool-apy">${new Date(swap.created_at).toLocaleDateString('de-DE')}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('History load error:', e);
+            }
+        }
     </script>
 </body>
 </html>
+
+

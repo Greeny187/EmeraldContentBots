@@ -58,6 +58,38 @@
         <button id="btn_reload" class="ghost">Neu laden</button>
       </div>
       <div id="routes" class="list"></div>
+      <div id="route_detail" class="card" style="display:none;margin-top:16px;border-color:#2dd4bf">
+        <div class="row">
+          <button id="btn_close_detail" class="ghost">× Schließen</button>
+          <div><label>Route #<span id="detail_id">-</span></label></div>
+          <div class="grid-2">
+            <div><label>Quelle Chat ID</label><input id="detail_source" type="text" readonly/></div>
+            <div><label>Aktiv</label><select id="detail_active"><option value="true">Ja</option><option value="false">Nein</option></select></div>
+          </div>
+          <div><label>Ziele</label><textarea id="detail_dests" rows="3" readonly></textarea></div>
+          <div class="grid-2">
+            <div><label>Prefix</label><input id="detail_prefix" type="text"/></div>
+            <div><label>Suffix</label><input id="detail_suffix" type="text"/></div>
+          </div>
+          <div><label>Hashtag-Whitelist</label><input id="detail_wl" type="text"/></div>
+          <div><label>Hashtag-Blacklist</label><input id="detail_bl" type="text"/></div>
+          <div class="inline">
+            <button id="btn_detail_save" style="background:#2dd4bf;color:#000">Aktualisieren</button>
+            <button id="btn_detail_delete" style="background:#ef4444;color:#fff">Löschen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <strong>Activity Log (letzte 50)</strong>
+      <div class="grid-2">
+        <div><label>Filter Status</label><select id="log_filter"><option value="">Alle</option><option value="sent">Sent</option><option value="error">Error</option></select></div>
+        <button id="btn_logs_reload" class="ghost">Neu laden</button>
+      </div>
+      <div id="logs_list" class="list" style="max-height:300px;overflow-y:auto"></div>
     </div>
   </section>
 
@@ -76,6 +108,16 @@
   </section>
 
   <section class="card"><div class="row"><strong>Statistik</strong><pre id="stats" class="muted">–</pre></div></section>
+
+  <section class="card">
+    <div class="row">
+      <strong>Test-Nachricht senden</strong>
+      <div><label>Route ID</label><input id="test_route_id" type="number" placeholder="z.B. 1"/></div>
+      <div><label>Test-Text</label><textarea id="test_text" rows="3" placeholder="Dies ist ein Test #news"></textarea></div>
+      <button id="btn_test_send" style="background:#ff8c00">Senden</button>
+      <pre id="test_result" class="muted" style="display:none"></pre>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -106,6 +148,22 @@
   const $stats  = document.getElementById('stats');
   const $xToken = document.getElementById('x_token');
   const $conList= document.getElementById('connectors_list');
+
+  // Route Detail View
+  const $detail = document.getElementById('route_detail');
+  const $detailId = document.getElementById('detail_id');
+  const $detailSrc = document.getElementById('detail_source');
+  const $detailDsts = document.getElementById('detail_dests');
+  const $detailActive = document.getElementById('detail_active');
+  const $detailPrefix = document.getElementById('detail_prefix');
+  const $detailSuffix = document.getElementById('detail_suffix');
+  const $detailWl = document.getElementById('detail_wl');
+  const $detailBl = document.getElementById('detail_bl');
+
+  // Logs
+  const $logsList = document.getElementById('logs_list');
+  const $logFilter = document.getElementById('log_filter');
+  let currentRoute = null;
 
   document.getElementById('btn_preview').addEventListener('click', ()=>{
     const sample = 'Beispieltext für Crossposting. #news #update';
@@ -150,6 +208,64 @@
   });
   document.getElementById('btn_reload_connectors').addEventListener('click', loadConnectors);
 
+  document.getElementById('btn_close_detail').addEventListener('click', ()=>{ $detail.style.display='none'; currentRoute=null; });
+
+  document.getElementById('btn_detail_save').addEventListener('click', async ()=>{
+    try{
+      if(!currentRoute) return;
+      const tid = Number($tenant.value);
+      const rid = Number($detailId.textContent);
+      const dests = parseCSV($detailDsts.value).map(v=>{
+        if (v.toLowerCase() === 'x') return { type: 'x' };
+        if (v.startsWith('http') && v.includes('discord.com/api/webhooks')) return { type: 'discord', webhook_url: v };
+        const n = Number(v);
+        if (!Number.isNaN(n)) return { type: 'telegram', chat_id: n };
+        return null;
+      }).filter(Boolean);
+      const payload = {
+        tenant_id: tid,
+        source_chat_id: Number($detailSrc.value),
+        destinations: dests,
+        transform: { prefix: $detailPrefix.value||'', suffix:$detailSuffix.value||'', plain_text: $pt.checked },
+        filters: { hashtags_whitelist: parseCSV($detailWl.value), hashtags_blacklist: parseCSV($detailBl.value) },
+        active: $detailActive.value === 'true'
+      };
+      await api(`/routes/${rid}`, { method:'PATCH', body: JSON.stringify(payload) });
+      await loadRoutes(); alert('Route aktualisiert.');
+      $detail.style.display='none'; currentRoute=null;
+    }catch(e){ alert(String(e).slice(0,400)); }
+  });
+
+  document.getElementById('btn_detail_delete').addEventListener('click', async ()=>{
+    try{
+      if(!currentRoute || !confirm('Wirklich löschen?')) return;
+      const tid = Number($tenant.value);
+      const rid = Number($detailId.textContent);
+      await api(`/routes/${rid}?tenant_id=${tid}`, { method:'DELETE' });
+      await loadRoutes(); alert('Route gelöscht.');
+      $detail.style.display='none'; currentRoute=null;
+    }catch(e){ alert(String(e).slice(0,400)); }
+  });
+
+  document.getElementById('btn_logs_reload').addEventListener('click', loadLogs);
+  document.getElementById('log_filter').addEventListener('change', loadLogs);
+
+  document.getElementById('btn_test_send').addEventListener('click', async ()=>{
+    try{
+      const tid = Number($tenant.value);
+      const rid = Number(document.getElementById('test_route_id').value);
+      const txt = document.getElementById('test_text').value;
+      if(!rid || !txt) { alert('Route ID und Text erforderlich'); return; }
+      const $res = document.getElementById('test_result');
+      $res.textContent = 'Sende...';
+      $res.style.display='block';
+      const res = await api('/test-send', { method:'POST', body: JSON.stringify({tenant_id:tid, route_id:rid, text:txt}) });
+      $res.textContent = JSON.stringify(res, null, 2);
+    }catch(e){ document.getElementById('test_result').textContent = 'Fehler: ' + String(e); document.getElementById('test_result').style.display='block'; }
+  });
+
+  document.getElementById('btn_reload_connectors').addEventListener('click', loadConnectors);
+
   async function loadTenants(){
     $tenant.innerHTML = '<option>Lade…</option>';
     const list = await api('/tenants'); // auto-provision passiert serverseitig
@@ -178,7 +294,8 @@
           if (d.type==='discord') return 'Discord Webhook';
           return d.type;
         }).join(', ');
-        div.innerHTML = `<div><div><strong>#${r.id}</strong> – Mandant: <code>${r.tenant_id}</code> · Quelle: <code>${r.source_chat_id}</code></div><div class="muted">Ziele: ${dests} · Aktiv: ${r.active ? 'Ja' : 'Nein'}</div></div>`;
+        div.innerHTML = `<div style="flex:1"><div><strong>#${r.id}</strong> – Mandant: <code>${r.tenant_id}</code> · Quelle: <code>${r.source_chat_id}</code></div><div class="muted">Ziele: ${dests} · Aktiv: ${r.active ? 'Ja' : 'Nein'}</div></div><button class="ghost" style="padding:4px 8px;font-size:12px">Bearbeiten</button>`;
+        div.querySelector('button').addEventListener('click', () => showRouteDetail(r));
         $routes.appendChild(div);
       });
     }
@@ -186,6 +303,44 @@
       const s = await api('/stats?tenant_id=' + encodeURIComponent(tid));
       $stats.textContent = JSON.stringify(s, null, 2);
     }catch(e){ $stats.textContent = '–'; }
+  }
+
+  async function showRouteDetail(r){
+    currentRoute = r;
+    $detailId.textContent = r.id;
+    $detailSrc.value = r.source_chat_id;
+    $detailActive.value = r.active ? 'true' : 'false';
+    $detailDsts.value = r.destinations.map(d=>{
+      if(d.type==='telegram') return d.chat_id;
+      if(d.type==='x') return 'x';
+      if(d.type==='discord') return d.webhook_url;
+      return '';
+    }).join(', ');
+    $detailPrefix.value = r.transform?.prefix || '';
+    $detailSuffix.value = r.transform?.suffix || '';
+    $detailWl.value = (r.filters?.hashtags_whitelist || []).join(',');
+    $detailBl.value = (r.filters?.hashtags_blacklist || []).join(',');
+    $detail.style.display='block';
+    await loadLogs();
+  }
+
+  async function loadLogs(){
+    const tid = $tenant.value;
+    const rid = currentRoute?.id;
+    if(!tid || !rid){ $logsList.innerHTML = '<span class="muted">Keine Logs.</span>'; return; }
+    const filter = $logFilter.value || '';
+    try{
+      const logs = await api(`/logs?tenant_id=${tid}&route_id=${rid}&status=${filter}&limit=50`);
+      if(!logs.length){ $logsList.innerHTML = '<span class="muted">Keine Logs.</span>'; return; }
+      $logsList.innerHTML = '';
+      logs.forEach(l => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        const color = l.status === 'sent' ? '#2dd4bf' : '#ef4444';
+        div.innerHTML = `<div><div style="color:${color};font-weight:600">${l.status}</div><div class="muted" style="font-size:11px">${new Date(l.created_at).toLocaleString()} – ${l.dest_descriptor}</div>${l.error ? '<div style="color:#ef4444;font-size:11px">'+l.error+'</div>' : ''}</div>`;
+        $logsList.appendChild(div);
+      });
+    }catch(e){ $logsList.innerHTML = '<span class="muted">Fehler beim Laden.</span>'; }
   }
 
   async function loadConnectors(){
