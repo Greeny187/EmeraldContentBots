@@ -1,202 +1,671 @@
     <!doctype html>
-    <html lang="de">
-    <head>
-      <meta charset="utf-8" />
-      <title>Emerald Trade API – MiniApp</title>
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <script src="https://telegram.org/js/telegram-web-app.js"></script>
-      <style>
-        :root{--pad:12px;--line:#e6e6e6;--muted:#666}
-        body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:var(--pad)}
-        .card{padding:var(--pad);border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.08);background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#111);margin-bottom:var(--pad)}
-        label{display:block;margin:8px 0 4px;color:var(--muted);font-size:13px}
-        input,select,button,textarea{width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#111)}
-        button{border:0;font-weight:600;margin-top:10px;cursor:pointer;background:var(--tg-theme-button-color,#16a34a);color:var(--tg-theme-button-text-color,#fff)}
-        .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .muted{color:var(--muted);font-size:12px}
-        .list-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-        .danger{background:#ef4444}
-        pre{white-space:pre-wrap;word-break:break-word;background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:8px}
-      </style>
-    </head>
-    <body>
-      <div class="card">
-        <h3>Trading-APIs verknüpfen</h3>
-        <p class="muted">Free: 1 Anbieter. Pro: mehrere Anbieter. Daten werden serverseitig verschlüsselt gespeichert.</p>
-        <label>Anbieter</label>
-        <select id="provider"></select>
-        <label>Bezeichnung (optional)</label>
-        <input id="label" placeholder="z. B. Main" />
-        <div class="row">
-          <div><label>API Key</label><input id="api_key" /></div>
-          <div><label>API Secret</label><input id="api_secret" /></div>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>Emerald Trade API – MiniApp</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --pad: 12px;
+            --line: #e6e6e6;
+            --muted: #666;
+            --success: #16a34a;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --primary: #3b82f6;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: var(--pad);
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #111);
+        }
+        
+        .header {
+            padding: 12px 0;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--line);
+        }
+        
+        .header h1 { margin: 0; font-size: 20px; }
+        
+        .header .subtitle { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        
+        .card {
+            padding: var(--pad);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            background: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #111);
+            margin-bottom: var(--pad);
+        }
+        
+        .card h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; }
+        
+        .card h3 { margin: 12px 0 8px; font-size: 14px; color: var(--primary); }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--line);
+            overflow-x: auto;
+            padding-bottom: 0;
+        }
+        
+        .tab-btn {
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
+        .tab-content { display: none; }
+        
+        .tab-content.active { display: block; }
+        
+        label {
+            display: block;
+            margin: 8px 0 4px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #111);
+            font-family: inherit;
+            margin-bottom: 8px;
+        }
+        
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        
+        button {
+            border: 0;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: 0.2s;
+        }
+        
+        button:hover { opacity: 0.9; }
+        
+        button.danger { background: var(--danger); }
+        button.success { background: var(--success); }
+        button.small { font-size: 12px; padding: 6px 8px; margin: 0; width: auto; }
+        
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .muted { color: var(--muted); font-size: 12px; }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        
+        .list-item:last-child { border-bottom: none; }
+        
+        .list-item-content { flex: 1; }
+        
+        .list-item-label { font-weight: 600; display: block; }
+        
+        .list-item-meta { font-size: 12px; color: var(--muted); }
+        
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #f9fafb;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 11px;
+            overflow-x: auto;
+        }
+        
+        .status-box {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .status-box.success { background: #d1fae5; color: #065f46; }
+        .status-box.error { background: #fee2e2; color: #7f1d1d; }
+        .status-box.info { background: #dbeafe; color: #0c2340; }
+        
+        .grid-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-box {
+            padding: 12px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            text-align: center;
+        }
+        
+        .stat-value { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💰 Trade API MiniApp</h1>
+        <div class="subtitle">Vollständige Trading Platform</div>
+    </div>
+    
+    <!-- MAIN TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="dashboard">📊</button>
+        <button class="tab-btn" data-tab="keys">🔑</button>
+        <button class="tab-btn" data-tab="portfolio">📈</button>
+        <button class="tab-btn" data-tab="signals">⚡</button>
+        <button class="tab-btn" data-tab="alerts">🔔</button>
+        <button class="tab-btn" data-tab="sentiment">💭</button>
+        <button class="tab-btn" data-tab="settings">⚙️</button>
+    </div>
+    
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard" class="tab-content active">
+        <div class="card">
+            <h2>📊 Dashboard</h2>
+            <div id="dashboard-loading" class="muted">Lade...</div>
+            <div id="dashboard-content" style="display: none;">
+                <div class="grid-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="dash-portfolio-count">0</div>
+                        <div class="stat-label">Portfolios</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="dash-alerts-count">0</div>
+                        <div class="stat-label">Alerts</div>
+                    </div>
+                </div>
+                <h3>Portfolio Value</h3>
+                <div class="stat-box" style="background: var(--primary); color: white;">
+                    <div class="stat-value" style="color: white;" id="dash-total-value">$0.00</div>
+                </div>
+                <h3>Signale & Alerts</h3>
+                <div id="dash-signals" style="margin-bottom: 12px;"></div>
+                <button id="refresh-dashboard" class="success">🔄 Aktualisieren</button>
+            </div>
         </div>
-        <label>Passphrase (falls benötigt)</label>
-        <input id="passphrase" />
-        <button id="save">Speichern</button>
-        <button id="ping">Verbindung testen</button>
-        <button id="verify">Authentifiziert prüfen (Balance)</button>
-        <div id="status" class="muted" aria-live="polite"></div>
-      </div>
+    </div>
+    
+    <!-- API KEYS TAB -->
+    <div id="keys" class="tab-content">
+        <div class="card">
+            <h2>🔐 API Keys</h2>
+            <label>Anbieter</label>
+            <select id="provider"></select>
+            <label>Bezeichnung (optional)</label>
+            <input id="label" placeholder="z.B. Main" />
+            <div class="row">
+                <div>
+                    <label>API Key</label>
+                    <input id="api_key" type="password" />
+                </div>
+                <div>
+                    <label>API Secret</label>
+                    <input id="api_secret" type="password" />
+                </div>
+            </div>
+            <label>Passphrase (optional)</label>
+            <input id="passphrase" type="password" />
+            <div class="row">
+                <button id="save" class="success">💾 Speichern</button>
+                <button id="ping" class="primary">🔗 Testen</button>
+            </div>
+            <button id="verify" class="primary">✅ Prüfen</button>
+            <div id="status" class="status-box hidden"></div>
+        </div>
+        <div class="card">
+            <h2>Gespeicherte Keys</h2>
+            <div id="list" class="muted">Lade...</div>
+        </div>
+    </div>
+    
+    <!-- PORTFOLIO TAB -->
+    <div id="portfolio" class="tab-content">
+        <div class="card">
+            <h2>📊 Portfolio erstellen</h2>
+            <label>Name</label>
+            <input id="port-name" placeholder="Mein Portfolio" />
+            <label>Beschreibung</label>
+            <input id="port-desc" placeholder="" />
+            <label>Risk Level</label>
+            <select id="port-risk">
+                <option value="low">Conservative</option>
+                <option value="medium" selected>Moderate</option>
+                <option value="high">Aggressive</option>
+            </select>
+            <label>Initialkapital (USD)</label>
+            <input id="port-cash" type="number" value="10000" />
+            <button id="create-portfolio" class="success">➕ Erstellen</button>
+        </div>
+        <div class="card">
+            <h2>Meine Portfolios</h2>
+            <div id="portfolios-list" class="muted">Lade...</div>
+        </div>
+    </div>
+    
+    <!-- SIGNALS TAB -->
+    <div id="signals" class="tab-content">
+        <div class="card">
+            <h2>⚡ Signal Generator</h2>
+            <label>Symbol</label>
+            <input id="symbol" value="BTCUSDT" />
+            <label>OHLCV (JSON)</label>
+            <textarea id="ohlcv" rows="5" placeholder="[[O,H,L,C,V], ...]"></textarea>
+            <label>Kontostand (USD)</label>
+            <input id="balance" type="number" value="1000" />
+            <button id="runSignal" class="primary">🎯 Generieren</button>
+            <div id="signalOut" style="margin-top: 12px;"></div>
+        </div>
+        <div class="card">
+            <h2>🔐 Proofs</h2>
+            <button id="loadProofs" class="primary">📜 Anzeigen</button>
+            <div id="proofs" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+    
+    <!-- ALERTS TAB -->
+    <div id="alerts" class="tab-content">
+        <div class="card">
+            <h2>🔔 Alert erstellen</h2>
+            <label>Symbol</label>
+            <input id="alert-symbol" placeholder="BTC" value="BTC" />
+            <label>Typ</label>
+            <select id="alert-type">
+                <option value="price">Preis</option>
+                <option value="volume">Volumen</option>
+                <option value="rsi">RSI</option>
+            </select>
+            <label>Zielpreis (USD)</label>
+            <input id="alert-price" type="number" step="0.01" />
+            <label>Bedingung</label>
+            <select id="alert-comparison">
+                <option value="above">Über</option>
+                <option value="below">Unter</option>
+            </select>
+            <button id="create-alert" class="success">➕ Erstellen</button>
+        </div>
+        <div class="card">
+            <h2>Meine Alerts</h2>
+            <div id="alerts-list" class="muted">Lade...</div>
+        </div>
+    </div>
+    
+    <!-- SENTIMENT TAB -->
+    <div id="sentiment" class="tab-content">
+        <div class="card">
+            <h2>💭 Sentiment</h2>
+            <label>Texte (Zeile pro Text)</label>
+            <textarea id="texts" rows="5" placeholder="Bitcoin steigt&#10;FED Entscheidung..."></textarea>
+            <button id="runSent" class="primary">📊 Analysieren</button>
+            <div id="sentOut" style="margin-top: 12px;"></div>
+        </div>
+        <div class="card">
+            <h2>⚖️ Portfolio Optimizer</h2>
+            <label>Gewichte (JSON)</label>
+            <textarea id="weights" rows="3" placeholder='{"BTC":0.6,"ETH":0.4}'></textarea>
+            <label>Sentiment (optional)</label>
+            <textarea id="sentHint" rows="2" placeholder='{"positive":0.4,"negative":0.2}'></textarea>
+            <button id="runOpt" class="success">⚖️ Optimieren</button>
+            <div id="optOut" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+    
+    <!-- SETTINGS TAB -->
+    <div id="settings" class="tab-content">
+        <div class="card">
+            <h2>⚙️ Einstellungen</h2>
+            <label>Theme</label>
+            <select id="theme">
+                <option value="dark">🌙 Dunkel</option>
+                <option value="light">☀️ Hell</option>
+            </select>
+            <label>Sprache</label>
+            <select id="language">
+                <option value="de" selected>🇩🇪 Deutsch</option>
+                <option value="en">🇬🇧 English</option>
+            </select>
+            <label>Benachrichtigungen</label>
+            <select id="notifications">
+                <option value="true">✅ Aktiviert</option>
+                <option value="false">❌ Deaktiviert</option>
+            </select>
+            <label>Alert Threshold (USD)</label>
+            <input id="alert-threshold" type="number" value="100" />
+            <label>Währung</label>
+            <select id="currency">
+                <option value="USD">💵 USD</option>
+                <option value="EUR">💶 EUR</option>
+                <option value="GBP">💷 GBP</option>
+            </select>
+            <button id="save-settings" class="success">💾 Speichern</button>
+        </div>
+    </div>
 
-      <div class="card">
-        <h3>Gespeicherte Anbindungen</h3>
-        <div id="list" class="muted">Lade…</div>
-      </div>
-
-      <div class="card">
-        <h3>XGBoost-Signals + ATR Risk</h3>
-        <p class="muted">Gib OHLCV als JSON (Liste Listen) an. Ein Proof-Hash wird gespeichert.</p>
-        <label>Symbol</label>
-        <input id="symbol" value="BTCUSDT"/>
-        <label>OHLCV (JSON)</label>
-        <textarea id="ohlcv" rows="5" placeholder="[[O,H,L,C,V], ...]"></textarea>
-        <label>Kontostand (USD, optional)</label>
-        <input id="balance" value="1000"/>
-        <button id="runSignal">Signal generieren</button>
-        <div id="signalOut"></div>
-      </div>
-
-      <div class="card">
-        <h3>FinBERT Sentiment</h3>
-        <label>Texte (je Zeile einer)</label>
-        <textarea id="texts" rows="4" placeholder="Bitcoin springt über 70k
-FOMC belässt Zinsen…"></textarea>
-        <button id="runSent">Analysieren</button>
-        <div id="sentOut"></div>
-      </div>
-
-      <div class="card">
-        <h3>Portfolio Optimizer</h3>
-        <label>Gewichte-Hinweis (JSON, z.B. {"BTC":0.6,"ETH":0.4})</label>
-        <textarea id="weights" rows="3"></textarea>
-        <label>Sentiment (optional JSON, z.B. {"positive":0.4,"neutral":0.4,"negative":0.2})</label>
-        <textarea id="sentHint" rows="2"></textarea>
-        <button id="runOpt">Optimieren</button>
-        <div id="optOut"></div>
-      </div>
-
-      <div class="card">
-        <h3>Signal-Proofs</h3>
-        <button id="loadProofs">Liste anzeigen</button>
-        <div id="proofs"></div>
-      </div>
-
-      <script>
-        const tg = window.Telegram.WebApp; tg.expand(); tg.MainButton.hide();
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.hide();
         const el = id => document.getElementById(id);
-        function toast(msg){ el("status").textContent = msg; tg.HapticFeedback.selectionChanged(); }
-        function asJSON(s){ try{return JSON.parse(s)}catch{return null} }
-        async function api(path, method="GET", body=null){
-          const initData = tg.initDataUnsafe || {};
-          const headers = {"Content-Type":"application/json"};
-          let url = path;
-          if(method==="GET" && initData.user?.id){
-            const sep = path.includes("?") ? "&" : "?";
-            url = path + sep + "telegram_id=" + encodeURIComponent(initData.user.id);
-          }
-          const opts = {method, headers};
-          if(body) opts.body = JSON.stringify({...body, initData});
-          const res = await fetch(url, opts);
-          let j = {}; try{ j = await res.json(); }catch{}
-          if(!res.ok || j.error) throw new Error(j.error || ("HTTP "+res.status));
-          return j;
+        
+        function toast(msg, type = 'info') {
+            const box = el("status");
+            box.textContent = msg;
+            box.className = `status-box ${type}`;
+            box.classList.remove('hidden');
+            tg.HapticFeedback.selectionChanged();
+            setTimeout(() => box.classList.add('hidden'), 4000);
         }
-
-        async function loadProviders(){
-          const j = await api("/tradeapi/providers");
-          el("provider").innerHTML = ""; j.providers.forEach(p=>{
-            const o = document.createElement("option"); o.value=p.id; o.textContent=p.name; el("provider").appendChild(o);
-          });
+        
+        function asJSON(s) {
+            try { return JSON.parse(s); } catch { return null; }
         }
-        async function loadList(){
-          const j = await api("/tradeapi/keys","GET");
-          const box = el("list");
-          if(!j.items || j.items.length===0){ box.textContent="Keine Einträge."; return; }
-          box.innerHTML = j.items.map(it => \`
-            <div class="list-item">
-              <div><b>\${it.provider}\${it.label?(" – "+it.label):""}</b><div class="muted">\${new Date(it.updated_at).toLocaleString()}</div></div>
-              <button class="danger" data-id="\${it.id}">Löschen</button>
-            </div>\`).join("");
-          box.querySelectorAll("button[data-id]").forEach(btn=>{
-            btn.onclick = async () => { await api("/tradeapi/keys/delete","POST",{id:btn.dataset.id}); loadList(); };
-          });
+        
+        async function api(path, method = "GET", body = null) {
+            const initData = tg.initDataUnsafe || {};
+            const headers = { "Content-Type": "application/json" };
+            let url = path;
+            if (method === "GET" && initData.user?.id) {
+                const sep = path.includes("?") ? "&" : "?";
+                url = path + sep + "telegram_id=" + encodeURIComponent(initData.user.id);
+            }
+            const opts = { method, headers };
+            if (body) opts.body = JSON.stringify({ ...body, initData });
+            try {
+                const res = await fetch(url, opts);
+                let j = {};
+                try { j = await res.json(); } catch {}
+                if (!res.ok || j.error) throw new Error(j.error || (`HTTP ${res.status}`));
+                return j;
+            } catch (e) {
+                toast(e.message, 'error');
+                throw e;
+            }
         }
-
+        
+        // TAB SYSTEM
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                const content = document.getElementById(tabName);
+                if (content) content.classList.add('active');
+                if (tabName === 'dashboard') loadDashboard();
+                else if (tabName === 'keys') loadList();
+                else if (tabName === 'portfolio') loadPortfolios();
+                else if (tabName === 'alerts') loadAlerts();
+            });
+        });
+        
+        // PROVIDERS
+        async function loadProviders() {
+            try {
+                const j = await api("/tradeapi/providers");
+                el("provider").innerHTML = "";
+                j.providers.forEach(p => {
+                    const o = document.createElement("option");
+                    o.value = p.id;
+                    o.textContent = p.name;
+                    el("provider").appendChild(o);
+                });
+            } catch (e) { }
+        }
+        
+        // API KEYS
+        async function loadList() {
+            try {
+                const j = await api("/tradeapi/keys", "GET");
+                const box = el("list");
+                if (!j.items || j.items.length === 0) {
+                    box.innerHTML = '<p class="muted">Keine Keys vorhanden</p>';
+                    return;
+                }
+                box.innerHTML = j.items.map(it =>
+                    `<div class="list-item">
+                        <div class="list-item-content">
+                            <span class="list-item-label">📌 ${it.provider}${it.label ? ' – ' + it.label : ''}</span>
+                            <span class="list-item-meta">${new Date(it.updated_at).toLocaleDateString()}</span>
+                        </div>
+                        <button class="small danger" data-id="${it.id}">🗑️</button>
+                    </div>`
+                ).join("");
+                box.querySelectorAll("button[data-id]").forEach(btn => {
+                    btn.onclick = async () => {
+                        if (!confirm("Löschen?")) return;
+                        try {
+                            await api("/tradeapi/keys/delete", "POST", { id: btn.dataset.id });
+                            toast("✅ Gelöscht", "success");
+                            await loadList();
+                        } catch (e) { }
+                    };
+                });
+            } catch (e) { el("list").textContent = "Fehler"; }
+        }
+        
         el("save").onclick = async () => {
-          try {
-            await api("/tradeapi/keys","POST",{
-              provider: el("provider").value,
-              label: el("label").value,
-              api_key: el("api_key").value,
-              api_secret: el("api_secret").value,
-              passphrase: el("passphrase").value
-            });
-            toast("Gespeichert."); el("api_key").value=""; el("api_secret").value="";
-            await loadList();
-          } catch(e){ toast(e.message); }
+            try {
+                await api("/tradeapi/keys", "POST", {
+                    provider: el("provider").value,
+                    label: el("label").value,
+                    api_key: el("api_key").value,
+                    api_secret: el("api_secret").value,
+                    passphrase: el("passphrase").value
+                });
+                toast("✅ Gespeichert!", "success");
+                el("api_key").value = el("api_secret").value = el("passphrase").value = "";
+                await loadList();
+            } catch (e) { }
         };
+        
         el("ping").onclick = async () => {
-          try {
-            const j = await api("/tradeapi/keys/ping","POST",{provider: el("provider").value});
-            toast(j.ok ? "✅ Verbindung ok." : "❌ Fehler."); 
-          } catch(e){ toast(e.message); }
+            try {
+                const j = await api("/tradeapi/keys/ping", "POST", { provider: el("provider").value });
+                toast(j.ok ? "✅ OK" : "❌ Fehler", j.ok ? "success" : "error");
+            } catch (e) { }
         };
-
+        
+        el("verify").onclick = async () => {
+            try {
+                const j = await api("/tradeapi/keys/verify", "POST", { provider: el("provider").value });
+                toast(j.ok ? "✅ OK" : "❌ Fehler", j.ok ? "success" : "error");
+                if (j.balances) {
+                    const pre = document.createElement("pre");
+                    pre.textContent = JSON.stringify(j.balances, null, 2);
+                    el("list").prepend(pre);
+                }
+            } catch (e) { }
+        };
+        
+        // DASHBOARD
+        async function loadDashboard() {
+            try {
+                el("dashboard-loading").style.display = "block";
+                el("dashboard-content").style.display = "none";
+                const j = await api("/tradeapi/dashboard", "GET");
+                const dash = j.dashboard;
+                el("dash-portfolio-count").textContent = dash.portfolio_count;
+                el("dash-alerts-count").textContent = dash.active_alerts;
+                el("dash-total-value").textContent = "$" + dash.total_portfolio_value.toFixed(2);
+                el("dash-signals").innerHTML = dash.recent_signals.length > 0
+                    ? dash.recent_signals.map(s => `<div class="list-item"><div><strong>${s.signal_type} ${s.symbol}</strong><br><span class="muted">${(s.confidence*100).toFixed(0)}%</span></div></div>`).join("")
+                    : '<p class="muted">Keine Signale</p>';
+                el("dashboard-loading").style.display = "none";
+                el("dashboard-content").style.display = "block";
+            } catch (e) { el("dashboard-loading").textContent = "Fehler"; }
+        }
+        
+        el("refresh-dashboard").onclick = loadDashboard;
+        
+        // SIGNALS
         el("runSignal").onclick = async () => {
-          try {
-            const ohlcv = asJSON(el("ohlcv").value) || [];
-            const j = await api("/tradeapi/signal/generate","POST",{
-              provider: el("provider").value,
-              symbol: el("symbol").value,
-              ohlcv: ohlcv,
-              balance_usd: parseFloat(el("balance").value || "1000")
-            });
-            el("signalOut").innerHTML = "<pre>"+JSON.stringify(j,null,2)+"</pre>";
-          } catch(e){ el("signalOut").textContent = e.message; }
+            try {
+                const ohlcv = asJSON(el("ohlcv").value) || [];
+                const j = await api("/tradeapi/signal/generate", "POST", {
+                    provider: el("provider").value,
+                    symbol: el("symbol").value,
+                    ohlcv: ohlcv,
+                    balance_usd: parseFloat(el("balance").value || "1000")
+                });
+                el("signalOut").innerHTML = `<div class="status-box success">✅ Signal generiert</div><pre>${JSON.stringify(j.payload, null, 2)}</pre>`;
+            } catch (e) { }
         };
-        el("runSent").onclick = async () => {
-          try {
-            const texts = (el("texts").value || "").split(/\n+/).filter(Boolean);
-            const j = await api("/tradeapi/sentiment/analyze","POST",{texts});
-            el("sentOut").innerHTML = "<pre>"+JSON.stringify(j,null,2)+"</pre>";
-          } catch(e){ el("sentOut").textContent = e.message; }
-        };
-        el("runOpt").onclick = async () => {
-          try {
-            const weights = asJSON(el("weights").value) || {};
-            const sent = asJSON(el("sentHint").value) || null;
-            const j = await api("/tradeapi/portfolio/optimize","POST",{weights:weights, sentiment:sent});
-            el("optOut").innerHTML = "<pre>"+JSON.stringify(j,null,2)+"</pre>";
-          } catch(e){ el("optOut").textContent = e.message; }
-        };
+        
         el("loadProofs").onclick = async () => {
-          try {
-            const j = await api("/tradeapi/proof/list","GET");
-            el("proofs").innerHTML = "<pre>"+JSON.stringify(j,null,2)+"</pre>";
-          } catch(e){ el("proofs").textContent = e.message; }
+            try {
+                const j = await api("/tradeapi/proof/list", "GET");
+                el("proofs").innerHTML = j.items.length > 0 ? "<pre>" + JSON.stringify(j.items, null, 2) + "</pre>" : '<p class="muted">Keine</p>';
+            } catch (e) { }
         };
-
+        
+        // SENTIMENT
+        el("runSent").onclick = async () => {
+            try {
+                const texts = (el("texts").value || "").split(/\n+/).filter(Boolean);
+                const j = await api("/tradeapi/sentiment/analyze", "POST", { texts });
+                el("sentOut").innerHTML = "<pre>" + JSON.stringify(j, null, 2) + "</pre>";
+            } catch (e) { }
+        };
+        
+        el("runOpt").onclick = async () => {
+            try {
+                const weights = asJSON(el("weights").value) || {};
+                const sent = asJSON(el("sentHint").value) || null;
+                const j = await api("/tradeapi/portfolio/optimize", "POST", { weights, sentiment: sent });
+                el("optOut").innerHTML = "<pre>" + JSON.stringify(j, null, 2) + "</pre>";
+            } catch (e) { }
+        };
+        
+        // PORTFOLIO
+        async function loadPortfolios() {
+            try {
+                const j = await api("/tradeapi/portfolios", "GET");
+                const box = el("portfolios-list");
+                if (!j.portfolios || j.portfolios.length === 0) {
+                    box.innerHTML = '<p class="muted">Keine Portfolios</p>';
+                    return;
+                }
+                box.innerHTML = j.portfolios.map(p =>
+                    `<div class="list-item"><div><strong>${p.name}</strong><br><span class="muted">$${parseFloat(p.total_value).toFixed(2)}</span></div></div>`
+                ).join("");
+            } catch (e) { el("portfolios-list").textContent = "Fehler"; }
+        }
+        
+        el("create-portfolio").onclick = async () => {
+            try {
+                const name = el("port-name").value.trim();
+                if (!name) { toast("Name erforderlich", "error"); return; }
+                await api("/tradeapi/portfolios", "POST", {
+                    name: name,
+                    description: el("port-desc").value,
+                    risk_level: el("port-risk").value,
+                    initial_cash: parseFloat(el("port-cash").value || 10000)
+                });
+                toast("✅ Portfolio erstellt!", "success");
+                el("port-name").value = "";
+                await loadPortfolios();
+            } catch (e) { }
+        };
+        
+        // ALERTS
+        async function loadAlerts() {
+            try {
+                const j = await api("/tradeapi/alerts?active_only=true", "GET");
+                const box = el("alerts-list");
+                if (!j.alerts || j.alerts.length === 0) {
+                    box.innerHTML = '<p class="muted">Keine aktiven Alerts</p>';
+                    return;
+                }
+                box.innerHTML = j.alerts.map(a =>
+                    `<div class="list-item"><div><strong>${a.symbol}</strong><br><span class="muted">${a.comparison} $${a.target_price}</span></div><button class="small danger" onclick="deleteAlert(${a.id})">🗑️</button></div>`
+                ).join("");
+            } catch (e) { el("alerts-list").textContent = "Fehler"; }
+        }
+        
+        el("create-alert").onclick = async () => {
+            try {
+                const symbol = el("alert-symbol").value.trim().toUpperCase();
+                const price = parseFloat(el("alert-price").value);
+                if (!symbol || !price) { toast("Symbol und Preis erforderlich", "error"); return; }
+                await api("/tradeapi/alerts", "POST", {
+                    symbol: symbol,
+                    alert_type: el("alert-type").value,
+                    target_price: price,
+                    comparison: el("alert-comparison").value
+                });
+                toast("✅ Alert erstellt!", "success");
+                el("alert-symbol").value = "";
+                el("alert-price").value = "";
+                await loadAlerts();
+            } catch (e) { }
+        };
+        
+        // SETTINGS
+        el("save-settings").onclick = async () => {
+            try {
+                await api("/tradeapi/settings", "POST", {
+                    theme: el("theme").value,
+                    language: el("language").value,
+                    notifications_enabled: el("notifications").value === "true",
+                    alert_threshold_usd: parseFloat(el("alert-threshold").value),
+                    preferred_currency: el("currency").value
+                });
+                toast("✅ Gespeichert!", "success");
+            } catch (e) { }
+        };
+        
+        // HELPERS
+        async function deleteAlert(id) {
+            if (!confirm("Löschen?")) return;
+            try {
+                await api("/tradeapi/alerts/delete", "POST", { alert_id: id });
+                toast("✅ Gelöscht", "success");
+                await loadAlerts();
+            } catch (e) { }
+        }
+        
+        // INIT
         (async () => {
-          try {
-            const auth = await api("/tradeapi/auth","POST",{});
-            await loadProviders(); await loadList();
-          } catch(e){ alert("Auth/Init fehlgeschlagen: "+e.message); }
+            try {
+                await api("/tradeapi/auth", "POST", {});
+                await loadProviders();
+                await loadList();
+                toast("✅ Verbunden", "success");
+            } catch (e) { toast("❌ Auth Error", "error"); }
         })();
-      </script>
-    </body>
-    </html>
+    </script>
+</body>
+</html>
 
-<script>
-  document.getElementById("verify").onclick = async () => {
-    try {
-      const j = await api("/tradeapi/keys/verify","POST",{provider: el("provider").value});
-      toast(j.ok ? "✅ Auth ok." : ("❌ " + (j.error || "Auth fehlgeschlagen")));
-      if (j.balances) {
-        const box = document.getElementById("list");
-        const pre = document.createElement("pre"); pre.textContent = JSON.stringify(j.balances, null, 2);
-        box.prepend(pre);
-      }
-    } catch(e){ toast(e.message); }
-  };
-</script>
