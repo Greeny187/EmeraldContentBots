@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="backend" content="" /> <!-- Optional: API-Basis hier eintragen, sonst ?api=... nutzen -->
-  <title>Emerald Support • Mini‑App</title>
+  <meta name="backend" content="" />
+  <title>Emerald Support • Mini-App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -23,12 +23,7 @@
     header.ec-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
     .brand{font-weight:800;letter-spacing:.3px}
     .brand span{color:var(--primary)}
-    .tabs{display:flex;gap:8px}
-    .tabs button{background:transparent;color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:12px;cursor:pointer;opacity:.9}
-    .tabs button.active{border-color:var(--primary);opacity:1}
     main{padding:16px;display:block}
-    .tab{display:none}
-    .tab.active{display:block}
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
     .grid2{display:grid;grid-template-columns:1fr;gap:12px}
     @media(min-width:740px){.grid2{grid-template-columns:1fr 1fr}}
@@ -40,13 +35,6 @@
     .btn{border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
     .btn.primary{background:var(--primary);color:var(--primary-text)}
     .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-    .btn.danger{background:var(--danger);color:#fff}
-    .switch{position:relative;display:inline-block;width:44px;height:24px}
-    .switch input{opacity:0;width:0;height:0}
-    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#2a2e33;border:1px solid var(--border);transition:.2s;border-radius:999px}
-    .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:2.5px;background:#b8bfc6;transition:.2s;border-radius:50%}
-    .switch input:checked + .slider{background:var(--primary)}
-    .switch input:checked + .slider:before{transform:translateX(20px);background:var(--primary-text)}
     .list{display:grid;gap:12px}
     .ticket{border:1px solid var(--border);border-radius:14px;padding:12px}
     .ticket .meta{display:flex;gap:8px;font-size:12px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap}
@@ -57,208 +45,132 @@
     .subtabs{display:flex;gap:6px;margin:8px 0 12px}
     .subtabs .chip{padding:8px 10px;border:1px solid var(--border);border-radius:999px;cursor:pointer}
     .chip.active{border-color:var(--primary)}
-    .hint{font-size:12px;color:var(--muted)}
-    .ok{color:#7cd992}
-    .err{color:#ff8a8a}
-    .inline{display:flex;gap:8px;align-items:center}
   </style>
 </head>
 <body>
   <header class="ec-header">
     <div class="brand">Emerald <span>Support</span></div>
-    <nav class="tabs">
-      <button data-tab="support" class="active">Support</button>
-      <button data-tab="setup">Gruppen‑Setup</button>
-      <button data-tab="stats">Statistiken</button>
-    </nav>
   </header>
 
   <main>
-    <!-- TAB: SUPPORT -->
-    <section id="tab-support" class="tab active">
-      <div class="subtabs" role="tablist">
-        <div class="chip active" data-subtab="create">Neue Anfrage</div>
-        <div class="chip" data-subtab="mine">Meine Tickets</div>
-        <div class="chip" data-subtab="kb">KB‑Suche</div>
-      </div>
+    <div class="subtabs" role="tablist">
+      <div class="chip active" data-subtab="create">Neue Anfrage</div>
+      <div class="chip" data-subtab="mine">Meine Tickets</div>
+      <div class="chip" data-subtab="kb">KB-Suche</div>
+    </div>
 
-      <!-- CREATE -->
-      <div id="sub-create" class="card">
-        <div class="grid2">
-          <div class="row">
-            <label>Kategorie</label>
-            <select id="new-category">
-              <option value="allgemein">Allgemein</option>
-              <option value="technik">Technik</option>
-              <option value="zahlungen">Zahlungen</option>
-              <option value="konto">Konto</option>
-              <option value="feedback">Feedback</option>
-            </select>
-          </div>
-          <div class="row">
-            <label>Betreff</label>
-            <input id="new-subject" type="text" maxlength="140" placeholder="Kurz und prägnant…" />
-          </div>
+    <!-- CREATE -->
+    <div id="sub-create" class="card">
+      <div class="grid2">
+        <div class="row">
+          <label>Kategorie</label>
+          <select id="new-category">
+            <option value="allgemein">Allgemein</option>
+            <option value="technik">Technik</option>
+            <option value="zahlungen">Zahlungen</option>
+            <option value="konto">Konto</option>
+            <option value="feedback">Feedback</option>
+          </select>
         </div>
         <div class="row">
-          <label>Beschreibung</label>
-          <textarea id="new-body" rows="6" maxlength="4000" placeholder="Was ist passiert? Schritte, erwartetes Verhalten, ggf. Links…"></textarea>
-        </div>
-        <div class="actions">
-          <button id="btn-create" class="btn primary">Ticket erstellen</button>
-          <button id="btn-clear" class="btn ghost">Zurücksetzen</button>
-        </div>
-        <div id="suggest" class="row"></div>
-      </div>
-
-      <!-- MINE -->
-      <div id="sub-mine" class="card" style="display:none">
-        <div id="mine-list" class="list"></div>
-      </div>
-
-      <!-- KB -->
-      <div id="sub-kb" class="card" style="display:none">
-        <div class="row"><input id="kb-q" type="search" placeholder="Suchwort…" /></div>
-        <div id="kb-results" class="list"></div>
-      </div>
-    </section>
-
-    <!-- TAB: STATS -->
-    <section id="tab-stats" class="tab">
-      <div class="card">
-        <div class="row"><label>Zeitraum (Tage)</label><input type="number" id="stats-days" min="1" max="60" value="14" /></div>
-        <div class="actions"><button id="btn-load-stats" class="btn primary">Laden</button></div>
-      </div>
-      <div id="stats-container" style="margin-top:12px"></div>
-    </section>
-      <div class="grid2">
-        <div class="card">
-          <div class="row inline"><label>Welcome aktivieren</label><label class="switch"><input id="welcome_on" type="checkbox"><span class="slider"></span></label></div>
-          <div class="row"><label>Welcome‑Text</label><textarea id="welcome_text" rows="3" placeholder="Willkommen bei …"></textarea></div>
-        </div>
-        <div class="card">
-          <div class="row inline"><label>Farewell aktivieren</label><label class="switch"><input id="farewell_on" type="checkbox"><span class="slider"></span></label></div>
-          <div class="row"><label>Farewell‑Text</label><textarea id="farewell_text" rows="3" placeholder="Schade, dass du gehst …"></textarea></div>
+          <label>Betreff</label>
+          <input id="new-subject" type="text" maxlength="140" placeholder="Kurz und prägnant…" />
         </div>
       </div>
-
-      <div class="grid2">
-        <div class="card">
-          <div class="row inline"><label>Regeln posten</label><label class="switch"><input id="rules_on" type="checkbox"><span class="slider"></span></label></div>
-          <div class="row"><label>Regel‑Text</label><textarea id="rules_text" rows="4" placeholder="1) …\n2) …"></textarea></div>
-        </div>
-        <div class="card">
-          <div class="row inline"><label>Nur Admin‑Links</label><label class="switch"><input id="admins_only" type="checkbox"><span class="slider"></span></label></div>
-          <div class="row inline"><label>Warnung senden</label><label class="switch"><input id="warning_on" type="checkbox"><span class="slider"></span></label></div>
-          <div class="row"><label>Warntext</label><input id="warning_text" type="text" placeholder="Links nur mit Freigabe …" /></div>
-          <div class="row inline"><label>Ausnahmen aktivieren</label><label class="switch"><input id="exceptions_on" type="checkbox"><span class="slider"></span></label></div>
-        </div>
+      <div class="row">
+        <label>Beschreibung</label>
+        <textarea id="new-body" rows="6" maxlength="4000" placeholder="Was ist passiert? Schritte, erwartetes Verhalten, ggf. Links…"></textarea>
       </div>
-
-      <div class="grid2">
-        <div class="card">
-          <div class="row inline"><label>AI‑FAQ</label><label class="switch"><input id="ai_faq" type="checkbox" checked><span class="slider"></span></label></div>
-          <div class="row inline"><label>AI‑RSS</label><label class="switch"><input id="ai_rss" type="checkbox"><span class="slider"></span></label></div>
-        </div>
-        <div class="card">
-          <div class="row"><label>Stimmungs‑Thema</label><input id="mood_topic" type="text" placeholder="Tägliche Frage …" /></div>
-          <div class="row"><label>Frage</label><input id="mood_question" type="text" value="Wie war dein Tag von 1–5?" /></div>
-          <div class="row inline"><label>Tägliche Kurz‑Stats posten</label><label class="switch"><input id="daily_stats" type="checkbox"><span class="slider"></span></label></div>
-        </div>
-      </div>
-
       <div class="actions">
-        <button id="btn-save" class="btn primary">Speichern</button>
-        <span id="save-status" class="hint"></span>
+        <button id="btn-create" class="btn primary">Ticket erstellen</button>
+        <button id="btn-clear" class="btn ghost">Zurücksetzen</button>
       </div>
-    </section>
+      <div id="suggest" class="row"></div>
+    </div>
 
-  <footer class="ec-footer">Emerald Support • v0.1</footer>
+    <!-- MINE -->
+    <div id="sub-mine" class="card" style="display:none">
+      <div id="mine-list" class="list"></div>
+    </div>
+
+    <!-- KB -->
+    <div id="sub-kb" class="card" style="display:none">
+      <div class="row"><input id="kb-q" type="search" placeholder="Suchwort…" /></div>
+      <div id="kb-results" class="list"></div>
+    </div>
+  </main>
+
+  <footer class="ec-footer">Emerald Support • v1.1</footer>
 
   <script>
     const tg = window.Telegram.WebApp;
     try { tg.expand(); } catch (e) {}
 
-    // ============ API Configuration ============
-    // Bestimme API-Basis: Meta-Tag > Query-Param > Default
+    // API Base: Meta-Tag > Query-Param > Default
     const metaBackend = document.querySelector('meta[name="backend"]')?.content || '';
     const queryApi = new URLSearchParams(location.search).get('api');
-    const defaultApi = location.hostname.includes('localhost') 
-      ? 'http://localhost:8000' 
-      : 'https://emerald-bots.herokuapp.com';  // TODO: Anpassen
-    
+    const defaultApi = location.hostname.includes('localhost')
+      ? 'http://localhost:8000'
+      : 'https://emerald-bots.herokuapp.com'; // TODO: Anpassen
     const apiBase = (queryApi || metaBackend || defaultApi).replace(/\/$/, '') + '/api/support';
 
-    // ============ Helpers ============
     const qs = sel => document.querySelector(sel);
     const qsa = sel => Array.from(document.querySelectorAll(sel));
-    const h = () => ({ 
+    const h = () => ({
       'X-Telegram-Init-Data': tg.initData || '',
-      'Content-Type': 'application/json' 
+      'Content-Type': 'application/json'
     });
-    
+
     const param = k => new URLSearchParams(location.search).get(k);
-    const cid = param('cid');  // Chat ID (optional)
+    const cid = param('cid'); // optional
     const title = param('title') ? decodeURIComponent(param('title')) : '';
+    const startTab = param('tab'); // create|mine|kb
     const uid = tg.initDataUnsafe?.user?.id || 0;
 
-    // ============ Tabs ============
-    qsa('.tabs button').forEach(b => b.addEventListener('click', () => {
-      qsa('.tabs button').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      qsa('.tab').forEach(t => t.classList.remove('active'));
-      qs('#tab-' + b.dataset.tab)?.classList.add('active');
-      
-      if (b.dataset.tab === 'stats') loadStats();
-      if (b.dataset.tab === 'setup') loadSettings();
-    }));
-
-    // ============ Subtabs (Support) ============
-    qsa('.subtabs .chip').forEach(c => c.addEventListener('click', () => {
-      qsa('.subtabs .chip').forEach(x => x.classList.remove('active'));
-      c.classList.add('active');
+    function showSubtab(key){
+      qsa('.subtabs .chip').forEach(x => x.classList.toggle('active', x.dataset.subtab === key));
       ['create','mine','kb'].forEach(k => {
         const el = qs('#sub-' + k);
-        if (el) el.style.display = 'none';
+        if (el) el.style.display = (k === key) ? 'block' : 'none';
       });
-      const el = qs('#sub-' + c.dataset.subtab);
-      if (el) el.style.display = 'block';
-      if (c.dataset.subtab === 'mine') loadMyTickets();
-    }));
+      if (key === 'mine') loadMyTickets();
+    }
 
-    // ============ CREATE TICKET ============
+    // Subtabs
+    qsa('.subtabs .chip').forEach(c => c.addEventListener('click', () => showSubtab(c.dataset.subtab)));
+
+    // Init tab from URL
+    if (startTab && ['create','mine','kb'].includes(startTab)) showSubtab(startTab);
+
+    // CREATE TICKET
     async function createTicket(){
       const category = qs('#new-category').value;
       const subject = qs('#new-subject').value.trim();
       const body = qs('#new-body').value.trim();
-      
-      if (subject.length < 4) {
-        alert('Betreff muss mindestens 4 Zeichen lang sein.');
-        return;
-      }
-      if (body.length < 10) {
-        alert('Beschreibung muss mindestens 10 Zeichen lang sein.');
-        return;
-      }
-      
+
+      if (subject.length < 4) return alert('Betreff muss mindestens 4 Zeichen lang sein.');
+      if (body.length < 10) return alert('Beschreibung muss mindestens 10 Zeichen lang sein.');
+
       try {
         tg.MainButton.showProgress?.();
-        const r = await fetch(`${apiBase}/tickets`, { 
-          method: 'POST', 
-          headers: h(), 
-          body: JSON.stringify({category, subject, body}) 
+
+        const qp = [];
+        if (cid) qp.push('cid=' + encodeURIComponent(cid));
+        if (title) qp.push('title=' + encodeURIComponent(title));
+        const url = `${apiBase}/tickets` + (qp.length ? ('?' + qp.join('&')) : '');
+
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: h(),
+          body: JSON.stringify({category, subject, body})
         });
-        
-        if (!r.ok) {
-          const err = await r.text();
-          throw new Error(err || `HTTP ${r.status}`);
-        }
-        
+
+        if (!r.ok) throw new Error(await r.text() || `HTTP ${r.status}`);
+
         const data = await r.json();
         tg.HapticFeedback.notificationOccurred?.('success');
         alert('✅ Ticket #' + data.ticket_id + ' erstellt.');
-        
-        // Clear form
+
         qs('#new-subject').value='';
         qs('#new-body').value='';
         qs('#suggest').innerHTML='';
@@ -269,31 +181,25 @@
         tg.MainButton.hideProgress?.();
       }
     }
-    
+
     qs('#btn-create')?.addEventListener('click', createTicket);
-    qs('#btn-clear')?.addEventListener('click', () => { 
+    qs('#btn-clear')?.addEventListener('click', () => {
       qs('#new-subject').value='';
       qs('#new-body').value='';
       qs('#suggest').innerHTML='';
     });
 
-    // ============ KB LIVE-Vorschläge ============
+    // KB LIVE Vorschläge
     let kbTimer;
     function scheduleKbSuggest(){
       clearTimeout(kbTimer);
       const q = (qs('#new-subject').value + ' ' + qs('#new-body').value).trim();
-      if (q.length < 3){ 
-        qs('#suggest').innerHTML=''; 
-        return; 
-      }
-      
+      if (q.length < 3){ qs('#suggest').innerHTML=''; return; }
+
       kbTimer = setTimeout(async () => {
-        try {
-          const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { 
-            headers: h() 
-          });
+        try{
+          const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { headers: h() });
           if (!r.ok) return;
-          
           const data = await r.json();
           const items = (data.results||[]).slice(0,3).map(x => `
             <div class="card" style="border-style:dashed;border-color:var(--muted)">
@@ -301,33 +207,31 @@
               <div class="muted" style="font-size:11px">${(x.snippet||'').replace(/</g,'&lt;').substring(0,100)}...</div>
             </div>`).join('');
           qs('#suggest').innerHTML = items ? '<div class="muted" style="margin-bottom:6px">💡 Ähnliche KB-Artikel:</div>' + items : '';
-        } catch(e) { 
-          console.log('KB search error', e); 
+        } catch(e){
+          console.log('KB suggest error', e);
         }
       }, 400);
     }
-    
     qs('#new-subject')?.addEventListener('input', scheduleKbSuggest);
     qs('#new-body')?.addEventListener('input', scheduleKbSuggest);
 
-    // ============ LOAD MY TICKETS ============
+    // LOAD MY TICKETS
     async function loadMyTickets(){
       const cont = qs('#mine-list');
       if (!cont) return;
-      
       cont.innerHTML = '<div class="card">Lade …</div>';
-      try {
-        const url = cid ? `${apiBase}/tickets?cid=${cid}` : `${apiBase}/tickets`;
+
+      try{
+        const url = cid ? `${apiBase}/tickets?cid=${encodeURIComponent(cid)}` : `${apiBase}/tickets`;
         const r = await fetch(url, { headers: h() });
-        
         if (!r.ok) throw new Error(await r.text());
-        
         const data = await r.json();
-        if (!data.tickets?.length){ 
-          cont.innerHTML = '<div class="card">Keine Tickets.</div>'; 
-          return; 
+
+        if (!data.tickets?.length){
+          cont.innerHTML = '<div class="card">Keine Tickets.</div>';
+          return;
         }
-        
+
         cont.innerHTML = data.tickets.map(t => {
           const created = new Date(t.created_at).toLocaleDateString('de-DE', {month:'short', day:'numeric'});
           const statusEmoji = t.status === 'geloest' ? '✅' : t.status === 'in_bearbeitung' ? '⏳' : '📋';
@@ -344,176 +248,29 @@
       }
     }
 
-    // ============ KB SEARCH ============
+    // KB SEARCH
     qs('#kb-q')?.addEventListener('input', async () => {
       const q = qs('#kb-q').value.trim();
       const list = qs('#kb-results');
       if (!list) return;
-      
-      if (q.length < 2){ 
-        list.innerHTML = ''; 
-        return; 
-      }
-      
-      try {
-        const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { 
-          headers: h() 
-        });
-        
+      if (q.length < 2){ list.innerHTML=''; return; }
+
+      try{
+        const r = await fetch(`${apiBase}/kb/search?q=${encodeURIComponent(q)}`, { headers: h() });
         if (!r.ok) throw new Error(await r.text());
-        
         const data = await r.json();
         list.innerHTML = (data.results||[]).map(x => `
           <div class="card">
             <div style="font-weight:600;margin-bottom:4px">${x.title}</div>
             <div class="muted" style="font-size:12px">${(x.snippet||'').replace(/</g,'&lt;')}</div>
           </div>`).join('');
-      } catch(e){ 
+      } catch(e){
         console.error('KB search error:', e);
-        list.innerHTML = '<div class="card">Fehler.</div>'; 
+        list.innerHTML = '<div class="card">Fehler.</div>';
       }
     });
 
-    // ============ SETUP TAB (Group Settings) ============
-    async function loadSettings(){
-      if (!cid) {
-        qs('#tab-setup').innerHTML = '<div class="card">Diese Funktion benötigt eine Gruppen-ID (cid).</div>';
-        return;
-      }
-      
-      try {
-        const r = await fetch(`${apiBase}/miniapp/state?cid=${cid}&uid=${uid}`, { 
-          headers: h() 
-        });
-        
-        if (!r.ok) throw new Error('Konnte Einstellungen nicht laden');
-        
-        const data = await r.json();
-        
-        // Map settings to form fields
-        qs('#welcome_on').checked = data.welcome?.on || false;
-        qs('#welcome_text').value = data.welcome?.text || '';
-        qs('#farewell_on').checked = data.farewell?.on || false;
-        qs('#farewell_text').value = data.farewell?.text || '';
-        qs('#rules_on').checked = data.rules?.on || false;
-        qs('#rules_text').value = data.rules?.text || '';
-        qs('#admins_only').checked = data.links?.only_admin_links || false;
-        qs('#warning_on').checked = data.links?.warning_enabled || false;
-        qs('#warning_text').value = data.links?.warning_text || '';
-        qs('#exceptions_on').checked = data.links?.exceptions_enabled || false;
-        qs('#ai_faq').checked = data.ai?.faq !== false;
-        qs('#ai_rss').checked = data.ai?.rss || false;
-        qs('#mood_topic').value = data.mood?.topic || '';
-        qs('#mood_question').value = data.mood?.question || 'Wie war dein Tag von 1–5?';
-        qs('#daily_stats').checked = data.daily_stats || false;
-        
-        console.log('Settings loaded');
-      } catch(e){
-        console.error('Error loading settings:', e);
-        qs('#save-status').textContent = '❌ Fehler beim Laden';
-      }
-    }
-
-    // ============ SAVE SETTINGS ============
-    qs('#btn-save')?.addEventListener('click', async () => {
-      if (!cid) {
-        alert('Gruppe erforderlich');
-        return;
-      }
-      
-      const payload = {
-        cid,
-        title: title || 'Support Group',
-        welcome_on: qs('#welcome_on').checked,
-        welcome_text: qs('#welcome_text').value,
-        farewell_on: qs('#farewell_on').checked,
-        farewell_text: qs('#farewell_text').value,
-        rules_on: qs('#rules_on').checked,
-        rules_text: qs('#rules_text').value,
-        admins_only: qs('#admins_only').checked,
-        warning_on: qs('#warning_on').checked,
-        warning_text: qs('#warning_text').value,
-        exceptions_on: qs('#exceptions_on').checked,
-        ai_faq: qs('#ai_faq').checked,
-        ai_rss: qs('#ai_rss').checked,
-        mood_topic: qs('#mood_topic').value,
-        mood_question: qs('#mood_question').value,
-        daily_stats: qs('#daily_stats').checked
-      };
-      
-      try {
-        qs('#save-status').textContent = '⏳ Speichert…';
-        
-        const r = await fetch(`${apiBase}/miniapp/state?cid=${cid}`, {
-          method: 'POST',
-          headers: h(),
-          body: JSON.stringify(payload)
-        });
-        
-        if (!r.ok) throw new Error(await r.text());
-        
-        qs('#save-status').textContent = '✅ Gespeichert!';
-        setTimeout(() => qs('#save-status').textContent = '', 2000);
-        
-        tg.HapticFeedback.notificationOccurred?.('success');
-      } catch(e){
-        console.error('Save error:', e);
-        qs('#save-status').textContent = '❌ ' + e.message;
-        tg.HapticFeedback.notificationOccurred?.('error');
-      }
-    });
-
-    // ============ STATS TAB ============
-    async function loadStats(){
-      if (!cid) {
-        qs('#stats-container').innerHTML = '<div class="card">Diese Funktion benötigt eine Gruppen-ID (cid).</div>';
-        return;
-      }
-      
-      const days = parseInt(qs('#stats-days').value) || 14;
-      try {
-        qs('#stats-container').innerHTML = '<div class="card">Lade …</div>';
-        
-        const r = await fetch(`${apiBase}/miniapp/stats?cid=${cid}&uid=${uid}&days=${days}`, { 
-          headers: h() 
-        });
-        
-        if (!r.ok) throw new Error('Konnte Statistiken nicht laden');
-        
-        const data = await r.json();
-        
-        if (!data.agg || data.agg.length === 0) {
-          qs('#stats-container').innerHTML = '<div class="card">Keine Daten verfügbar.</div>';
-          return;
-        }
-        
-        // Render stats
-        const html = '<div class="card"><strong>📊 Statistiken (letzte ' + days + ' Tage)</strong></div>' +
-          data.agg.map(s => `
-            <div class="card" style="margin-top:8px">
-              <div class="inline" style="justify-content:space-between">
-                <strong>${s.date}</strong>
-                <span class="muted">${s.messages} Messages</span>
-              </div>
-              <div class="muted" style="font-size:11px">
-                👥 ${s.active} aktiv | ➕ ${s.joins} beigetreten | ➖ ${s.leaves} verlassen
-              </div>
-            </div>`).join('');
-        
-        qs('#stats-container').innerHTML = html;
-      } catch(e){
-        console.error('Stats error:', e);
-        qs('#stats-container').innerHTML = '<div class="card">❌ Fehler: ' + e.message + '</div>';
-      }
-    }
-    
-    qs('#btn-load-stats')?.addEventListener('click', loadStats);
-
-    // ============ Init ============
-    console.log('Support MiniApp initialized');
-    console.log('API Base:', apiBase);
-    console.log('Chat ID:', cid);
-    console.log('User ID:', uid);
+    console.log('Support MiniApp initialized', {apiBase, cid, uid});
   </script>
 </body>
 </html>
