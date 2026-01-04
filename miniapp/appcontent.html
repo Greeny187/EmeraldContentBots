@@ -170,16 +170,44 @@
 
   <section class="card" id="sec-spam">
     <div class="grid">
-      <label class="switch"><input type="checkbox" data-key="spam.on"> Spam-Filter aktiv</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_links"> Links blockieren (Admins)</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_media"> Medien blockieren</label>
-      <label class="switch"><input type="checkbox" data-key="spam.block_invite_links"> Invite-Links löschen</label>
-    </div>
-    <div class="grid">
-      <label>Policy-Topic (ID)
-        <input type="text" data-key="spam.policy_topic" data-validate="int" placeholder="z.B. 123" />
-        <div class="err" hidden id="err_spamtopic"></div>
+      <label class="switch"><input type="checkbox" data-key="spam.on" id="spam_on"> Spam-Filter aktiv</label>
+      <label>Level
+        <select data-key="spam.level" id="spam_level">
+          <option value="off">Aus</option>
+          <option value="light">Light</option>
+          <option value="medium">Medium</option>
+          <option value="strict">Strict</option>
+        </select>
       </label>
+      <label class="switch"><input type="checkbox" data-key="spam.block_links" id="spam_block_links"> Links blockieren (Admins)</label>
+    </div>
+
+    <div class="grid">
+      <label>User-Whitelist (User-IDs, eine pro Zeile)
+        <textarea data-key="spam.user_whitelist" id="spam_user_whitelist" placeholder="123456789&#10;987654321"></textarea>
+        <div class="hint">Diese Nutzer werden vom Spamfilter & Link-Filter ausgenommen.</div>
+      </label>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grid">
+      <label>Topic auswählen (Override)
+        <select id="spam_topic_select"></select>
+        <input type="hidden" data-key="spam.policy_topic" id="spam_policy_topic" value="0"/>
+        <div class="hint">Topic 0 = gesamte Gruppe (Main Chat). Änderungen gelten nur für das ausgewählte Topic.</div>
+      </label>
+
+      <label>Topic-Level
+        <select data-key="spam.topic_level" id="spam_topic_level">
+          <option value="">— (kein Override)</option>
+          <option value="off">Aus</option>
+          <option value="light">Light</option>
+          <option value="medium">Medium</option>
+          <option value="strict">Strict</option>
+        </select>
+      </label>
+
       <label>Aktion
         <select data-key="spam.action" id="spam_action">
           <option value="">—</option>
@@ -189,14 +217,16 @@
         </select>
       </label>
     </div>
+
     <div class="grid">
       <label>Whitelist-Domains (eine pro Zeile)
         <textarea data-key="spam.whitelist" id="spam_whitelist" placeholder="beispiel.de&#10;links.meine-seite.org"></textarea>
       </label>
       <label>Blacklist-Domains (eine pro Zeile)
-        <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam.xyz&#10;bad.example"></textarea>
+        <textarea data-key="spam.blacklist" id="spam_blacklist" placeholder="spam-domain.xyz&#10;bad.tld"></textarea>
       </label>
     </div>
+
     <div class="grid">
       <label>Tägliches Limit pro Nutzer
         <input type="number" data-key="spam.per_user_daily_limit" id="spam_limit" min="0" placeholder="0 = aus">
@@ -209,6 +239,27 @@
           <option value="always">Immer</option>
         </select>
       </label>
+      <div class="row" style="align-items:flex-end;justify-content:flex-end">
+        <button class="btn small primary" id="spam_apply_topic" type="button">Topic-Override speichern</button>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grid">
+      <div>
+        <div class="hint">Vorhandene Topic-Overrides</div>
+        <div id="spam_overrides_list" class="list"></div>
+      </div>
+      <div>
+        <div class="hint">Topic-User setzen (Owner/Zuordnung)</div>
+        <div class="row">
+          <input type="text" id="topic_user_id" placeholder="User-ID" data-validate="int" />
+          <select id="topic_user_topic_select"></select>
+          <button class="btn small primary" id="topic_user_set_btn" type="button">Setzen</button>
+        </div>
+        <div id="topic_users_list" class="list"></div>
+      </div>
     </div>
   </section>
 
@@ -898,17 +949,178 @@ async function loadState() {
       const img = qs('#farewell_img_prev');
       if(img) { img.src = j.farewell.image_url; img.style.display = 'block'; }
     }
+
     setVal('spam.on', j.spam?.on ?? false);
+    setVal('spam.level', j.spam?.level ?? 'off');
     setVal('spam.block_links', j.spam?.block_links ?? false);
     setVal('spam.block_media', j.spam?.block_media ?? false);
     setVal('spam.block_invite_links', j.spam?.block_invite_links ?? false);
+
+    // User-Whitelist
+    if(Array.isArray(j.spam?.user_whitelist)) qs('#spam_user_whitelist').value = (j.spam.user_whitelist||[]).join('\n');
+    else setVal('spam.user_whitelist', j.spam?.user_whitelist ?? '');
+
+    // Topic-Override Editor
     setVal('spam.policy_topic', j.spam?.policy_topic ?? 0);
+    setVal('spam.topic_level', j.spam?.topic_level ?? '');
     if(Array.isArray(j.spam?.whitelist)) qs('#spam_whitelist').value = (j.spam.whitelist||[]).join('\n');
     if(Array.isArray(j.spam?.blacklist)) qs('#spam_blacklist').value = (j.spam.blacklist||[]).join('\n');
     setVal('spam.action', j.spam?.action ?? '');
     setVal('spam.per_user_daily_limit', j.spam?.per_user_daily_limit ?? 0);
     setVal('spam.quota_notify', j.spam?.quota_notify ?? '');
+
+    renderSpamUI(j.spam || {});
+
+    let SPAM_CACHE = null;
+    let SPAM_HANDLERS_READY = false;
+
+    function _fillTopicSelect(sel, topics, selected) {
+      if(!sel) return;
+      sel.innerHTML = '';
+      const base = [{id:0, name:'Topic 0 (Gruppe)'}].concat((topics||[]).filter(t=>Number(t.id)!==0));
+      base.forEach(t=>{
+        const opt = document.createElement('option');
+        opt.value = String(t.id);
+        opt.textContent = `${t.name} (#${t.id})`;
+        sel.appendChild(opt);
+      });
+      sel.value = String(selected ?? 0);
+    }
+
+    function _findTopicPolicy(spam, topicId) {
+      const tid = Number(topicId ?? 0);
+      const list = (spam?.topic_policies || []);
+      return list.find(p=>Number(p.topic_id)===tid) || null;
+    }
+
+    function _applyTopicPolicyToForm(spam, topicId) {
+      const tid = Number(topicId ?? 0);
+      const pol = _findTopicPolicy(spam, tid) || {};
+      const hid = qs('#spam_policy_topic');
+      if(hid) hid.value = String(tid);
+
+      setVal('spam.topic_level', pol.level ?? '');
+      setVal('spam.action', pol.action_primary ?? '');
+      qs('#spam_whitelist').value = (pol.link_whitelist || []).join('\n');
+      qs('#spam_blacklist').value = (pol.domain_blacklist || []).join('\n');
+      setVal('spam.per_user_daily_limit', pol.per_user_daily_limit ?? 0);
+      setVal('spam.quota_notify', pol.quota_notify ?? '');
+    }
+
+    function _renderSpamOverrides(spam) {
+      const box = qs('#spam_overrides_list');
+      if(!box) return;
+      box.innerHTML = '';
+      const topicsById = new Map((spam?.topics||[]).map(t=>[Number(t.id), t.name]));
+      const rows = (spam?.topic_policies || []).filter(p=>Number(p.topic_id)!==0);
+      if(rows.length===0) {
+        box.innerHTML = '<div class="hint">Keine Topic-Overrides vorhanden.</div>';
+        return;
+      }
+      rows.forEach(p=>{
+        const tid = Number(p.topic_id);
+        const item = document.createElement('div');
+        item.className = 'item';
+        const left = document.createElement('div');
+        left.innerHTML = `<div><b>${topicsById.get(tid) || ('Topic '+tid)}</b> <span class="hint">(#${tid})</span></div>
+                          <div class="hint">Level: ${p.level || '—'} • Limit: ${p.per_user_daily_limit ?? 0} • Notify: ${p.quota_notify || '—'}</div>`;
+        const btns = document.createElement('div');
+        btns.className = 'row';
+
+        const edit = document.createElement('button');
+        edit.className = 'btn small';
+        edit.type = 'button';
+        edit.textContent = 'Laden';
+        edit.onclick = ()=>{
+          const sel = qs('#spam_topic_select');
+          if(sel) sel.value = String(tid);
+          _applyTopicPolicyToForm(spam, tid);
+        };
+
+        const del = document.createElement('button');
+        del.className = 'btn small danger';
+        del.type = 'button';
+        del.textContent = 'Löschen';
+        del.onclick = ()=> sendPayload({spam_topic_del:{topic_id:tid}});
+
+        btns.appendChild(edit);
+        btns.appendChild(del);
+
+        item.appendChild(left);
+        item.appendChild(btns);
+        box.appendChild(item);
+      });
+    }
+
+    function _renderTopicUsers(spam) {
+      const box = qs('#topic_users_list');
+      if(!box) return;
+      box.innerHTML = '';
+      const rows = spam?.topic_users || [];
+      if(rows.length===0) {
+        box.innerHTML = '<div class="hint">Keine Topic-User gesetzt.</div>';
+        return;
+      }
+      rows.forEach(r=>{
+        const item = document.createElement('div');
+        item.className = 'item';
+        const left = document.createElement('div');
+        left.innerHTML = `<div><b>${r.topic_name || ('Topic '+r.topic_id)}</b> <span class="hint">(#${r.topic_id})</span></div>
+                          <div class="hint">User-ID: ${r.user_id}</div>`;
+        const btns = document.createElement('div');
+        btns.className = 'row';
+        const del = document.createElement('button');
+        del.className = 'btn small danger';
+        del.type = 'button';
+        del.textContent = 'Entfernen';
+        del.onclick = ()=> sendPayload({topic_user_del:{user_id:r.user_id}});
+        btns.appendChild(del);
+        item.appendChild(left);
+        item.appendChild(btns);
+        box.appendChild(item);
+      });
+    }
+
+    function setupSpamHandlers() {
+      if(SPAM_HANDLERS_READY) return;
+      SPAM_HANDLERS_READY = true;
+
+      qs('#spam_topic_select')?.addEventListener('change', (e)=>{
+        const tid = Number(e.target.value || 0);
+        if(SPAM_CACHE) _applyTopicPolicyToForm(SPAM_CACHE, tid);
+      });
+
+      qs('#spam_apply_topic')?.addEventListener('click', ()=>{
+        sendPayload({});
+      });
+
+      qs('#topic_user_set_btn')?.addEventListener('click', ()=>{
+        const u = (qs('#topic_user_id')?.value || '').trim();
+        const t = (qs('#topic_user_topic_select')?.value || '0').trim();
+        if(!u || !/^[0-9]+$/.test(u)) return alert('Bitte eine gültige User-ID (Zahl) eingeben.');
+        if(!/^[0-9]+$/.test(t)) return alert('Bitte ein gültiges Topic auswählen.');
+        sendPayload({topic_user_set:{user_id:Number(u), topic_id:Number(t)}});
+      });
+    }
+
+    function renderSpamUI(spam) {
+      SPAM_CACHE = spam || {};
+      setupSpamHandlers();
+
+      const topics = (spam?.topics || []);
+      const currentTopic = Number(spam?.policy_topic ?? 0);
+
+      _fillTopicSelect(qs('#spam_topic_select'), topics, currentTopic);
+      _fillTopicSelect(qs('#topic_user_topic_select'), topics, 0);
+
+      _applyTopicPolicyToForm(spam, currentTopic);
+
+      _renderSpamOverrides(spam);
+      _renderTopicUsers(spam);
+    }
     
+
+    // Load AI data
     setVal('ai.on', j.ai?.on ?? false);
     setVal('ai.faq', j.ai?.faq ?? '');
     setVal('ai.rss_analysis', j.ai?.rss_analysis ?? false);
