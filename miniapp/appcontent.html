@@ -261,6 +261,19 @@
         <div id="topic_users_list" class="list"></div>
       </div>
     </div>
+    <div class="sep"></div>
+    
+    <div class="grid" id="spam_tools">
+      <div class="row" style="gap:8px; flex-wrap:wrap;">
+        <button class="btn small" type="button" id="btn_topics_sync">Topics sync (Namen aktualisieren)</button>
+        <button class="btn small danger" type="button" id="btn_spam_reset">Topic-Override zurücksetzen</button>
+        <button class="btn small primary" type="button" id="btn_spam_test">Policy testen</button>
+      </div>
+      <div>
+        <div class="hint">Test-Ausgabe (effektive Policies für das aktuelle Policy-Topic)</div>
+        <pre class="mono" id="spam_effective_out" style="max-height:260px; overflow:auto;">—</pre>
+      </div>
+    </div>
   </section>
 
   <section class="card" id="sec-rss">
@@ -1260,6 +1273,57 @@ async function sendPayload(extra = {}) {
   }
 }
 
+async function spamTestEffective() {
+  const tid = (qs('[data-key="spam.policy_topic"]')?.value || '0').trim();
+  const out = qs('#spam_effective_out');
+  if(out) out.textContent = 'Teste …';
+  try {
+    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': INIT_DATA
+      }
+    });
+    const j = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(j?.error || (await res.text()));
+    if(out) out.textContent = JSON.stringify(j, null, 2);
+  } catch (e) {
+    if(out) out.textContent = `❌ Fehler: ${e?.message || e}`;
+  }
+}
+
+async function topicsSyncNow() {
+  const out = qs('#spam_effective_out');
+  if(out) out.textContent = 'Sync …';
+  try {
+    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': INIT_DATA
+      },
+      body: JSON.stringify({sync:true})
+    });
+    const j = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(j?.error || (await res.text()));
+    if(out) out.textContent = `✅ Sync ok. Aktualisiert: ${j.updated || 0}\n` + JSON.stringify(j, null, 2);
+    try { await loadState(); } catch {}
+  } catch (e) {
+    if(out) out.textContent = `❌ Fehler: ${e?.message || e}`;
+  }
+}
+
+function setupSpamToolButtons() {
+  qs('#btn_spam_test')?.addEventListener('click', spamTestEffective);
+  qs('#btn_topics_sync')?.addEventListener('click', topicsSyncNow);
+  qs('#btn_spam_reset')?.addEventListener('click', ()=>{
+    const tid = (qs('[data-key="spam.policy_topic"]')?.value || '0').trim();
+    if(!tid) return;
+    sendPayload({spam_topic_reset:{topic_id: tid}});
+  });
+}
+
 qs('#backBtn')?.addEventListener('click', showStartPage);
 qs('#closeBtn')?.addEventListener('click', ()=>{ try{ tg.close(); }catch{ window.close(); } });
 qs('#resetBtn')?.addEventListener('click', loadState);
@@ -1448,6 +1512,7 @@ qs('#pro_buy_1m_paypal')?.addEventListener('click', ()=>{
 qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
 
 document.addEventListener('DOMContentLoaded', async ()=>{
+  try { setupSpamToolButtons(); } catch {}
   await loadGroups();
   if(cid) { showContentArea(cid); await loadState(); }
   else { showStartPage(); }
