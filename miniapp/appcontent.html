@@ -6,10 +6,12 @@
   <title>Emerald Content – Mini-App</title>
   <style>
     :root{
+      color-scheme: dark;
       --bg:#0b1220; --panel:#0f172a; --ring:#1f2937; --text:#e5e7eb; --muted:#94a3b8;
       --brand:#22c55e; --danger:#ef4444; --yellow:#f59e0b; --shadow:0 10px 30px rgba(0,0,0,.35);
     }
     [data-theme="light"]{
+      color-scheme: light;
       --bg:#f7fafc; --panel:#ffffff; --ring:#e5e7eb; --text:#0b1220; --muted:#4b5563;
       --brand:#16a34a; --danger:#dc2626; --yellow:#d97706; --shadow:0 6px 22px rgba(0,0,0,.12);
     }
@@ -29,6 +31,7 @@
     .card.active{display:block}
     label{display:block;font-weight:600;margin:6px 0 6px;color:var(--muted)}
     input[type="text"],input[type="number"],input[type="datetime-local"],textarea,select{width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px}
+    
     /* Select-Dropdowns im Darkmode lesbar machen (Browser-Default ist oft weiss/weiss) */
     select{background:var(--panel)}
     select option{background:var(--panel);color:var(--text)}
