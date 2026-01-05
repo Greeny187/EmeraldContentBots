@@ -1,7 +1,175 @@
-/**
- * Story Sharing UI Components
- * Integration für die Emerald Miniapp
- */
+(function(){
+  const qs = (s) => document.querySelector(s);
+  const qa = (s) => Array.from(document.querySelectorAll(s));
+
+  const tg = window.Telegram?.WebApp;
+
+  function toast(msg){
+    const out = qs('#out');
+    if(out) out.textContent = msg;
+    try { tg?.showPopup?.({title:"Emerald", message: msg, buttons:[{type:"ok"}]}); } catch {}
+  }
+
+  async function api(path, opts={}){
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...opts,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': INIT_DATA,
+        ...(opts.headers||{})
+      }
+    });
+    let j=null;
+    const ct = res.headers.get('content-type')||'';
+    if(ct.includes('application/json')){
+      j = await res.json();
+    } else {
+      const t = await res.text();
+      j = { success: res.ok, text: t };
+    }
+    if(!res.ok) {
+      const err = (j && (j.error || j.text)) ? (j.error || j.text) : `HTTP ${res.status}`;
+      throw new Error(err);
+    }
+    return j;
+  }
+
+  function currentGroupName(){
+    // best effort: Gruppenname aus UI, falls vorhanden
+    const el = qs('#groupTitle') || qs('[data-current-group-title]');
+    return (el?.textContent || '').trim() || 'Meine Gruppe';
+  }
+
+  async function createAndShare(template){
+    if(!cid){
+      toast("⚠️ Bitte zuerst eine Gruppe wählen.");
+      return;
+    }
+    toast("🎞️ Erzeuge Story…");
+    try {
+      const j = await api(`/api/stories/create`, {
+        method:'POST',
+        body: JSON.stringify({
+          chat_id: cid,
+          template,
+          group_name: currentGroupName()
+        })
+      });
+
+      const share = j.share || {};
+      const cardUrl = share.card_url;
+      const ref = share.referral_link;
+
+      if(!cardUrl){
+        toast("⚠️ Kein card_url erhalten.");
+        return;
+      }
+
+      // Telegram Story Share (falls verfügbar)
+      if(tg?.shareToStory){
+        try {
+          const widget_link = ref ? { url: ref, name: "Join" } : undefined;
+          await tg.shareToStory(cardUrl, {
+            text: "💎 Emerald Ecosystem",
+            widget_link
+          });
+          toast("✅ Story geteilt!");
+          return;
+        } catch(e){
+          console.warn("shareToStory failed:", e);
+        }
+      }
+
+      // Fallback: URL öffnen + Link kopieren
+      try { window.open(cardUrl, "_blank"); } catch {}
+      if(ref && navigator.clipboard){
+        try { await navigator.clipboard.writeText(ref); } catch {}
+      }
+      toast("✅ Karte geöffnet. Referral-Link ggf. kopiert.");
+    } catch(e){
+      const msg = (e && e.message) ? e.message : String(e);
+      if(msg.includes("rate_limited")){
+        toast("⏳ Rate-Limit erreicht (heute).");
+      } else {
+        toast(`⚠️ Story Fehler: ${msg}`);
+      }
+    }
+  }
+
+  async function loadMyShares(){
+    if(!cid || !uid){
+      toast("⚠️ Gruppe/UID fehlt.");
+      return;
+    }
+    toast("Lade Shares…");
+    try{
+      const j = await api(`/api/stories/user/${encodeURIComponent(uid)}?chat_id=${encodeURIComponent(cid)}`, {method:'GET'});
+      const box = qs('#user_shares_list');
+      const list = box?.querySelector('.list');
+      if(!box || !list) return;
+      list.innerHTML = '';
+      (j.shares || []).forEach(s=>{
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div class="left">
+            <div class="title">#${s.share_id} • ${s.template || ''}</div>
+            <div class="hint">Clicks: ${s.clicks||0} • Conv: ${s.conversions||0}</div>
+          </div>
+          <button class="btn" data-open-card="${s.share_id}">🎴 Card</button>
+        `;
+        list.appendChild(div);
+      });
+      box.style.display = 'block';
+      toast("✅ Shares geladen");
+    }catch(e){
+      toast(`⚠️ Shares Fehler: ${e.message||e}`);
+    }
+  }
+
+  function wire(){
+    qa('[data-story-action]').forEach(btn=>{
+      btn.addEventListener('click', ()=>createAndShare(btn.getAttribute('data-story-action')));
+    });
+    qa('[data-load-user-shares]').forEach(btn=>{
+      btn.addEventListener('click', loadMyShares);
+    });
+    document.addEventListener('click', (ev)=>{
+      const t = ev.target;
+      if(!(t instanceof HTMLElement)) return;
+      const sid = t.getAttribute('data-open-card');
+      if(sid){
+        try{ window.open(`${API_BASE}/api/stories/card/share/${encodeURIComponent(sid)}`, "_blank"); }catch{}
+      }
+    });
+  }
+
+  // optional hook from main appcontent loadState()
+  window.__onStateLoaded = function(state){
+    try{
+      const sharing = state?.sharing || {};
+      const enabled = !!sharing.enabled;
+      qa('[data-story-action]').forEach(b=>{
+        b.disabled = !enabled;
+        b.style.opacity = enabled ? '1' : '0.5';
+      });
+      // templates enable/disable
+      const tmpl = sharing.templates || {};
+      qa('[data-story-action]').forEach(b=>{
+        const key = b.getAttribute('data-story-action');
+        if(key in tmpl){
+          b.style.display = tmpl[key] ? '' : 'none';
+        }
+      });
+    }catch(e){}
+  };
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', wire);
+  }else{
+    wire();
+  }
+})();
 
 class StorySharing {
   constructor(apiBase = '/api') {

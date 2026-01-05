@@ -492,6 +492,12 @@
       </label>
     </div>
 
+    <div class="grid" style="margin-top:10px">
+          <label>Tägliches Share-Limit pro User (Anti-Farm)
+        <input type="number" min="1" max="50" data-key="sharing.daily_limit" value="5" />
+      </label>
+    </div>
+
     <div class="grid">
       <label>Story-Templates
         <div class="list" id="sharing_templates" style="margin-top:8px">
@@ -500,35 +506,35 @@
               <div class="title">✨ Emerald nutzen – Story teilen</div>
               <div class="hint">Grundtemplate</div>
             </div>
-            <input type="checkbox" checked disabled />
+            <input type="checkbox" data-key="sharing.templates.group_bot" checked />
           </div>
           <div class="item">
             <div class="left">
               <div class="title">📊 Meine Stats teilen</div>
               <div class="hint">Statistiken der Gruppe</div>
             </div>
-            <input type="checkbox" checked disabled />
+            <input type="checkbox" data-key="sharing.templates.stats" checked />
           </div>
           <div class="item">
             <div class="left">
               <div class="title">📝 Content Bot nutzen</div>
               <div class="hint">Automatische Posts</div>
             </div>
-            <input type="checkbox" checked disabled />
+            <input type="checkbox" data-key="sharing.templates.content" checked />
           </div>
           <div class="item">
             <div class="left">
               <div class="title">💎 EMRD erhalten – Story teilen</div>
               <div class="hint">Rewards-fokussiert</div>
             </div>
-            <input type="checkbox" checked disabled />
+            <input type="checkbox" data-key="sharing.templates.emrd_rewards" checked />
           </div>
           <div class="item">
             <div class="left">
               <div class="title">🔥 Zeig deinen Gruppen-Bot</div>
               <div class="hint">Affiliate-Link</div>
             </div>
-            <input type="checkbox" checked disabled />
+            <input type="checkbox" data-key="sharing.templates.affiliate" checked />
           </div>
         </div>
       </label>
@@ -1223,18 +1229,29 @@ async function loadState() {
       manualBox.innerHTML = `Befehl im Bot: <span class="kbd">${cmd}</span><br>${desc}`;
     }
     
+    // Story-Sharing (pro Gruppe)
+    const sh = j.sharing || {};
+    setVal('sharing.enabled', sh.enabled ?? true);
+    setVal('sharing.referral_tracking', sh.referral_tracking ?? true);
+    setVal('sharing.daily_limit', sh.daily_limit ?? 5);
+    setVal('sharing.reward_share', sh.reward_share ?? 50);
+    setVal('sharing.reward_referral', sh.reward_referral ?? 100);
+    setVal('sharing.reward_clicks', sh.reward_clicks ?? 25);
+    setVal('sharing.leaderboard_enabled', sh.leaderboard_enabled ?? false);
+    setVal('sharing.show_analytics', sh.show_analytics ?? false);
+    // Template-Schalter
+    const t = sh.templates || {};
+    ['group_bot','stats','content','emrd_rewards','affiliate'].forEach(k=>{
+      setVal(`sharing.templates.${k}`, t[k] ?? true);
+    });
+
     qs('#out').textContent = 'Bereit.';
     STATE_READY = true;
     validateAll();
 
-
-    qs('#out').textContent = 'Bereit.';
-    STATE_READY = true;
-    validateAll();
-  } catch(e) {
+  } catch (e) {
     console.error(e);
-    qs('#out').textContent = 'Fehler beim Laden.';
-    STATE_READY = false;
+    qs('#out').textContent = 'Fehler beim Laden: ' + e;
   }
 }
 
