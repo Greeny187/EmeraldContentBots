@@ -29,6 +29,9 @@
     .card.active{display:block}
     label{display:block;font-weight:600;margin:6px 0 6px;color:var(--muted)}
     input[type="text"],input[type="number"],input[type="datetime-local"],textarea,select{width:100%;background:#0000;border:1px solid var(--ring);color:var(--text);border-radius:12px;padding:9px 10px}
+    /* Select-Dropdowns im Darkmode lesbar machen (Browser-Default ist oft weiss/weiss) */
+    select{background:var(--panel)}
+    select option{background:var(--panel);color:var(--text)}
     textarea{min-height:92px;resize:vertical}
     .switch{display:inline-flex;align-items:center;gap:6px}
     .switch input{accent-color:var(--brand)}
