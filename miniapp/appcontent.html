@@ -740,6 +740,12 @@ let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
 let STATE_READY = false;
 
+
+// --- Spam UI Globals (müssen VOR der ersten Nutzung existieren) ---
+// Fix für: "Cannot access 'SPAM_CACHE' before initialization"
+let SPAM_CACHE = null;
+let SPAM_HANDLERS_READY = false;
+
 // Validation helpers
 function validTime(val) { const s = (val || '').trim(); if (s === '') return true; return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(s); }
 function validInt(val) { const s = (val ?? '').toString().trim(); return s === '' || /^-?\d+$/.test(s); }
@@ -990,8 +996,6 @@ async function loadState() {
 
     renderSpamUI(j.spam || {});
 
-    let SPAM_CACHE = null;
-    let SPAM_HANDLERS_READY = false;
 
     function _fillTopicSelect(sel, topics, selected) {
       if(!sel) return;
