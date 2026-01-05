@@ -1102,7 +1102,7 @@ async function loadState() {
         del.className = 'btn small danger';
         del.type = 'button';
         del.textContent = 'Entfernen';
-        del.onclick = ()=> sendPayload({topic_user_del:{user_id:r.user_id}});
+        del.onclick = ()=> sendPayload({topic_user_del:{user_id:r.user_id, topic_id:r.topic_id}});
         btns.appendChild(del);
         item.appendChild(left);
         item.appendChild(btns);
@@ -1323,6 +1323,10 @@ async function spamTestEffective() {
 async function topicsSyncNow() {
   const out = qs('#spam_effective_out');
   if(out) out.textContent = 'Sync …';
+  if(!cid || Number(cid)===0) {
+    if(out) out.textContent = '❌ Bitte zuerst eine Gruppe auswählen.';
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS}`, {
       method: 'POST',
