@@ -744,19 +744,6 @@ const INIT_DATA = tg?.initData || "";
 const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-function refreshTelegramAuth(){
-  try {
-    const t = window.Telegram?.WebApp;
-    if (!t) return;
-    try { t.ready?.(); } catch {}
-    try { t.expand?.(); } catch {}
-    // initData inkl. Signatur (wichtig für Backend-Auth)
-    INIT_DATA = t.initData || INIT_DATA || "";
-    const maybe = parseInt(getUrlParam("uid") || t.initDataUnsafe?.user?.id || 0);
-    if (maybe) uid = maybe;
-  } catch {}
-}
-
 function authQS(){
   return INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
 }
