@@ -740,9 +740,8 @@ const getUrlParam = (k, def=null) => new URL(location.href).searchParams.get(k) 
 
 const tg = window.Telegram?.WebApp;
 const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
-// Telegram Auth: initData kann in manchen Clients erst nach tg.ready() sicher verfügbar sein.
-let INIT_DATA = tg?.initData || "";
-let uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
+const INIT_DATA = tg?.initData || "";
+const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
 function refreshTelegramAuth(){
@@ -1759,6 +1758,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   else { showStartPage(); }
 });
 </script>
-<script src="story-sharing.js"></script>
+<script src="story-sharing.js">
+</script>
 </body>
 </html>
