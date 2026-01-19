@@ -739,22 +739,23 @@ const qa = (s) => Array.from(document.querySelectorAll(s));
 const getUrlParam = (k, def=null) => new URL(location.href).searchParams.get(k) ?? def;
 
 const tg = window.Telegram?.WebApp;
-const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
+// API-Base:
+// - wenn ?api=... gesetzt ist -> nutze das
+// - sonst: wenn NICHT GitHub Pages -> nutze die aktuelle Origin (praktisch, wenn du das HTML direkt vom Server auslieferst)
+// - sonst fallback auf die Heroku-URL
+const DEFAULT_API_BASE = "https://emeraldcontent-aac379fc581e.herokuapp.com";
+const API_BASE = getUrlParam("api") || (location.origin.includes("github.io") ? DEFAULT_API_BASE : location.origin) || DEFAULT_API_BASE;
 const INIT_DATA = tg?.initData || "";
 const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-function refreshTelegramAuth() {
-  if(!tg) return;
-  const data = tg.initData || "";
-  if(data && data !== INIT_DATA) {
-    location.href = `${location.pathname}?api=${encodeURIComponent(API_BASE)}&uid=${encodeURIComponent(uid)}&init_data=${encodeURIComponent(data)}`;
-  }
+function authQS(){
+  return INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
 }
-refreshTelegramAuth();
-setTimeout(refreshTelegramAuth, 200);
-setTimeout(refreshTelegramAuth, 900);
 
++refreshTelegramAuth();
++setTimeout(refreshTelegramAuth, 200);
++setTimeout(refreshTelegramAuth, 900);
 let STATE_READY = false;
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
@@ -834,8 +835,7 @@ async function loadGroups() {
     list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
     if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    const qs = authQS ? `?${authQS.replace(/^&/, '')}` : '';
-    const res = await fetch(`/miniapp/groups${qs}`, { headers });
+    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const groups = data?.groups || [];
@@ -878,7 +878,13 @@ async function loadGroups() {
     }
   } catch(err) {
     console.error('Gruppen laden fehlgeschlagen', err);
-    list.innerHTML = `<p class="hint error">Fehler: ${err.message}</p>`;
+    const tried = `${API_BASE}/miniapp/groups?${authQS}`;
+    list.innerHTML = `
+      <p class="hint error">
+        Fehler: ${err.message}<br>
+        <span style="font-size:11px;color:var(--muted)">${tried}</span><br>
+        <span style="font-size:11px;color:var(--muted)">Wenn du das HTML über GitHub Pages hostest, setze in BotFather/WebApp-URL unbedingt <b>?api=DEINE_HEROKU_URL</b>.</span>
+      </p>`;
   }
 }
 
