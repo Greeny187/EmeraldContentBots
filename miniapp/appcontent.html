@@ -748,15 +748,16 @@ const API_BASE = getUrlParam("api") || (location.origin.includes("github.io") ? 
 const INIT_DATA = tg?.initData || "";
 const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
-const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-function authQS(){
-  return INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-}
 
-+refreshTelegramAuth();
-+setTimeout(refreshTelegramAuth, 200);
-+setTimeout(refreshTelegramAuth, 900);
+// Auth Querystring (Fallback nur wenn kein initData vorhanden ist)
+const AUTH_UID = (Number.isFinite(uid) && uid>0) ? String(uid) : '' ;
+const AUTH_QS  = INIT_DATA ? '' : (AUTH_UID ? ('uid=' + encodeURIComponent(AUTH_UID)) : '');
+function withAuthQS(url){
+  if (INIT_DATA) return url;
+  if (!AUTH_QS) return url;
+  return url + (url.includes('?') ? '&' : '?') + AUTH_QS;
 let STATE_READY = false;
+}
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
 
@@ -835,7 +836,7 @@ async function loadGroups() {
     list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
     if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/groups`), {headers});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const groups = data?.groups || [];
@@ -878,7 +879,7 @@ async function loadGroups() {
     }
   } catch(err) {
     console.error('Gruppen laden fehlgeschlagen', err);
-    const tried = `${API_BASE}/miniapp/groups?${authQS}`;
+    const tried = withAuthQS(`${API_BASE}/miniapp/groups`);
     list.innerHTML = `
       <p class="hint error">
         Fehler: ${err.message}<br>
@@ -942,7 +943,7 @@ async function startProCheckout(plan, provider) {
       }
     }
 
-    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS}`, {
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/pay?cid=${cid}`), {
 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -975,7 +976,7 @@ async function startProCheckout(plan, provider) {
 async function loadState() {
   qs('#out').textContent = 'Lade …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/state?cid=${cid}`), {
 
       method: 'GET',
       headers: {
@@ -1333,7 +1334,7 @@ async function spamTestEffective() {
   const out = qs('#spam_effective_out');
   if(out) out.textContent = 'Teste …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS}`, {
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1356,7 +1357,7 @@ async function topicsSyncNow() {
     return;
   }
   try {
-    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS}`, {
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
