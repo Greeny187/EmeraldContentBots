@@ -962,10 +962,10 @@ async function startProCheckout(plan, provider) {
 }
 
 async function loadState() {
-  refreshTelegramAuth();
   qs('#out').textContent = 'Lade …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS()}`, {
+    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1283,7 +1283,6 @@ async function loadState() {
 }
 
 async function sendPayload(extra = {}) {
-  refreshTelegramAuth();
   if(!STATE_READY) { qs('#out').textContent = '⚠️ Erst Daten laden'; return; }
   
   const out = Object.assign({}, collect(), extra);
@@ -1323,7 +1322,7 @@ async function spamTestEffective() {
   const out = qs('#spam_effective_out');
   if(out) out.textContent = 'Teste …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS()}`, {
+    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1346,7 +1345,7 @@ async function topicsSyncNow() {
     return;
   }
   try {
-    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS()}`, {
+    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
