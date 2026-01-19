@@ -588,6 +588,16 @@
 
 
         // ===================== API FUNCTIONS =====================
+        function setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function setValue(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.value = value;
+        }
+
         async function fetchStats() {
             if (!userId) {
                 console.warn('User ID not available');
@@ -610,28 +620,28 @@
                 const stats = data.stats || {};
                 const tier = data.tier || {};
 
-                // Update stats
-                document.getElementById('totalReferrals').textContent = stats.total_referrals ?? 0;
-                document.getElementById('activeReferrals').textContent = stats.active_referrals ?? 0;
-                document.getElementById('totalEarned').textContent = `${Number(stats.total_earned || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
-                document.getElementById('pendingEarned').textContent = `${Number(stats.pending || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
+                // Update stats (IDs that actually exist in this HTML)
+                const totalEarnedTxt = `${Number(stats.total_earned || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
+                const pendingTxt = `${Number(stats.pending || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
+                setText('totalEarned', totalEarnedTxt);
+                setText('pending', pendingTxt);
+                setText('payoutAmount', pendingTxt);
+                setText('activeReferralCount', stats.active_referrals ?? 0);
 
-                // Update tier
-                if (tier && tier.tier) {
-                    document.getElementById('tierName').textContent = `${tier.tier_emoji || '🥉'} ${(tier.tier || 'bronze').toUpperCase()}`;
-                    document.getElementById('commissionRate').textContent = `${Math.round((tier.commission_rate || 0.05) * 100)}%`;
-                } else {
-                    document.getElementById('tierName').textContent = '🥉 BRONZE';
-                    document.getElementById('commissionRate').textContent = '5%';
-                }
+                // Update tier (existing IDs: tierLabel + tierBenefits)
+                const tierName = tier?.tier ? `${tier.tier_emoji || '🥉'} ${(tier.tier || 'bronze').toUpperCase()} Tier` : '🥉 BRONZE Tier';
+                const commissionPct = Math.round(((tier?.commission_rate ?? 0.05) * 100));
+                setText('tierLabel', tierName);
+                setText('tierBenefits', `✓ ${commissionPct}% Provision pro Referral\n✓ Tracking & Statistiken\n✓ Auszahlung ab ${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`.replace(/\n/g, '\n'));
 
                 // Update minimum payout + numeric cache
-                document.getElementById('minimumPayout').textContent = `${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`;
+                setText('minimumPayout', `${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`);
                 currentStats.pending = Number(stats.pending || 0);
                 currentStats.minimumPayout = Number(data.minimum_payout || 1000);
 
                 // Referral link
                 document.getElementById('affiliateLink').value = data.referral_link || '';
+                setValue('affiliateLink', data.referral_link || '');
 
                 // Payout button state
                 const payoutBtn = document.getElementById('payoutBtn');
@@ -737,9 +747,8 @@
             } catch (error) {
                 alert('❌ Fehler bei der Auszahlung: ' + error.message);
             } finally {
-                const btn = document.getElementById('payoutBtn');
-                btn.disabled = false;
-                btn.textContent = '💰 Auszahlung Anfordern';
+                // Let fetchStats() restore correct state/text
+                fetchStats();
             }
         }
 
