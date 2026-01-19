@@ -744,13 +744,17 @@ const INIT_DATA = tg?.initData || "";
 const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
-function authQS(){
-  return INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+function refreshTelegramAuth() {
+  if(!tg) return;
+  const data = tg.initData || "";
+  if(data && data !== INIT_DATA) {
+    location.href = `${location.pathname}?api=${encodeURIComponent(API_BASE)}&uid=${encodeURIComponent(uid)}&init_data=${encodeURIComponent(data)}`;
+  }
 }
+refreshTelegramAuth();
+setTimeout(refreshTelegramAuth, 200);
+setTimeout(refreshTelegramAuth, 900);
 
-+refreshTelegramAuth();
-+setTimeout(refreshTelegramAuth, 200);
-+setTimeout(refreshTelegramAuth, 900);
 let STATE_READY = false;
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
