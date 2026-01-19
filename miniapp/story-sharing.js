@@ -4,6 +4,11 @@
 
   const tg = window.Telegram?.WebApp;
 
+  function currentInitData(){
+    // initData (inkl. Signatur) ist die einzige saubere Auth-Quelle fuer Backend-Calls
+    return (window.Telegram?.WebApp?.initData || (typeof INIT_DATA !== 'undefined' ? INIT_DATA : '') || '').trim();
+  }
+
   function toast(msg){
     const out = qs('#out');
     if(out) out.textContent = msg;
@@ -15,7 +20,7 @@
       ...opts,
       headers: {
         'Content-Type': 'application/json',
-        'X-Telegram-Init-Data': INIT_DATA,
+        ...(currentInitData() ? {'X-Telegram-Init-Data': currentInitData()} : {}),
         ...(opts.headers||{})
       }
     });
@@ -90,7 +95,8 @@
       const msg = (e && e.message) ? e.message : String(e);
       if(msg.includes("rate_limited")){
         toast("⏳ Rate-Limit erreicht (heute).");
-      } else {
+      } else if(msg.includes("auth_required") || msg.includes("forbidden")){
+        toast("❌ Auth fehlt. Öffne die Miniapp über den Bot-Button in Telegram (nicht über einen normalen Link). Tipp: Telegram neu öffnen und nochmal versuchen.");
         toast(`⚠️ Story Fehler: ${msg}`);
       }
     }
@@ -123,9 +129,43 @@
       box.style.display = 'block';
       toast("✅ Shares geladen");
     }catch(e){
-      toast(`⚠️ Shares Fehler: ${e.message||e}`);
+      const msg = (e && e.message) ? e.message : String(e);
+      if(msg.includes("auth_required") || msg.includes("forbidden")){
+        toast("❌ Auth fehlt. Bitte Miniapp wirklich als Telegram-WebApp starten (Button im Bot / Menu) – nicht im Browser.");
+      } else {
+        toast(`⚠️ Shares Fehler: ${msg}`);
+      }
     }
   }
+
+  async function loadTopShares(){
+      if(!cid){ return; }
+      const box = qs('#top_shares_list');
+      const list = box?.querySelector('.list');
+      if(!box || !list) return;
+
+      try{
+        const j = await api(`/api/stories/top?chat_id=${encodeURIComponent(cid)}&days=7&limit=10`, {method:'GET'});
+        list.innerHTML = '';
+        (j.shares || []).forEach((s, i)=>{
+          const div = document.createElement('div');
+          div.className = 'item';
+          const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : `#${i+1}`;
+          div.innerHTML = `
+            <div class="left">
+              <div class="title">${medal} ${s.group_name || 'Gruppe'} • ${s.template || ''}</div>
+              <div class="hint">Clicks: ${s.clicks||0} • Conv: ${s.conversions||0} • Rewards: ${s.total_rewards||0}</div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+        box.style.display = 'block';
+      }catch(e){
+        const msg = (e && e.message) ? e.message : String(e);
+        list.innerHTML = `<div class="hint" style="color:var(--danger)">${msg}</div>`;
+        box.style.display = 'block';
+      }
+    }
 
   function wire(){
     qa('[data-story-action]').forEach(btn=>{
@@ -163,7 +203,14 @@
       });
     }catch(e){}
   };
-
+    // Leaderboard anzeigen (wenn aktiviert)
+     try{
+       const lb = !!sharing.leaderboard_enabled;
+       const box = qs('#top_shares_list');
+       if(box) box.style.display = lb ? 'block' : 'none';
+       if(lb) loadTopShares();
+     }catch{}
+     
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', wire);
   }else{

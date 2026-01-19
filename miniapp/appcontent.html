@@ -740,10 +740,31 @@ const getUrlParam = (k, def=null) => new URL(location.href).searchParams.get(k) 
 
 const tg = window.Telegram?.WebApp;
 const API_BASE = getUrlParam("api") || "https://emeraldcontent-aac379fc581e.herokuapp.com";
-const INIT_DATA = tg?.initData || "";
-const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
+// Telegram Auth: initData kann in manchen Clients erst nach tg.ready() sicher verfügbar sein.
+let INIT_DATA = tg?.initData || "";
+let uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+function refreshTelegramAuth(){
+  try {
+    const t = window.Telegram?.WebApp;
+    if (!t) return;
+    try { t.ready?.(); } catch {}
+    try { t.expand?.(); } catch {}
+    // initData inkl. Signatur (wichtig für Backend-Auth)
+    INIT_DATA = t.initData || INIT_DATA || "";
+    const maybe = parseInt(getUrlParam("uid") || t.initDataUnsafe?.user?.id || 0);
+    if (maybe) uid = maybe;
+  } catch {}
+}
+
+function authQS(){
+  return INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
+}
+
++refreshTelegramAuth();
++setTimeout(refreshTelegramAuth, 200);
++setTimeout(refreshTelegramAuth, 900);
 let STATE_READY = false;
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
@@ -817,13 +838,14 @@ function showContentArea(gid) {
 }
 
 async function loadGroups() {
+  refreshTelegramAuth();
   const list = qs('#groupList');
   if(!list) return;
   try {
     list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
     if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
+    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS()}`, {headers});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const groups = data?.groups || [];
@@ -924,7 +946,8 @@ async function startProCheckout(plan, provider) {
       }
     }
 
-    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS}`, {
+    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS()}`, {
+
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -954,9 +977,10 @@ async function startProCheckout(plan, provider) {
 }
 
 async function loadState() {
+  refreshTelegramAuth();
   qs('#out').textContent = 'Lade …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS}`, {
+    const res = await fetch(`${API_BASE}/miniapp/state?cid=${cid}${authQS()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1261,7 +1285,8 @@ async function loadState() {
     ['group_bot','stats','content','emrd_rewards','affiliate'].forEach(k=>{
       setVal(`sharing.templates.${k}`, t[k] ?? true);
     });
-
+    // Hook: Story-Sharing UI kann auf geladenen State reagieren
+    try { window.__onStateLoaded?.(j); } catch {}
     qs('#out').textContent = 'Bereit.';
     STATE_READY = true;
     validateAll();
@@ -1273,6 +1298,7 @@ async function loadState() {
 }
 
 async function sendPayload(extra = {}) {
+  refreshTelegramAuth();
   if(!STATE_READY) { qs('#out').textContent = '⚠️ Erst Daten laden'; return; }
   
   const out = Object.assign({}, collect(), extra);
@@ -1312,7 +1338,7 @@ async function spamTestEffective() {
   const out = qs('#spam_effective_out');
   if(out) out.textContent = 'Teste …';
   try {
-    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS}`, {
+    const res = await fetch(`${API_BASE}/miniapp/spam/effective?cid=${encodeURIComponent(cid)}&topic_id=${encodeURIComponent(tid)}${authQS()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1335,7 +1361,7 @@ async function topicsSyncNow() {
     return;
   }
   try {
-    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS}`, {
+    const res = await fetch(`${API_BASE}/miniapp/topics/sync?cid=${encodeURIComponent(cid)}${authQS()}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
