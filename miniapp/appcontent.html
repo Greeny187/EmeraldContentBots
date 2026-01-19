@@ -830,7 +830,7 @@ async function loadGroups() {
     list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
     if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS()}`, {headers});
+    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const groups = data?.groups || [];
@@ -931,7 +931,7 @@ async function startProCheckout(plan, provider) {
       }
     }
 
-    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS()}`, {
+    const res = await fetch(`${API_BASE}/miniapp/pay?cid=${cid}${authQS}`, {
 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
