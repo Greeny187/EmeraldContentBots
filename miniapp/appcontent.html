@@ -834,7 +834,8 @@ async function loadGroups() {
     list.innerHTML = '<p class="hint">⏳ Lade Gruppen…</p>';
     const headers = {};
     if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
-    const res = await fetch(`${API_BASE}/miniapp/groups?${authQS}`, {headers});
+    const qs = authQS ? `?${authQS.replace(/^&/, '')}` : '';
+    const res = await fetch(`/miniapp/groups${qs}`, { headers });
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const groups = data?.groups || [];
