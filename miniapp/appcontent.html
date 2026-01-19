@@ -745,7 +745,8 @@ const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 const authQS = INIT_DATA ? "" : `&uid=${encodeURIComponent(uid)}`;
 let STATE_READY = false;
-
+// Gruppen-Titel Cache (für Story-Sharing group_name)
+let GROUPS_MAP = {};
 
 // --- Spam UI Globals (müssen VOR der ersten Nutzung existieren) ---
 // Fix für: "Cannot access 'SPAM_CACHE' before initialization"
@@ -827,6 +828,12 @@ async function loadGroups() {
     const data = await res.json();
     const groups = data?.groups || [];
     
+    // Cache für Story-Sharing (id -> title)
+    GROUPS_MAP = {};
+    (groups || []).forEach(g=>{
+      try { GROUPS_MAP[parseInt(g.id)] = (g.title || String(g.id)); } catch {}
+    });
+
     const select = qs('#groupSelect');
     if(select) {
       select.innerHTML = '<option value="">Gruppe wählen...</option>' + 
@@ -1527,6 +1534,182 @@ qs('#clean_now')?.addEventListener('click', async ()=>{
   sendPayload({clean_delete_now: {demote, notify}});
 });
 
+// ---------------------------
+// Story Sharing (Frontend)
+// ---------------------------
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function storyOut(msg){
+  const o = qs('#out');
+  if(o) o.textContent = msg;
+}
+
+async function createStoryShare(templateId){
+  if(!cid || Number(cid) === 0){
+    storyOut('❌ Bitte zuerst eine Gruppe auswählen.');
+    return;
+  }
+
+  const groupName = GROUPS_MAP[cid] || `Gruppe ${cid}`;
+  storyOut('⏳ Erstelle Story-Share…');
+  const res = await fetch(`${API_BASE}/api/stories/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Telegram-Init-Data': INIT_DATA
+    },
+    body: JSON.stringify({chat_id: cid, template: templateId, group_name: groupName})
+  });
+
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok || !j?.success){
+    const err = j?.error || `HTTP ${res.status}`;
+    if(res.status === 403 && err === 'forbidden'){
+      storyOut('❌ Nur Admins dieser Gruppe können einen Story-Share erstellen.');
+      return;
+    }
+    if(res.status === 403 && err === 'auth_required'){
+      storyOut('❌ Auth fehlt. Starte die Miniapp in Telegram (nicht im Browser).');
+      return;
+    }
+    if(res.status === 429){
+      storyOut(`⛔ Rate-Limit: ${j?.used ?? '?'} / ${j?.limit ?? '?'} Shares heute.`);
+      return;
+    }
+    storyOut(`❌ Story-Share Fehler: ${err}`);
+    return;
+  }
+
+  const share = j.share || {};
+  const cardUrl = share.card_url;
+  const linkUrl = share.referral_link;
+  const title = share.title || 'Emerald Story';
+  const desc = share.description || '';
+
+  // Telegram Story API (Mobile)
+  if(tg?.shareToStory && cardUrl){
+    try{
+      tg.shareToStory(cardUrl, {
+        text: `${title}${desc ? `\n${desc}` : ''}`,
+        widget_link: linkUrl ? { url: linkUrl, name: 'Öffnen' } : undefined
+      });
+      storyOut('✅ Story-Editor geöffnet.');
+      return;
+    }catch(e){
+      console.warn('shareToStory failed', e);
+    }
+  }
+
+  // Fallback: normales Share (Chat)
+  const tme = `https://t.me/share/url?url=${encodeURIComponent(linkUrl || '')}&text=${encodeURIComponent(`${title}${desc ? ` – ${desc}` : ''}`)}`;
+  try{
+    if(tg?.openTelegramLink) tg.openTelegramLink(tme);
+    else window.open(tme, '_blank');
+    storyOut('✅ Share-Link geöffnet (Fallback).');
+  }catch(e){
+    storyOut('❌ Konnte Share nicht öffnen.');
+  }
+}
+
+function renderSharesInto(containerSel, shares){
+  const root = qs(containerSel);
+  if(!root) return;
+  const list = root.querySelector('.list') || root;
+  if(!shares || !shares.length){
+    list.innerHTML = '<div class="hint">Keine Shares vorhanden.</div>';
+    return;
+  }
+  list.innerHTML = shares.map(s=>{
+    const sid = s.share_id || s.id;
+    const tpl = s.template || s.story_template || '';
+    const when = s.shared_at ? new Date(s.shared_at).toLocaleString() : '';
+    const clicks = s.clicks ?? 0;
+    const conv = s.conversions ?? 0;
+    const ref = s.referral_link || '';
+    const card = `${API_BASE}/api/stories/card/share/${encodeURIComponent(sid)}`;
+    return `
+      <div class="item">
+        <div class="left">
+          <div class="title">#${esc(sid)} · ${esc(tpl)} <span class="hint">${esc(when)}</span></div>
+          <div class="hint">👆 ${esc(clicks)} Clicks · ✅ ${esc(conv)} Conversions</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn small" data-open="${esc(ref)}">Link</button>
+          <button class="btn small" data-card="${esc(card)}">Card</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  qa(`${containerSel} [data-open]`).forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const url = b.getAttribute('data-open');
+      if(!url) return;
+      try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch{}
+    });
+  });
+  qa(`${containerSel} [data-card]`).forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const url = b.getAttribute('data-card');
+      if(!url) return;
+      try{ window.open(url,'_blank'); }catch{}
+    });
+  });
+}
+
+async function loadUserShares(){
+  const box = qs('#user_shares_list');
+  if(!box) return;
+  box.style.display = 'block';
+  const list = box.querySelector('.list');
+  if(list) list.innerHTML = '<div class="hint">⏳ Lade…</div>';
+  try{
+    const res = await fetch(`${API_BASE}/api/stories/user/${encodeURIComponent(uid)}?chat_id=${encodeURIComponent(cid)}&limit=10`, {
+      headers: {'X-Telegram-Init-Data': INIT_DATA}
+    });
+    const j = await res.json().catch(()=>({}));
+    if(!res.ok || !j?.success) throw new Error(j?.error || `HTTP ${res.status}`);
+    renderSharesInto('#user_shares_list .list', j.shares || []);
+    storyOut('✅ Shares geladen.');
+  }catch(e){
+    if(list) list.innerHTML = `<div class="hint">❌ Fehler: ${esc(e?.message || e)}</div>`;
+    storyOut('❌ Shares konnten nicht geladen werden.');
+  }
+}
+
+async function loadTopShares(){
+  const box = qs('#top_shares_list');
+  if(!box) return;
+  box.style.display = 'block';
+  const list = box.querySelector('.list');
+  if(list) list.innerHTML = '<div class="hint">⏳ Lade…</div>';
+  try{
+    const res = await fetch(`${API_BASE}/api/stories/top?chat_id=${encodeURIComponent(cid)}&days=7&limit=10`, {
+      headers: {'X-Telegram-Init-Data': INIT_DATA}
+    });
+    const j = await res.json().catch(()=>({}));
+    if(!res.ok || !j?.success) throw new Error(j?.error || `HTTP ${res.status}`);
+    renderSharesInto('#top_shares_list .list', j.shares || []);
+  }catch(e){
+    if(list) list.innerHTML = `<div class="hint">${esc(e?.message || e)}</div>`;
+  }
+}
+
+function setupStorySharingButtons(){
+  qa('[data-story-action]').forEach(btn=>{
+    btn.addEventListener('click', ()=>createStoryShare(btn.dataset.storyAction));
+  });
+  qa('[data-load-user-shares]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      await loadUserShares();
+      await loadTopShares();
+    });
+  });
+}
+
+
 // PRO Checkout Buttons
 qs('#pro_buy_1m_ton')?.addEventListener('click', ()=>{
   startProCheckout('pro_monthly', 'walletconnect_ton');
@@ -1544,6 +1727,7 @@ qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll
 
 document.addEventListener('DOMContentLoaded', async ()=>{
   try { setupSpamToolButtons(); } catch {}
+  try { setupStorySharingButtons(); } catch {}
   await loadGroups();
   if(cid) { showContentArea(cid); await loadState(); }
   else { showStartPage(); }
