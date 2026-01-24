@@ -1447,51 +1447,81 @@
     // ============================================
     async function loadMonitoring() {
       try {
-        const logs = await apiCall('/system/logs?limit=50');
-        const groups = await apiCall('/bot-groups');
-        const feeds = await apiCall('/content/feeds');
-        const moderation = await apiCall('/moderation/stats');
-
-        // System Logs
-        const logsHtml = logs.logs.map(log => `
+        // Get real monitoring data
+        const monitoring = await apiCall('/devdash/monitoring');
+        const health = await apiCall('/system/health');
+        
+        // System metrics
+        const systemHtml = `
           <tr>
-            <td><span style="color: ${log.level === 'error' ? 'var(--danger)' : log.level === 'warning' ? 'var(--warning)' : 'var(--success)'};">${log.level.toUpperCase()}</span></td>
-            <td>${log.message}</td>
-            <td>${new Date(log.created_at).toLocaleString()}</td>
+            <td>CPU Usage</td>
+            <td>${monitoring.system.cpu_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.cpu_percent}%"></div></div></td>
           </tr>
-        `).join('');
-        document.getElementById('systemLogs').innerHTML = logsHtml || '<tr><td colspan="3" style="text-align: center;">No logs</td></tr>';
+          <tr>
+            <td>Memory Usage</td>
+            <td>${monitoring.system.memory_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.memory_percent}%"></div></div></td>
+          </tr>
+          <tr>
+            <td>Disk Usage</td>
+            <td>${monitoring.system.disk_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.disk_percent}%"></div></div></td>
+          </tr>
+        `;
+        document.getElementById('systemLogs').innerHTML = systemHtml;
 
-        // Bot Groups
-        const groupsHtml = groups.groups.map(g => `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">🌐 ${g.chat_title}</div>
-              <div class="item-desc">${g.member_count} members</div>
-            </div>
-          </div>
-        `).join('');
-        document.getElementById('botGroups').innerHTML = groupsHtml || '<p style="color: var(--text-secondary);">No groups</p>';
+        // Database stats
+        const dbHtml = `
+          <tr>
+            <td>Users</td>
+            <td>${monitoring.database.users}</td>
+          </tr>
+          <tr>
+            <td>Active Bots</td>
+            <td>${monitoring.database.active_bots}</td>
+          </tr>
+          <tr>
+            <td>Active Ads</td>
+            <td>${monitoring.database.active_ads}</td>
+          </tr>
+          <tr>
+            <td>Token Events</td>
+            <td>${monitoring.database.token_events}</td>
+          </tr>
+        `;
+        document.getElementById('botGroups').innerHTML = dbHtml;
 
-        // RSS Feeds
-        const feedsHtml = feeds.feeds.map(f => `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">📰 ${f.name}</div>
-              <div class="item-desc">${f.item_count} items</div>
-            </div>
-          </div>
-        `).join('');
-        document.getElementById('rssFeeds').innerHTML = feedsHtml || '<p style="color: var(--text-secondary);">No feeds</p>';
+        // Activity in last 24h
+        const activityHtml = `
+          <tr>
+            <td>New Users (24h)</td>
+            <td>${monitoring.activity_24h.new_users}</td>
+          </tr>
+          <tr>
+            <td>New Ads (24h)</td>
+            <td>${monitoring.activity_24h.new_ads}</td>
+          </tr>
+          <tr>
+            <td>Database Status</td>
+            <td><span class="item-status">${health.database.status.toUpperCase()}</span></td>
+          </tr>
+          <tr>
+            <td>Last Activity</td>
+            <td>${health.database.last_activity}</td>
+          </tr>
+        `;
+        document.getElementById('rssFeeds').innerHTML = activityHtml;
 
-        // Moderation
+        // Health status
         document.getElementById('moderationStats').innerHTML = `
-          <strong>🚨 Spam Detected:</strong> ${moderation.spam_detected}<br>
-          <strong>🗑️ Messages Deleted:</strong> ${moderation.messages_deleted}<br>
-          <strong>🚫 Users Banned:</strong> ${moderation.users_banned}
+          <strong>🏥 System Status:</strong> ${health.status.toUpperCase()}<br>
+          <strong>⏱️ Response Time:</strong> ${health.response_time_ms}ms<br>
+          <strong>📊 Services:</strong> ${Object.keys(health.services).length} monitored
         `;
       } catch (error) {
         console.error('Failed to load monitoring:', error);
+        document.getElementById('systemLogs').innerHTML = '<tr><td colspan="3">Error loading data</td></tr>';
       }
     }
 
