@@ -740,9 +740,45 @@
           <button onclick="showModal('addBotModal')" style="width: 100%;">➕ Add New Bot</button>
         </div>
 
-        <div class="card">
-          <h3>🤖 Registered Bots</h3>
-          <div id="botsList" class="list"></div>
+        <div id="botsListView" style="display: block;">
+          <div class="card">
+            <h3>🤖 Registered Bots</h3>
+            <div id="botsList" class="list"></div>
+          </div>
+        </div>
+
+        <div id="botDetailView" style="display: none;">
+          <button onclick="backToBotsList()" style="margin-bottom: 20px;">← Back to Bots</button>
+          <div class="card">
+            <h3 id="botDetailTitle">Bot Details</h3>
+            
+            <div class="grid" style="margin-bottom: 20px; gap: 12px;">
+              <div class="card" style="grid-column: auto;">
+                <h3>👥 Affiliate Stats</h3>
+                <div id="botAffiliateStats"></div>
+              </div>
+              <div class="card" style="grid-column: auto;">
+                <h3>💹 Trading Stats</h3>
+                <div id="botTradeStats"></div>
+              </div>
+              <div class="card" style="grid-column: auto;">
+                <h3>📚 Learning Stats</h3>
+                <div id="botLearningStats"></div>
+              </div>
+              <div class="card" style="grid-column: auto;">
+                <h3>🏛️ DAO Stats</h3>
+                <div id="botDaoStats"></div>
+              </div>
+              <div class="card" style="grid-column: auto;">
+                <h3>🛟 Support Stats</h3>
+                <div id="botSupportStats"></div>
+              </div>
+              <div class="card" style="grid-column: auto;">
+                <h3>📰 Content Stats</h3>
+                <div id="botContentStats"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1376,14 +1412,13 @@
         }
 
         botsList.innerHTML = data.bots.map(bot => `
-          <div class="list-item">
+          <div class="list-item" onclick="showBotDetails('${bot.username}')" style="cursor: pointer;">
             <div class="list-item-content">
               <div class="item-title">🤖 ${bot.title || bot.username}</div>
               <div class="item-desc">
                 <strong>${bot.username}</strong> • 
                 ${bot.user_count} users • 
-                ${bot.days_running} days running • 
-                ${bot.endpoint_count} endpoints
+                ${bot.days_running} days running
               </div>
               <div class="item-desc" style="margin-top: 4px; font-size: 11px;">
                 Status: <span style="color: ${bot.is_active ? 'var(--success)' : 'var(--text-secondary)'}">${bot.status.toUpperCase()}</span> • 
@@ -1399,6 +1434,91 @@
         console.error('Failed to load bots:', error);
         document.getElementById('botsList').innerHTML = '<p style="color: var(--text-secondary);">Error loading bot data</p>';
       }
+    }
+
+    async function showBotDetails(botUsername) {
+      try {
+        // Load comprehensive bot details
+        const data = await apiCall(`/analytics/bot-details?bot=${botUsername}`);
+        
+        // Hide list, show details
+        document.getElementById('botsListView').style.display = 'none';
+        document.getElementById('botDetailView').style.display = 'block';
+        
+        // Update title
+        document.getElementById('botDetailTitle').textContent = `${data.title || data.username} Details`;
+        
+        // Affiliate Stats
+        document.getElementById('botAffiliateStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Total Referrals:</strong> ${data.affiliate?.total_referrals || 0}</div>
+            <div><strong>Converted:</strong> ${data.affiliate?.converted_referrals || 0}</div>
+            <div><strong>Total Commissions:</strong> ${data.affiliate?.total_commissions || 0} EMRD</div>
+            <div><strong>Pending Payouts:</strong> ${data.affiliate?.pending_payouts || 0} EMRD</div>
+          </div>
+        `;
+        
+        // Trading Stats
+        document.getElementById('botTradeStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Portfolios:</strong> ${data.trade?.portfolios || 0}</div>
+            <div><strong>Active Positions:</strong> ${data.trade?.active_positions || 0}</div>
+            <div><strong>Total Alerts:</strong> ${data.trade?.total_alerts || 0}</div>
+            <div><strong>Active Strategies:</strong> ${data.trade?.active_strategies || 0}</div>
+            <div><strong>Total Swap Volume:</strong> ${data.trade?.total_swap_volume || 0}</div>
+          </div>
+        `;
+        
+        // Learning Stats
+        document.getElementById('botLearningStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Courses:</strong> ${data.learning?.total_courses || 0}</div>
+            <div><strong>Enrolled Users:</strong> ${data.learning?.enrolled_users || 0}</div>
+            <div><strong>Completed:</strong> ${data.learning?.completed_courses || 0}</div>
+            <div><strong>Quizzes:</strong> ${data.learning?.total_quizzes || 0}</div>
+            <div><strong>Certificates:</strong> ${data.learning?.certificates_issued || 0}</div>
+            <div><strong>Rewards Distributed:</strong> ${data.learning?.total_rewards_distributed || 0} EMRD</div>
+          </div>
+        `;
+        
+        // DAO Stats
+        document.getElementById('botDaoStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Active Proposals:</strong> ${data.dao?.active_proposals || 0}</div>
+            <div><strong>Total Voters:</strong> ${data.dao?.total_voters || 0}</div>
+            <div><strong>Treasury Balance:</strong> ${data.dao?.treasury_balance || 0} EMRD</div>
+            <div><strong>Total Delegations:</strong> ${data.dao?.total_delegations || 0}</div>
+            <div><strong>Governance Participation:</strong> ${data.dao?.governance_participation || 0}%</div>
+          </div>
+        `;
+        
+        // Support Stats
+        document.getElementById('botSupportStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Open Tickets:</strong> ${data.support?.open_tickets || 0}</div>
+            <div><strong>Resolved Tickets:</strong> ${data.support?.resolved_tickets || 0}</div>
+            <div><strong>Avg Resolution Time:</strong> ${data.support?.avg_resolution_time_hours || 0}h</div>
+          </div>
+        `;
+        
+        // Content Stats
+        document.getElementById('botContentStats').innerHTML = `
+          <div style="line-height: 2;">
+            <div><strong>Total Members:</strong> ${data.content?.total_members || 0}</div>
+            <div><strong>Active Topics:</strong> ${data.content?.active_topics || 0}</div>
+            <div><strong>Stories Shared:</strong> ${data.content?.stories_shared || 0}</div>
+            <div><strong>Trending Stories:</strong> ${data.content?.trending_stories || 0}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load bot details:', error);
+        alert('Error loading bot details: ' + error.message);
+      }
+    }
+
+    function backToBotsList() {
+      document.getElementById('botsListView').style.display = 'block';
+      document.getElementById('botDetailView').style.display = 'none';
     }
 
     // ============================================
