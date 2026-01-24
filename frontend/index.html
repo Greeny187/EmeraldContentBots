@@ -622,6 +622,21 @@
         Login with Telegram
       </button>
       <p><small>Secure login via Telegram Web App</small></p>
+      
+      <hr style="margin: 20px 0; border: none; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Alternative Methods:</p>
+      
+      <button onclick="devLogin()" style="background: #667eea; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
+        Dev Login (Code)
+      </button>
+      
+      <button onclick="tonWalletLogin()" style="background: #0088cc; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
+        Login with TON Wallet
+      </button>
+      
+      <button onclick="nearWalletLogin()" style="background: #ff4d4d; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
+        Login with NEAR Wallet
+      </button>
     </div>
   </div>
 
@@ -1011,6 +1026,84 @@
       } catch (error) {
         console.error('Telegram auth failed:', error);
         alert('Authentication failed: ' + error.message);
+      }
+    }
+
+    // Alternative Auth Methods
+    async function devLogin() {
+      const code = prompt('Enter DEV_LOGIN_CODE:');
+      if (!code) return;
+      const tg_id = prompt('Enter Telegram ID:');
+      if (!tg_id) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/devdash/dev-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ telegram_id: parseInt(tg_id), code })
+        });
+        
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Dev login failed');
+        }
+        
+        const data = await response.json();
+        authToken = data.access_token;
+        localStorage.setItem('auth_token', authToken);
+        await initDashboard();
+      } catch (error) {
+        alert('Dev login failed: ' + error.message);
+      }
+    }
+
+    async function tonWalletLogin() {
+      const ton_address = prompt('Enter TON wallet address (UQA...):');
+      if (!ton_address) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/devdash/auth/ton-wallet`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ton_address })
+        });
+        
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'TON login failed');
+        }
+        
+        const data = await response.json();
+        authToken = data.access_token;
+        localStorage.setItem('auth_token', authToken);
+        await initDashboard();
+      } catch (error) {
+        alert('TON login failed: ' + error.message);
+      }
+    }
+
+    async function nearWalletLogin() {
+      const near_account_id = prompt('Enter NEAR account ID (user.near):');
+      if (!near_account_id) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/devdash/auth/near-wallet`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ near_account_id })
+        });
+        
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'NEAR login failed');
+        }
+        
+        const data = await response.json();
+        authToken = data.access_token;
+        localStorage.setItem('auth_token', authToken);
+        await initDashboard();
+      } catch (error) {
+        alert('NEAR login failed: ' + error.message);
       }
     }
 
