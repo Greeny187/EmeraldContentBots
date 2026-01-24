@@ -611,6 +611,113 @@
       font-size: 14px;
       margin-bottom: 20px;
     }
+
+    /* Bot Accordion */
+    .bot-item {
+      background: rgba(51, 65, 85, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .bot-header {
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .bot-header:hover {
+      background: rgba(0, 208, 132, 0.05);
+      border-color: var(--primary);
+    }
+
+    .bot-header.expanded {
+      background: rgba(0, 208, 132, 0.1);
+      border-color: var(--primary);
+    }
+
+    .bot-header-content {
+      flex: 1;
+    }
+
+    .bot-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .bot-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .bot-toggle {
+      font-size: 16px;
+      transition: transform 0.2s;
+      margin-left: 16px;
+    }
+
+    .bot-toggle.open {
+      transform: rotate(180deg);
+    }
+
+    .bot-details {
+      display: none;
+      background: rgba(30, 41, 59, 0.8);
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
+      padding: 20px;
+    }
+
+    .bot-details.show {
+      display: block;
+    }
+
+    .bot-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .bot-stat-card {
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .bot-stat-card h4 {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      margin-top: 0;
+    }
+
+    .bot-stat-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .bot-stat-item:last-child {
+      border-bottom: none;
+    }
+
+    .bot-stat-label {
+      color: var(--text-secondary);
+    }
+
+    .bot-stat-value {
+      color: var(--primary);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -740,45 +847,9 @@
           <button onclick="showModal('addBotModal')" style="width: 100%;">➕ Add New Bot</button>
         </div>
 
-        <div id="botsListView" style="display: block;">
-          <div class="card">
-            <h3>🤖 Registered Bots</h3>
-            <div id="botsList" class="list"></div>
-          </div>
-        </div>
-
-        <div id="botDetailView" style="display: none;">
-          <button onclick="backToBotsList()" style="margin-bottom: 20px;">← Back to Bots</button>
-          <div class="card">
-            <h3 id="botDetailTitle">Bot Details</h3>
-            
-            <div class="grid" style="margin-bottom: 20px; gap: 12px;">
-              <div class="card" style="grid-column: auto;">
-                <h3>👥 Affiliate Stats</h3>
-                <div id="botAffiliateStats"></div>
-              </div>
-              <div class="card" style="grid-column: auto;">
-                <h3>💹 Trading Stats</h3>
-                <div id="botTradeStats"></div>
-              </div>
-              <div class="card" style="grid-column: auto;">
-                <h3>📚 Learning Stats</h3>
-                <div id="botLearningStats"></div>
-              </div>
-              <div class="card" style="grid-column: auto;">
-                <h3>🏛️ DAO Stats</h3>
-                <div id="botDaoStats"></div>
-              </div>
-              <div class="card" style="grid-column: auto;">
-                <h3>🛟 Support Stats</h3>
-                <div id="botSupportStats"></div>
-              </div>
-              <div class="card" style="grid-column: auto;">
-                <h3>📰 Content Stats</h3>
-                <div id="botContentStats"></div>
-              </div>
-            </div>
-          </div>
+        <div class="card">
+          <h3>🤖 Registered Bots</h3>
+          <div id="botsList" class="list"></div>
         </div>
       </div>
 
@@ -1412,22 +1483,18 @@
         }
 
         botsList.innerHTML = data.bots.map(bot => `
-          <div class="list-item" onclick="showBotDetails('${bot.username}')" style="cursor: pointer;">
-            <div class="list-item-content">
-              <div class="item-title">🤖 ${bot.title || bot.username}</div>
-              <div class="item-desc">
-                <strong>${bot.username}</strong> • 
-                ${bot.user_count} users • 
-                ${bot.days_running} days running
+          <div class="bot-item">
+            <div class="bot-header" onclick="toggleBotDetails(this, '${bot.username}')">
+              <div class="bot-header-content">
+                <div class="bot-title">🤖 ${bot.title || bot.username}</div>
+                <div class="bot-meta">
+                  <strong>${bot.username}</strong> • ${bot.user_count} users • ${bot.days_running} days running
+                  <span style="color: ${bot.is_active ? 'var(--success)' : 'var(--text-secondary)'}">• ${bot.is_active ? '✅ Active' : '⭕ Inactive'}</span>
+                </div>
               </div>
-              <div class="item-desc" style="margin-top: 4px; font-size: 11px;">
-                Status: <span style="color: ${bot.is_active ? 'var(--success)' : 'var(--text-secondary)'}">${bot.status.toUpperCase()}</span> • 
-                Last Update: ${bot.updated_at ? new Date(bot.updated_at).toLocaleDateString() : 'Never'}
-              </div>
+              <span class="bot-toggle">▼</span>
             </div>
-            <span class="item-status ${bot.is_active ? '' : 'inactive'}">
-              ${bot.is_active ? '✅ Active' : '⭕ Inactive'}
-            </span>
+            <div class="bot-details" id="details_${bot.username}"></div>
           </div>
         `).join('');
       } catch (error) {
@@ -1436,89 +1503,176 @@
       }
     }
 
-    async function showBotDetails(botUsername) {
-      try {
-        // Load comprehensive bot details
-        const data = await apiCall(`/analytics/bot-details?bot=${botUsername}`);
-        
-        // Hide list, show details
-        document.getElementById('botsListView').style.display = 'none';
-        document.getElementById('botDetailView').style.display = 'block';
-        
-        // Update title
-        document.getElementById('botDetailTitle').textContent = `${data.title || data.username} Details`;
-        
-        // Affiliate Stats
-        document.getElementById('botAffiliateStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Total Referrals:</strong> ${data.affiliate?.total_referrals || 0}</div>
-            <div><strong>Converted:</strong> ${data.affiliate?.converted_referrals || 0}</div>
-            <div><strong>Total Commissions:</strong> ${data.affiliate?.total_commissions || 0} EMRD</div>
-            <div><strong>Pending Payouts:</strong> ${data.affiliate?.pending_payouts || 0} EMRD</div>
-          </div>
-        `;
-        
-        // Trading Stats
-        document.getElementById('botTradeStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Portfolios:</strong> ${data.trade?.portfolios || 0}</div>
-            <div><strong>Active Positions:</strong> ${data.trade?.active_positions || 0}</div>
-            <div><strong>Total Alerts:</strong> ${data.trade?.total_alerts || 0}</div>
-            <div><strong>Active Strategies:</strong> ${data.trade?.active_strategies || 0}</div>
-            <div><strong>Total Swap Volume:</strong> ${data.trade?.total_swap_volume || 0}</div>
-          </div>
-        `;
-        
-        // Learning Stats
-        document.getElementById('botLearningStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Courses:</strong> ${data.learning?.total_courses || 0}</div>
-            <div><strong>Enrolled Users:</strong> ${data.learning?.enrolled_users || 0}</div>
-            <div><strong>Completed:</strong> ${data.learning?.completed_courses || 0}</div>
-            <div><strong>Quizzes:</strong> ${data.learning?.total_quizzes || 0}</div>
-            <div><strong>Certificates:</strong> ${data.learning?.certificates_issued || 0}</div>
-            <div><strong>Rewards Distributed:</strong> ${data.learning?.total_rewards_distributed || 0} EMRD</div>
-          </div>
-        `;
-        
-        // DAO Stats
-        document.getElementById('botDaoStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Active Proposals:</strong> ${data.dao?.active_proposals || 0}</div>
-            <div><strong>Total Voters:</strong> ${data.dao?.total_voters || 0}</div>
-            <div><strong>Treasury Balance:</strong> ${data.dao?.treasury_balance || 0} EMRD</div>
-            <div><strong>Total Delegations:</strong> ${data.dao?.total_delegations || 0}</div>
-            <div><strong>Governance Participation:</strong> ${data.dao?.governance_participation || 0}%</div>
-          </div>
-        `;
-        
-        // Support Stats
-        document.getElementById('botSupportStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Open Tickets:</strong> ${data.support?.open_tickets || 0}</div>
-            <div><strong>Resolved Tickets:</strong> ${data.support?.resolved_tickets || 0}</div>
-            <div><strong>Avg Resolution Time:</strong> ${data.support?.avg_resolution_time_hours || 0}h</div>
-          </div>
-        `;
-        
-        // Content Stats
-        document.getElementById('botContentStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Total Members:</strong> ${data.content?.total_members || 0}</div>
-            <div><strong>Active Topics:</strong> ${data.content?.active_topics || 0}</div>
-            <div><strong>Stories Shared:</strong> ${data.content?.stories_shared || 0}</div>
-            <div><strong>Trending Stories:</strong> ${data.content?.trending_stories || 0}</div>
-          </div>
-        `;
-      } catch (error) {
-        console.error('Failed to load bot details:', error);
-        alert('Error loading bot details: ' + error.message);
+    async function toggleBotDetails(headerEl, botUsername) {
+      const detailsEl = document.getElementById(`details_${botUsername}`);
+      const toggleEl = headerEl.querySelector('.bot-toggle');
+      
+      // If already expanded, just collapse
+      if (detailsEl.classList.contains('show')) {
+        detailsEl.classList.remove('show');
+        headerEl.classList.remove('expanded');
+        toggleEl.classList.remove('open');
+        return;
       }
-    }
 
-    function backToBotsList() {
-      document.getElementById('botsListView').style.display = 'block';
-      document.getElementById('botDetailView').style.display = 'none';
+      // Load details if not already loaded
+      if (!detailsEl.innerHTML) {
+        try {
+          const data = await apiCall(`/analytics/bot-details?bot=${botUsername}`);
+          
+          const statsHtml = `
+            <div class="bot-stats-grid">
+              <!-- Affiliate -->
+              <div class="bot-stat-card">
+                <h4>👥 Affiliate Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Referrals</span>
+                  <span class="bot-stat-value">${data.affiliate?.total_referrals || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Converted</span>
+                  <span class="bot-stat-value">${data.affiliate?.converted_referrals || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Commissions</span>
+                  <span class="bot-stat-value">${(data.affiliate?.total_commissions || 0).toFixed(2)} EMRD</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Pending Payouts</span>
+                  <span class="bot-stat-value">${(data.affiliate?.pending_payouts || 0).toFixed(2)} EMRD</span>
+                </div>
+              </div>
+
+              <!-- Trading -->
+              <div class="bot-stat-card">
+                <h4>💹 Trading Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Portfolios</span>
+                  <span class="bot-stat-value">${data.trade?.portfolios || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Active Positions</span>
+                  <span class="bot-stat-value">${data.trade?.active_positions || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Alerts</span>
+                  <span class="bot-stat-value">${data.trade?.total_alerts || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Active Strategies</span>
+                  <span class="bot-stat-value">${data.trade?.active_strategies || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Swap Volume</span>
+                  <span class="bot-stat-value">${data.trade?.total_swap_volume || 0}</span>
+                </div>
+              </div>
+
+              <!-- Learning -->
+              <div class="bot-stat-card">
+                <h4>📚 Learning Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Courses</span>
+                  <span class="bot-stat-value">${data.learning?.total_courses || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Enrolled Users</span>
+                  <span class="bot-stat-value">${data.learning?.enrolled_users || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Completed Courses</span>
+                  <span class="bot-stat-value">${data.learning?.completed_courses || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Quizzes</span>
+                  <span class="bot-stat-value">${data.learning?.total_quizzes || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Certificates Issued</span>
+                  <span class="bot-stat-value">${data.learning?.certificates_issued || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Rewards Distributed</span>
+                  <span class="bot-stat-value">${(data.learning?.total_rewards_distributed || 0).toFixed(2)} EMRD</span>
+                </div>
+              </div>
+
+              <!-- DAO -->
+              <div class="bot-stat-card">
+                <h4>🏛️ DAO Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Active Proposals</span>
+                  <span class="bot-stat-value">${data.dao?.active_proposals || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Voters</span>
+                  <span class="bot-stat-value">${data.dao?.total_voters || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Treasury Balance</span>
+                  <span class="bot-stat-value">${(data.dao?.treasury_balance || 0).toFixed(2)} EMRD</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Delegations</span>
+                  <span class="bot-stat-value">${data.dao?.total_delegations || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Governance Participation</span>
+                  <span class="bot-stat-value">${(data.dao?.governance_participation || 0).toFixed(1)}%</span>
+                </div>
+              </div>
+
+              <!-- Support -->
+              <div class="bot-stat-card">
+                <h4>🛟 Support Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Open Tickets</span>
+                  <span class="bot-stat-value">${data.support?.open_tickets || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Resolved Tickets</span>
+                  <span class="bot-stat-value">${data.support?.resolved_tickets || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Avg Resolution Time</span>
+                  <span class="bot-stat-value">${(data.support?.avg_resolution_time_hours || 0).toFixed(1)}h</span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="bot-stat-card">
+                <h4>📰 Content Stats</h4>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Total Members</span>
+                  <span class="bot-stat-value">${data.content?.total_members || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Active Topics</span>
+                  <span class="bot-stat-value">${data.content?.active_topics || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Stories Shared</span>
+                  <span class="bot-stat-value">${data.content?.stories_shared || 0}</span>
+                </div>
+                <div class="bot-stat-item">
+                  <span class="bot-stat-label">Trending Stories</span>
+                  <span class="bot-stat-value">${data.content?.trending_stories || 0}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          detailsEl.innerHTML = statsHtml;
+        } catch (error) {
+          console.error('Failed to load bot details:', error);
+          detailsEl.innerHTML = `<p style="color: var(--text-secondary); padding: 20px;">Error loading details: ${error.message}</p>`;
+        }
+      }
+
+      // Show details
+      detailsEl.classList.add('show');
+      headerEl.classList.add('expanded');
+      toggleEl.classList.add('open');
     }
 
     // ============================================
