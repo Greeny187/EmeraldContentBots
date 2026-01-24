@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emerald Dashboard - API Konfiguration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #00D084, #00B06A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #cbd5e1;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      color: #e2e8f0;
+      font-family: monospace;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #00D084;
+      box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1);
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #00D084, #00B06A);
+      color: #0A2E1F;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 208, 132, 0.3);
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .status.success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #10b981;
+      display: block;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      display: block;
+    }
+
+    .links {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .links h3 {
+      font-size: 12px;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    a {
+      display: block;
+      padding: 10px;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      color: #00D084;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.2s;
+      word-break: break-all;
+    }
+
+    a:hover {
+      background: rgba(0, 208, 132, 0.1);
+      border-color: rgba(0, 208, 132, 0.3);
+    }
+
+    .code-block {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #cbd5e1;
+      overflow-x: auto;
+    }
+
+    .presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .preset-btn {
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 8px;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(0, 208, 132, 0.2);
+      border-color: rgba(0, 208, 132, 0.3);
+      color: #00D084;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌿 Emerald Dashboard</h1>
+    <p class="subtitle">API Konfiguration</p>
+
+    <p style="margin-bottom: 20px; color: #cbd5e1;">
+      Konfiguriere die Backend API URL für dein Dashboard:
+    </p>
+
+    <div class="presets">
+      <button class="preset-btn" onclick="setPreset('http://localhost:8000/api')">
+        💻 Local Dev
+      </button>
+      <button class="preset-btn" onclick="setPreset('https://emeraldcontent-aac379fc581e.herokuapp.com/api')">
+        🚀 Production
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="apiUrl">API URL:</label>
+      <input 
+        type="text" 
+        id="apiUrl" 
+        placeholder="https://emeraldcontent-aac379fc581e.herokuapp.com/api"
+        value="https://emeraldcontent-aac379fc581e.herokuapp.com/api"
+      >
+      <div class="code-block" style="margin-top: 8px;">
+        ℹ️ Format: https://domain.com/api
+      </div>
+    </div>
+
+    <button onclick="saveAndGoToDashboard()">✅ Speichern & Zum Dashboard</button>
+    <button onclick="testConnection()" style="background: transparent; color: #00D084; border: 1px solid rgba(0, 208, 132, 0.5); margin-top: 0;">
+      🔍 Verbindung testen
+    </button>
+
+    <div id="status" class="status"></div>
+
+    <div class="links">
+      <h3>⚡ Schnelllinks:</h3>
+      <div class="link-list">
+        <a href="index.html">📊 Dashboard (aktuelle Konfiguration)</a>
+        <a href="index.html?api=http://localhost:8000/api">💻 Dashboard (Local)</a>
+        <a href="index.html?api=https://emeraldcontent-aac379fc581e.herokuapp.com/api">🚀 Dashboard (Production)</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiInput = document.getElementById('apiUrl');
+    const statusDiv = document.getElementById('status');
+    const prodLink = document.getElementById('prodLink');
+
+    // Laden: Existierende Konfiguration anzeigen
+    window.addEventListener('DOMContentLoaded', () => {
+      const stored = localStorage.getItem('api_base');
+      if (stored) {
+        apiInput.value = stored;
+        updateProdLink();
+      }
+    });
+
+    function setPreset(url) {
+      apiInput.value = url;
+      updateProdLink();
+    }
+
+    function updateProdLink() {
+      if (apiInput.value.trim()) {
+        const dashboardUrl = `index.html?api=${encodeURIComponent(apiInput.value.trim())}`;
+        prodLink.href = dashboardUrl;
+        prodLink.style.display = 'block';
+      }
+    }
+
+    async function testConnection() {
+      const api = apiInput.value.trim();
+      
+      if (!api.startsWith('http')) {
+        showStatus('❌ Ungültige URL! Muss mit http:// oder https:// beginnen.', 'error');
+        return;
+      }
+
+      showStatus('🔄 Verbindung wird getestet...', 'success');
+
+      try {
+        const response = await fetch(`${api.replace('/api', '')}/healthz`, {
+          method: 'GET',
+          mode: 'cors'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          showStatus(`✅ Verbindung erfolgreich! Status: ${data.status}`, 'success');
+        } else {
+          showStatus(`❌ Server antwortet mit Status ${response.status}`, 'error');
+        }
+      } catch (e) {
+        showStatus(`❌ Fehler: ${e.message}. Backend erreichbar?`, 'error');
+      }
+    }
+
+    function saveAndGoToDashboard() {
+      const api = apiInput.value.trim();
+      
+      if (!api) {
+        showStatus('❌ Bitte API URL eingeben!', 'error');
+        return;
+      }
+
+      if (!api.startsWith('http')) {
+        showStatus('❌ URL muss mit http:// oder https:// beginnen!', 'error');
+        return;
+      }
+
+      localStorage.setItem('api_base', api);
+      showStatus('✅ Gespeichert! Umleitung zum Dashboard...', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    }
+
+    function showStatus(message, type) {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    // Enter-Taste in Input
+    apiInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        saveAndGoToDashboard();
+      }
+    });
+
+    // Live Update prod link
+    apiInput.addEventListener('input', updateProdLink);
+  </script>
+</body>
+</html>

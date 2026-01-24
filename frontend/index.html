@@ -911,7 +911,29 @@
     // ============================================
     // GLOBAL VARIABLES
     // ============================================
-    const API_BASE = '/api';
+    // API_BASE - Automatische Erkennung oder manuelle Konfiguration
+    const API_BASE = (function() {
+      // 1. Prüfe auf manuelle Konfiguration in localStorage
+      const stored = localStorage.getItem('api_base');
+      if (stored) return stored;
+      
+      // 2. Prüfe auf Query Parameter (?api=https://...)
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('api')) {
+        const api = params.get('api');
+        localStorage.setItem('api_base', api);
+        return api;
+      }
+      
+      // 3. Prüfe ob wir lokal entwickeln
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8000/api';
+      }
+      
+      // 4. Fallback: Production Heroku
+      return 'https://emeraldcontent-aac379fc581e.herokuapp.com/api';
+    })();
+    
     let authToken = localStorage.getItem('auth_token');
     let currentUser = null;
     let TelegramWebApp = window.Telegram?.WebApp;
