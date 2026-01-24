@@ -1527,19 +1527,19 @@
                 <h4>👥 Affiliate Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Referrals</span>
-                  <span class="bot-stat-value">${data.affiliate?.total_referrals || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.affiliate?.total_referrals) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Converted</span>
-                  <span class="bot-stat-value">${data.affiliate?.converted_referrals || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.affiliate?.converted_referrals) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Commissions</span>
-                  <span class="bot-stat-value">${(data.affiliate?.total_commissions || 0).toFixed(2)} EMRD</span>
+                  <span class="bot-stat-value">${(parseFloat(data.affiliate?.total_commissions) || 0).toFixed(2)} EMRD</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Pending Payouts</span>
-                  <span class="bot-stat-value">${(data.affiliate?.pending_payouts || 0).toFixed(2)} EMRD</span>
+                  <span class="bot-stat-value">${(parseFloat(data.affiliate?.pending_payouts) || 0).toFixed(2)} EMRD</span>
                 </div>
               </div>
 
@@ -1548,23 +1548,23 @@
                 <h4>💹 Trading Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Portfolios</span>
-                  <span class="bot-stat-value">${data.trade?.portfolios || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.trade?.portfolios) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Active Positions</span>
-                  <span class="bot-stat-value">${data.trade?.active_positions || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.trade?.active_positions) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Alerts</span>
-                  <span class="bot-stat-value">${data.trade?.total_alerts || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.trade?.total_alerts) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Active Strategies</span>
-                  <span class="bot-stat-value">${data.trade?.active_strategies || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.trade?.active_strategies) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Swap Volume</span>
-                  <span class="bot-stat-value">${data.trade?.total_swap_volume || 0}</span>
+                  <span class="bot-stat-value">${(parseFloat(data.trade?.total_swap_volume) || 0).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -1573,27 +1573,27 @@
                 <h4>📚 Learning Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Courses</span>
-                  <span class="bot-stat-value">${data.learning?.total_courses || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.learning?.total_courses) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Enrolled Users</span>
-                  <span class="bot-stat-value">${data.learning?.enrolled_users || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.learning?.enrolled_users) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Completed Courses</span>
-                  <span class="bot-stat-value">${data.learning?.completed_courses || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.learning?.completed_courses) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Quizzes</span>
-                  <span class="bot-stat-value">${data.learning?.total_quizzes || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.learning?.total_quizzes) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Certificates Issued</span>
-                  <span class="bot-stat-value">${data.learning?.certificates_issued || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.learning?.certificates_issued) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Rewards Distributed</span>
-                  <span class="bot-stat-value">${(data.learning?.total_rewards_distributed || 0).toFixed(2)} EMRD</span>
+                  <span class="bot-stat-value">${(parseFloat(data.learning?.total_rewards_distributed) || 0).toFixed(2)} EMRD</span>
                 </div>
               </div>
 
@@ -1602,23 +1602,23 @@
                 <h4>🏛️ DAO Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Active Proposals</span>
-                  <span class="bot-stat-value">${data.dao?.active_proposals || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.dao?.active_proposals) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Voters</span>
-                  <span class="bot-stat-value">${data.dao?.total_voters || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.dao?.total_voters) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Treasury Balance</span>
-                  <span class="bot-stat-value">${(data.dao?.treasury_balance || 0).toFixed(2)} EMRD</span>
+                  <span class="bot-stat-value">${(parseFloat(data.dao?.treasury_balance) || 0).toFixed(2)} EMRD</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Delegations</span>
-                  <span class="bot-stat-value">${data.dao?.total_delegations || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.dao?.total_delegations) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Governance Participation</span>
-                  <span class="bot-stat-value">${(data.dao?.governance_participation || 0).toFixed(1)}%</span>
+                  <span class="bot-stat-value">${(parseFloat(data.dao?.governance_participation) || 0).toFixed(1)}%</span>
                 </div>
               </div>
 
@@ -1627,15 +1627,15 @@
                 <h4>🛟 Support Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Open Tickets</span>
-                  <span class="bot-stat-value">${data.support?.open_tickets || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.support?.open_tickets) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Resolved Tickets</span>
-                  <span class="bot-stat-value">${data.support?.resolved_tickets || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.support?.resolved_tickets) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Avg Resolution Time</span>
-                  <span class="bot-stat-value">${(data.support?.avg_resolution_time_hours || 0).toFixed(1)}h</span>
+                  <span class="bot-stat-value">${(parseFloat(data.support?.avg_resolution_time_hours) || 0).toFixed(1)}h</span>
                 </div>
               </div>
 
@@ -1644,19 +1644,19 @@
                 <h4>📰 Content Stats</h4>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Total Members</span>
-                  <span class="bot-stat-value">${data.content?.total_members || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.content?.total_members) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Active Topics</span>
-                  <span class="bot-stat-value">${data.content?.active_topics || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.content?.active_topics) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Stories Shared</span>
-                  <span class="bot-stat-value">${data.content?.stories_shared || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.content?.stories_shared) || 0}</span>
                 </div>
                 <div class="bot-stat-item">
                   <span class="bot-stat-label">Trending Stories</span>
-                  <span class="bot-stat-value">${data.content?.trending_stories || 0}</span>
+                  <span class="bot-stat-value">${parseInt(data.content?.trending_stories) || 0}</span>
                 </div>
               </div>
             </div>
