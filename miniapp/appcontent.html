@@ -749,8 +749,7 @@ function getInitData(){
     // Telegram Desktop/WebView2 packt es teils in die URL
     const qp = new URLSearchParams(location.search);
     const tgData = qp.get('tgWebAppData') || qp.get('init_data') || '';
-    if (tgData) return decodeURIComponent(tgData);
-
+    if (tgData) return tgData;
     return '';
   }catch(e){
     return '';
@@ -1653,65 +1652,6 @@ async function createStoryShare(templateId){
   }catch(e){
     storyOut('❌ Konnte Share nicht öffnen.');
   }
-}
-
-async function createStoryShare(action){
-  const out = document.getElementById('storyOut');
-  out.innerHTML = '<div class="muted">Erstelle Story…</div>';
-}
-  try{
-    const res = await fetch(withAuthQS(`${API_BASE}/api/stories/create`), {
-      method:'POST',
-      headers:{'Content-Type':'application/json', ...INIT_HEADERS},
-      body: JSON.stringify({ chat_id: cid, template: action, group_name: await getGroupTitle(cid) })
-     });
-     const j = await res.json();
-    }
-
-  function renderSharesInto(containerSel, shares){
-    const root = qs(containerSel);
-    if(!root) return;
-    const list = root.querySelector('.list') || root;
-    if(!shares || !shares.length){
-      list.innerHTML = '<div class="hint">Keine Shares vorhanden.</div>';
-      return;
-    }
-    list.innerHTML = shares.map(s=>{
-      const sid = s.share_id || s.id;
-      const tpl = s.template || s.story_template || '';
-      const when = s.shared_at ? new Date(s.shared_at).toLocaleString() : '';
-      const clicks = s.clicks ?? 0;
-      const conv = s.conversions ?? 0;
-      const ref = s.referral_link || '';
-      const card = `${API_BASE}/api/stories/card/share/${encodeURIComponent(sid)}`;
-      return `
-        <div class="item">
-          <div class="left">
-            <div class="title">#${esc(sid)} · ${esc(tpl)} <span class="hint">${esc(when)}</span></div>
-            <div class="hint">👆 ${esc(clicks)} Clicks · ✅ ${esc(conv)} Conversions</div>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button class="btn small" data-open="${esc(ref)}">Link</button>
-            <button class="btn small" data-card="${esc(card)}">Card</button>
-          </div>
-        </div>
-      `;
-  }).join('');
-
-  qa(`${containerSel} [data-open]`).forEach(b=>{
-    b.addEventListener('click', ()=>{
-      const url = b.getAttribute('data-open');
-      if(!url) return;
-      try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch{}
-    });
-  });
-  qa(`${containerSel} [data-card]`).forEach(b=>{
-    b.addEventListener('click', ()=>{
-      const url = b.getAttribute('data-card');
-      if(!url) return;
-      try{ window.open(url,'_blank'); }catch{}
-    });
-  });
 }
 
 async function loadUserShares(){
