@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import logging
 import httpx
@@ -152,20 +153,20 @@ async def me(current=Depends(get_current_user)):
 
 @app.get("/bots")
 async def list_bots(current=Depends(get_current_user)):
-    rows = await fetch("select id, name, slug, description, is_active from dashboard_bots order by id asc")
+    rows = await fetch("select id, username, title, env_token_key, is_active, meta from dashboard_bots order by id asc")
     return {"bots": [dict(r) for r in rows]}
 
 class BotMeta(BaseModel):
-    name: str
-    slug: str
-    description: Optional[str] = None
+    username: str
+    title: Optional[str] = None
+    env_token_key: Optional[str] = None
     is_active: bool = True
 
 @app.post("/bots")
 async def add_bot(meta: BotMeta, current=Depends(get_current_user)):
     row = await fetchrow(
-        "insert into dashboard_bots(name, slug, description, is_active) values($1, $2, $3, $4) returning id, name, slug, description, is_active",
-        meta.name, meta.slug, meta.description, meta.is_active
+        "insert into dashboard_bots(username, title, env_token_key, is_active, meta) values($1, $2, $3, $4, $5) returning id, username, title, env_token_key, is_active, meta",
+        meta.username, meta.title, meta.env_token_key, meta.is_active, json.dumps({})
     )
     return dict(row)
 
