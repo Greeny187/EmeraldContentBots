@@ -686,21 +686,21 @@
           </div>
           <div class="stat-card">
             <div class="stat-label">Token Holders</div>
-            <div class="stat-value" id="stat_holders">-</div>
+            <div class="stat-value" id="holderCount">-</div>
           </div>
         </div>
 
         <div class="grid">
           <div class="card">
-            <h3>📈 Bot Activity</h3>
+            <h3>📊 System Metrics</h3>
             <div id="botActivityChart" class="list"></div>
           </div>
           <div class="card">
-            <h3>👥 User Growth (7d)</h3>
+            <h3>📈 Resource Usage</h3>
             <div id="userGrowthChart" class="list"></div>
           </div>
           <div class="card">
-            <h3>💰 Revenue</h3>
+            <h3>💾 Database Stats</h3>
             <div id="revenueStats"></div>
           </div>
         </div>
@@ -1148,20 +1148,26 @@
       document.getElementById('dashboard').classList.add('active');
 
       try {
-        // Load all dashboard data in parallel
+        // Load all dashboard data in parallel for all tabs
         await Promise.all([
           loadUserProfile(),
           refreshOverview(),
           loadAnalytics(),
-          loadMonitoring()
+          loadMonitoring(),
+          loadBots(),
+          loadTokenData(),
+          loadAds(),
+          loadUsers()
         ]);
         
         setupNavigation();
         
-        // Auto-refresh every 30s
+        // Auto-refresh every 30s for overview, 60s for other tabs
         setInterval(refreshOverview, 30000);
         setInterval(loadAnalytics, 60000);
         setInterval(loadMonitoring, 60000);
+        setInterval(loadBots, 120000);
+        setInterval(loadTokenData, 120000);
       } catch (error) {
         console.error('Failed to initialize dashboard:', error);
         logout();
@@ -1243,21 +1249,23 @@
     // ============================================
     async function refreshOverview() {
       try {
-        const data = await apiCall('/devdash/metrics/overview');
-        document.getElementById('stat_users').textContent = data.users_total;
-        document.getElementById('stat_bots').textContent = data.bots_active;
-        document.getElementById('stat_ads').textContent = data.ads_active;
-        document.getElementById('stat_holders').textContent = '1.2k';
-
-        // Load health
+        // Load system health first
         const health = await apiCall('/system/health');
-        document.getElementById('health_status').innerHTML = `<span style="color: var(--success);">✓ ${health.status}</span>`;
-        document.getElementById('health_uptime').textContent = `${health.uptime_days}d (${health.uptime_percent}%)`;
+        
+        // Update stat cards with real data
+        document.getElementById('stat_users').textContent = health.database.users_total || 0;
+        document.getElementById('stat_bots').textContent = health.database.bots_active || 0;
+        document.getElementById('stat_ads').textContent = health.database.ads_active || 0;
+        
+        // Update health section
+        const healthStatus = health.status === 'healthy' ? '✓ Healthy' : '⚠ Degraded';
+        const healthColor = health.status === 'healthy' ? 'var(--success)' : 'var(--warning)';
+        document.getElementById('health_status').innerHTML = `<span style="color: ${healthColor};">${healthStatus}</span>`;
         document.getElementById('health_response').textContent = `${health.response_time_ms}ms`;
-        document.getElementById('health_db').textContent = health.database;
-        document.getElementById('health_backup').textContent = health.last_backup;
-
-        // Load analytics
+        document.getElementById('health_db').textContent = health.database.status;
+        document.getElementById('health_backup').textContent = health.database.last_backup;
+        
+        // Load analytics (metrics only, no bot activity)
         await loadAnalytics();
       } catch (error) {
         console.error('Failed to load overview:', error);
@@ -1266,52 +1274,86 @@
 
     async function loadAnalytics() {
       try {
-        const botActivity = await apiCall('/analytics/bot-activity');
+        // Get monitoring data and system health
         const monitoring = await apiCall('/devdash/monitoring');
+        const health = await apiCall('/system/health');
 
-        // Bot Activity
-        const botActivityHtml = (botActivity.bots || [])
-          .slice(0, 5)
-          .map(item => `
-            <div class="list-item">
-              <div class="list-item-content">
-                <div class="item-title">🤖 ${item.title || item.username}</div>
-                <div class="item-desc">${item.is_active ? '✅ Active' : '❌ Inactive'}</div>
-              </div>
-              <span class="item-status">${new Date(item.updated_at).toLocaleDateString()}</span>
-            </div>
-          `).join('');
-        document.getElementById('botActivityChart').innerHTML = botActivityHtml || '<p style="color: var(--text-secondary);">No data</p>';
-
+        // Remove bot activity, show only metrics
         // Activity Stats
         const activityHtml = `
           <div class="list-item">
             <div class="list-item-content">
-              <div class="item-title">📊 New Users (24h)</div>
-              <div class="item-desc">${monitoring.activity_24h.new_users} users</div>
+              <div class="item-title">👥 Users (24h)</div>
+              <div class="item-desc">${monitoring.activity_24h.new_users} new users</div>
             </div>
           </div>
           <div class="list-item">
             <div class="list-item-content">
-              <div class="item-title">📢 New Ads (24h)</div>
-              <div class="item-desc">${monitoring.activity_24h.new_ads} campaigns</div>
+              <div class="item-title">📢 Ads (24h)</div>
+              <div class="item-desc">${monitoring.activity_24h.new_ads} new campaigns</div>
             </div>
           </div>
           <div class="list-item">
             <div class="list-item-content">
-              <div class="item-title">💾 Database Status</div>
-              <div class="item-desc">${monitoring.database.users} users registered</div>
+              <div class="item-title">💾 Database Events</div>
+              <div class="item-desc">${monitoring.database.token_events} token events</div>
             </div>
           </div>
         `;
-        document.getElementById('userGrowthChart').innerHTML = activityHtml;
+        document.getElementById('botActivityChart').innerHTML = activityHtml;
 
-        // System Stats
+        // System Stats with progress bars
+        document.getElementById('userGrowthChart').innerHTML = `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">🖥️ CPU Usage</div>
+              <div class="card .progress" style="margin-top: 8px;">
+                <div class="progress-bar" style="width: ${health.system.cpu_percent}%"></div>
+              </div>
+              <div class="item-desc">${health.system.cpu_percent.toFixed(1)}% (${health.system.cpu_count} cores)</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">💾 Memory Usage</div>
+              <div class="card .progress" style="margin-top: 8px;">
+                <div class="progress-bar" style="width: ${health.system.memory_percent}%"></div>
+              </div>
+              <div class="item-desc">${health.system.memory_percent.toFixed(1)}% (${health.system.memory_used_mb}/${health.system.memory_total_mb} MB)</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">💿 Disk Usage</div>
+              <div class="card .progress" style="margin-top: 8px;">
+                <div class="progress-bar" style="width: ${health.system.disk_percent}%"></div>
+              </div>
+              <div class="item-desc">${health.system.disk_percent.toFixed(1)}% (${health.system.disk_used_gb}/${health.system.disk_total_gb} GB)</div>
+            </div>
+          </div>
+        `;
+
+        // Database Status
         document.getElementById('revenueStats').innerHTML = `
-          <div class="item-title">🖥️ System Health</div>
-          <div class="item-desc">CPU: ${monitoring.system.cpu_percent.toFixed(1)}%</div>
-          <div class="item-desc">Memory: ${monitoring.system.memory_percent.toFixed(1)}%</div>
-          <div class="item-desc">Disk: ${monitoring.system.disk_percent.toFixed(1)}%</div>
+          <div style="font-weight: 600; margin-bottom: 12px;">📊 Database Statistics</div>
+          <div class="list-item" style="border: none; background: none; padding: 0;">
+            <div class="list-item-content">
+              <div class="item-title">Total Users</div>
+              <div class="item-desc">${monitoring.database.users}</div>
+            </div>
+          </div>
+          <div class="list-item" style="border: none; background: none; padding: 0;">
+            <div class="list-item-content">
+              <div class="item-title">Active Bots</div>
+              <div class="item-desc">${monitoring.database.active_bots}</div>
+            </div>
+          </div>
+          <div class="list-item" style="border: none; background: none; padding: 0;">
+            <div class="list-item-content">
+              <div class="item-title">Active Ads</div>
+              <div class="item-desc">${monitoring.database.active_ads}</div>
+            </div>
+          </div>
         `;
       } catch (error) {
         console.error('Failed to load analytics:', error);
@@ -1324,7 +1366,8 @@
     // ============================================
     async function loadBots() {
       try {
-        const data = await apiCall('/devdash/bots');
+        // Load detailed bot information
+        const data = await apiCall('/analytics/bot-detailed');
         const botsList = document.getElementById('botsList');
 
         if (!data.bots || data.bots.length === 0) {
@@ -1336,15 +1379,25 @@
           <div class="list-item">
             <div class="list-item-content">
               <div class="item-title">🤖 ${bot.title || bot.username}</div>
-              <div class="item-desc">${bot.username}${bot.env_token_key ? ' • ' + bot.env_token_key : ''}</div>
+              <div class="item-desc">
+                <strong>${bot.username}</strong> • 
+                ${bot.user_count} users • 
+                ${bot.days_running} days running • 
+                ${bot.endpoint_count} endpoints
+              </div>
+              <div class="item-desc" style="margin-top: 4px; font-size: 11px;">
+                Status: <span style="color: ${bot.is_active ? 'var(--success)' : 'var(--text-secondary)'}">${bot.status.toUpperCase()}</span> • 
+                Last Update: ${bot.updated_at ? new Date(bot.updated_at).toLocaleDateString() : 'Never'}
+              </div>
             </div>
             <span class="item-status ${bot.is_active ? '' : 'inactive'}">
-              ${bot.is_active ? 'Active' : 'Inactive'}
+              ${bot.is_active ? '✅ Active' : '⭕ Inactive'}
             </span>
           </div>
         `).join('');
       } catch (error) {
         console.error('Failed to load bots:', error);
+        document.getElementById('botsList').innerHTML = '<p style="color: var(--text-secondary);">Error loading bot data</p>';
       }
     }
 
@@ -1353,52 +1406,51 @@
     // ============================================
     async function loadTokenData() {
       try {
+        // Load real token data from blockchain
         const tokenInfo = await apiCall('/token/emrd');
         const holders = await apiCall('/token/holders?limit=10');
-        const transactions = await apiCall('/token/transactions?limit=10');
 
-        // Token Info
+        // Token Info Card
         document.getElementById('tokenInfo').innerHTML = `
-          <div class="item-title">${tokenInfo.name} (${tokenInfo.symbol})</div>
-          <div class="item-desc">Chain: ${tokenInfo.chain}</div>
-          <div style="margin-top: 10px;">
-            <strong>Price:</strong> $${tokenInfo.price_usd}<br>
-            <strong>Market Cap:</strong> $${(tokenInfo.market_cap / 1000000).toFixed(1)}M<br>
-            <strong>Holders:</strong> ${tokenInfo.holders.toLocaleString()}
+          <div class="item-title">🎯 ${tokenInfo.name}</div>
+          <div style="margin-top: 12px; line-height: 1.8;">
+            <div><strong>Symbol:</strong> ${tokenInfo.symbol}</div>
+            <div><strong>Network:</strong> ${tokenInfo.network}</div>
+            <div><strong>Decimals:</strong> ${tokenInfo.decimals}</div>
+            <div><strong>Status:</strong> <span style="color: var(--success);">● ${tokenInfo.status}</span></div>
+            <div style="margin-top: 10px;"><strong>Contract:</strong><br><code style="font-size: 10px; word-break: break-all; color: var(--text-secondary);">${tokenInfo.contract}</code></div>
           </div>
         `;
 
-        // Token Stats
+        // Token Stats Card
         document.getElementById('tokenStats').innerHTML = `
-          <strong>Total Supply:</strong> ${tokenInfo.total_supply}<br>
-          <strong>Circulating:</strong> ${tokenInfo.circulating_supply}<br>
-          <strong>Decimals:</strong> ${tokenInfo.decimals}
+          <div style="line-height: 2;">
+            <div><strong>Total Supply:</strong> ${tokenInfo.supply_units}</div>
+            <div><strong>Min Balance:</strong> ${tokenInfo.min_balance}</div>
+            <div><strong>Developer:</strong><br><code style="font-size: 10px; word-break: break-all; color: var(--text-secondary);">${tokenInfo.developer_address}</code></div>
+            <div style="margin-top: 10px;">
+              <a href="${tokenInfo.blockchain_explorer}" target="_blank" style="color: var(--primary); text-decoration: none;">🔗 View on Explorer</a>
+            </div>
+          </div>
         `;
 
         // Top Holders
-        const holdersHtml = holders.holders.map(h => `
+        const holdersHtml = (holders.holders || []).map(h => `
           <div class="list-item">
             <div class="list-item-content">
-              <div class="item-title">${h.ton_address.substring(0, 10)}...</div>
-              <div class="item-desc">${h.balance} (${h.percentage}%)</div>
+              <div class="item-title">${h.name || h.address.substring(0, 16)}...</div>
+              <div class="item-desc">${(parseInt(h.balance) / 1e18).toLocaleString()} EMRD</div>
             </div>
+            <span class="item-status">${h.percentage}%</span>
           </div>
         `).join('');
-        document.getElementById('tokenHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holders</p>';
+        document.getElementById('tokenHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holder data</p>';
 
-        // Transactions
-        const txHtml = transactions.transactions.map(tx => `
-          <tr>
-            <td>${tx.type}</td>
-            <td>${tx.amount}</td>
-            <td>${tx.from_address?.substring(0, 10) || '-'}...</td>
-            <td>${tx.to_address?.substring(0, 10) || '-'}...</td>
-            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-          </tr>
-        `).join('');
-        document.getElementById('tokenTransactions').innerHTML = txHtml || '<tr><td colspan="5" style="text-align: center;">No transactions</td></tr>';
+        // Total Holders Info
+        document.getElementById('holderCount').textContent = holders.total_holders || 0;
       } catch (error) {
         console.error('Failed to load token data:', error);
+        document.getElementById('tokenInfo').innerHTML = '<p style="color: var(--text-secondary);">Error loading token data</p>';
       }
     }
 
@@ -1474,43 +1526,46 @@
         const monitoring = await apiCall('/devdash/monitoring');
         const health = await apiCall('/system/health');
         
-        // System metrics
+        // System metrics with detailed info
         const systemHtml = `
           <tr>
-            <td>CPU Usage</td>
-            <td>${monitoring.system.cpu_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.cpu_percent}%"></div></div></td>
+            <td>🖥️ CPU Usage</td>
+            <td>${health.system.cpu_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.cpu_percent}%"></div></div></td>
+            <td>${health.system.cpu_count} cores</td>
           </tr>
           <tr>
-            <td>Memory Usage</td>
-            <td>${monitoring.system.memory_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.memory_percent}%"></div></div></td>
+            <td>💾 Memory Usage</td>
+            <td>${health.system.memory_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.memory_percent}%"></div></div></td>
+            <td>${health.system.memory_used_mb}/${health.system.memory_total_mb} MB</td>
           </tr>
           <tr>
-            <td>Disk Usage</td>
-            <td>${monitoring.system.disk_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${monitoring.system.disk_percent}%"></div></div></td>
+            <td>💿 Disk Usage</td>
+            <td>${health.system.disk_percent.toFixed(2)}%</td>
+            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.disk_percent}%"></div></div></td>
+            <td>${health.system.disk_used_gb}/${health.system.disk_total_gb} GB</td>
           </tr>
         `;
         document.getElementById('systemLogs').innerHTML = systemHtml;
 
-        // Database stats
+        // Database stats with full details
         const dbHtml = `
           <tr>
-            <td>Users</td>
-            <td>${monitoring.database.users}</td>
+            <td>👥 Total Users</td>
+            <td>${health.database.users_total}</td>
           </tr>
           <tr>
-            <td>Active Bots</td>
-            <td>${monitoring.database.active_bots}</td>
+            <td>🤖 Active Bots</td>
+            <td>${health.database.bots_active}/${health.database.bots_total}</td>
           </tr>
           <tr>
-            <td>Active Ads</td>
-            <td>${monitoring.database.active_ads}</td>
+            <td>📢 Active Ads</td>
+            <td>${health.database.ads_active}/${health.database.ads_total}</td>
           </tr>
           <tr>
-            <td>Token Events</td>
-            <td>${monitoring.database.token_events}</td>
+            <td>🔗 Token Events</td>
+            <td>${health.database.token_events}</td>
           </tr>
         `;
         document.getElementById('botGroups').innerHTML = dbHtml;
@@ -1518,29 +1573,31 @@
         // Activity in last 24h
         const activityHtml = `
           <tr>
-            <td>New Users (24h)</td>
+            <td>📈 New Users (24h)</td>
             <td>${monitoring.activity_24h.new_users}</td>
           </tr>
           <tr>
-            <td>New Ads (24h)</td>
+            <td>📢 New Ads (24h)</td>
             <td>${monitoring.activity_24h.new_ads}</td>
           </tr>
           <tr>
-            <td>Database Status</td>
+            <td>💾 Database Status</td>
             <td><span class="item-status">${health.database.status.toUpperCase()}</span></td>
           </tr>
           <tr>
-            <td>Last Activity</td>
-            <td>${health.database.last_activity}</td>
+            <td>🕐 Last Activity</td>
+            <td>${health.database.last_activity ? new Date(health.database.last_activity).toLocaleString() : 'Unknown'}</td>
           </tr>
         `;
         document.getElementById('rssFeeds').innerHTML = activityHtml;
 
-        // Health status
+        // Health status with full metrics
         document.getElementById('moderationStats').innerHTML = `
-          <strong>🏥 System Status:</strong> ${health.status.toUpperCase()}<br>
-          <strong>⏱️ Response Time:</strong> ${health.response_time_ms}ms<br>
-          <strong>📊 Services:</strong> ${Object.keys(health.services).length} monitored
+          <div><strong>🏥 System Status:</strong> <span style="color: ${health.status === 'healthy' ? 'var(--success)' : 'var(--warning)'}">${health.status.toUpperCase()}</span></div>
+          <div><strong>⏱️ Response Time:</strong> ${health.response_time_ms}ms</div>
+          <div><strong>🔌 DB Connection:</strong> ${health.database.status.toUpperCase()}</div>
+          <div><strong>📦 Backup:</strong> ${health.database.last_backup}</div>
+          <div style="margin-top: 10px;"><strong>📊 Platform:</strong> ${health.system.platform} • Python ${health.system.python_version}</div>
         `;
       } catch (error) {
         console.error('Failed to load monitoring:', error);
