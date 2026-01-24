@@ -107,6 +107,10 @@
       toast("⚠️ Gruppe/UID fehlt.");
       return;
     }
+    if(!tg || !INIT_DATA){
+      toast("❌ Auth fehlt. Bitte die Mini-App über den /miniapp Button öffnen (WebApp, nicht Link).");
+       return;
+    }
     toast("Lade Shares…");
     try{
       const j = await api(`/api/stories/user/${encodeURIComponent(uid)}?chat_id=${encodeURIComponent(cid)}`, {method:'GET'});
