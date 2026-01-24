@@ -71,7 +71,7 @@ async def healthz():
 async def _migrate():
     try:
         await execute("alter table if exists dashboard_users add column if not exists ton_address text;")
-    except:
+    except Exception:
         pass  # Column might already exist
     try:
         await execute("""
@@ -79,13 +79,13 @@ async def _migrate():
             id serial primary key,
             chain text not null check (chain in ('near','ton')),
             account_id text not null,
-            label text,
+            label TEXT NOT NULL DEFAULT '',
             meta jsonb default '{}'::jsonb,
             created_at timestamp not null default now(),
             unique(chain, account_id)
           );
         """)
-    except:
+    except Exception:
         pass  # Table might already exist
     try:
         await execute("""
@@ -93,7 +93,7 @@ async def _migrate():
           values ('near','emeraldcontent.near','Main Wallet')
           on conflict do nothing;
         """)
-    except:
+    except Exception:
         pass
 
 @app.post("/auth/telegram", response_model=TokenResponse)
@@ -391,7 +391,7 @@ async def get_token_holders(current=Depends(get_current_user), limit: int = 50):
             limit
         )
         return {"holders": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"holders": []}
 
 @app.get("/token/transactions")
@@ -406,7 +406,7 @@ async def get_token_transactions(current=Depends(get_current_user), limit: int =
             limit
         )
         return {"transactions": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"transactions": []}
 
 # ---------- Bot Statistics ----------
@@ -472,7 +472,7 @@ async def get_system_logs(current=Depends(get_current_user), limit: int = 100):
             limit
         )
         return {"logs": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"logs": []}
 
 # ---------- User Activity Analytics ----------
@@ -490,7 +490,7 @@ async def user_growth_analytics(current=Depends(get_current_user)):
         return {
             "weekly_growth": [{"week": str(r["week"]), "users": r["count"]} for r in weekly]
         }
-    except:
+    except Exception:
         return {"weekly_growth": []}
 
 @app.get("/analytics/bot-activity")
@@ -505,7 +505,7 @@ async def bot_activity_analytics(current=Depends(get_current_user)):
                order by events desc"""
         )
         return {"bot_activity": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"bot_activity": []}
 
 # ---------- Bot Groups Management ----------
@@ -519,7 +519,7 @@ async def get_bot_groups(current=Depends(get_current_user)):
                order by member_count desc"""
         )
         return {"groups": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"groups": []}
 
 # ---------- Content & RSS Feeds ----------
@@ -533,7 +533,7 @@ async def get_feeds(current=Depends(get_current_user)):
                order by last_update desc"""
         )
         return {"feeds": [dict(r) for r in rows]}
-    except:
+    except Exception:
         return {"feeds": []}
 
 # ---------- Moderation Stats ----------
@@ -550,7 +550,7 @@ async def get_moderation_stats(current=Depends(get_current_user)):
             "messages_deleted": deleted_msgs["c"] if deleted_msgs else 0,
             "users_banned": users_banned["c"] if users_banned else 0
         }
-    except:
+    except Exception:
         return {"spam_detected": 0, "messages_deleted": 0, "users_banned": 0}
 
 # ---------- Payment & Revenue Stats ----------
@@ -570,5 +570,5 @@ async def get_payment_stats(current=Depends(get_current_user)):
             "transactions_total": transactions["c"] if transactions else 0,
             "avg_transaction": float((total_revenue["total"] or 0) / max(transactions["c"] or 1, 1))
         }
-    except:
+    except Exception:
         return {"total_revenue_usd": 0, "transactions_total": 0, "avg_transaction": 0}

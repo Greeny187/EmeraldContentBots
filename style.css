@@ -220,24 +220,6 @@ body{
 .news-date{ font-size:.85rem; color: var(--muted); margin-bottom:6px; }
 .news-card h4{ margin:4px 0 8px; }
 .news-card ul{ margin:0; padding-left:18px; }
-
-.news-card.near{
-  border-color: rgba(16,199,160,.55);
-  background:
-    linear-gradient(0deg, rgba(16,199,160,.06), rgba(16,199,160,.06)),
-    var(--card);
-}
-.news-card.near .near-head{
-  display:flex; align-items:center; gap:10px; margin-bottom:6px;
-}
-
-/* NEAR logo:
-   - Normale lokale Datei: .logo-near-img
-   - Falls Fallback-URL genutzt wird, JS fügt Klasse .logo-near--fallback hinzu;
-     nur dann invertieren wir im Dark-Mode, um Sichtbarkeit zu sichern. */
-.logo-near-img{ height:auto; vertical-align:middle; }
-body:not(.light) .logo-near--fallback{ filter: invert(1) brightness(1.7); }
-
 .news-card.pinned{
   position: relative;
   box-shadow: 0 12px 28px rgba(16,199,160,.16);
@@ -334,4 +316,20 @@ body.light .logo-ton--light{ display:inline-block; }
 .news-logo{
   max-width: 140px; height:auto; display:block;
   opacity:.95;
+}
+/* === EMERALD Suite: 4/3/2 Spalten === */
+.container .suite .brand-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px;
+}
+@media (max-width: 1024px){
+  .container .suite .brand-grid{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 640px){
+  .container .suite .brand-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
