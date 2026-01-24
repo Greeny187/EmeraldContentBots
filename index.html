@@ -91,7 +91,6 @@
     <!-- ===================== MODERNE ECOSYSTEM-SVG (DROP-IN) ===================== -->
     <svg class="ecosystem-svg" viewBox="0 0 900 600" role="img" aria-label="Emerald Ökosystem – Übersicht" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Farben & Effekte -->
         <linearGradient id="eco-accent" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%"  stop-color="var(--accent)" stop-opacity="0.9"/>
           <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.4"/>
@@ -99,31 +98,25 @@
         <filter id="eco-glow" x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="var(--accent)" flood-opacity="0.35"/>
         </filter>
-
-        <!-- Node-Styles (nutzt deine CSS-Variablen) -->
         <style>
           .eco-ring { fill: none; stroke: var(--border); stroke-width: 2; stroke-dasharray: 6 10; }
           .eco-spoke { stroke: url(#eco-accent); stroke-width: 2.5; opacity: .85; }
           .eco-hub   { fill: var(--card); stroke: var(--border); filter: url(#eco-glow); }
           .eco-hub-title  { fill: var(--text); font: 800 18px/1 Inter, system-ui, sans-serif; letter-spacing: .2px; }
           .eco-hub-sub    { fill: var(--muted); font: 600 13px/1 Inter, system-ui, sans-serif; }
-
           .eco-node rect  { fill: var(--card); stroke: var(--border); rx: 12; ry: 12; }
           .eco-node a     { cursor: pointer; }
-          .eco-node .icon { fill: var(--text); font: 20px Inter, system-ui, sans-serif; opacity: .95; }
+          .eco-node .eco-icon{ opacity:.98; }
           .eco-node .label{ fill: var(--text); font: 700 13.5px/1 Inter, system-ui, sans-serif; letter-spacing: .15px; }
           .eco-node:hover rect { stroke: var(--accent); filter: url(#eco-glow); }
           .eco-node:hover .label { fill: var(--accent); }
-
           .eco-badge { fill: rgba(16,199,160,.14); stroke: rgba(16,199,160,.45); }
           .eco-badge-text { fill: var(--text); font: 700 12px/1 Inter, system-ui, sans-serif; letter-spacing: .25px; }
         </style>
       </defs>
 
-      <!-- Geometrie -->
       <!-- Ring & Speichen -->
       <circle class="eco-ring" cx="450" cy="300" r="200"/>
-      <!-- Speichen (Center -> Nodes) -->
       <g class="eco-lines" stroke-linecap="round">
         <line class="eco-spoke" x1="450" y1="300" x2="450" y2="100"/>
         <line class="eco-spoke" x1="450" y1="300" x2="591.4" y2="158.6"/>
@@ -137,25 +130,26 @@
 
       <!-- HUB -->
       <g class="eco-hub" transform="translate(450,300)">
-        <!-- zentriert auf (0,0) -->
         <rect x="-110" y="-46" width="220" height="92" rx="16" ry="16"/>
         <text class="eco-hub-title" text-anchor="middle" x="0" y="-6">Emerald Core</text>
         <text class="eco-hub-sub"   text-anchor="middle" x="0" y="16">Shared Data · Jobs · Identity</text>
       </g>
 
-      <!-- BADGE unten rechts -->
+      <!-- TON · EMRD Badge -->
       <g transform="translate(720,500)">
         <rect class="eco-badge" x="0" y="0" width="140" height="34" rx="10" ry="10"/>
         <text class="eco-badge-text" x="70" y="22" text-anchor="middle">TON · EMRD</text>
       </g>
 
-      <!-- NODES (klickbar) – positioniert auf dem Ring -->
+      <!-- NODES (mit deinen Assets) -->
       <!-- Top: Content Bot -->
       <g class="eco-node" transform="translate(450,100)">
         <a href="#content-bot">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🛡</text>
-          <text class="label" x="-34" y="6">Content Bot</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-content-bot.png" xlink:href="./assets/emerald-content-bot.png"/>
+          <text class="label" x="-24" y="6">Content Bot</text>
+          <title>Content Bot</title>
         </a>
       </g>
 
@@ -163,8 +157,10 @@
       <g class="eco-node" transform="translate(591.4,158.6)">
         <a href="#crossposter">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🔁</text>
-          <text class="label" x="-34" y="6">Crossposter</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-crossposter.png" xlink:href="./assets/emerald-crossposter.png"/>
+          <text class="label" x="-24" y="6">Crossposter</text>
+          <title>Crossposter</title>
         </a>
       </g>
 
@@ -172,8 +168,10 @@
       <g class="eco-node" transform="translate(650,300)">
         <a href="#learning">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">📚</text>
-          <text class="label" x="-34" y="6">Learning</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-learning.png" xlink:href="./assets/emerald-learning.png"/>
+          <text class="label" x="-24" y="6">Learning</text>
+          <title>Learning</title>
         </a>
       </g>
 
@@ -181,8 +179,10 @@
       <g class="eco-node" transform="translate(591.4,441.4)">
         <a href="#affiliate">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🤝</text>
-          <text class="label" x="-34" y="6">Affiliate</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-affiliate.jpg" xlink:href="./assets/emerald-affiliate.jpg"/>
+          <text class="label" x="-24" y="6">Affiliate</text>
+          <title>Affiliate</title>
         </a>
       </g>
 
@@ -190,8 +190,10 @@
       <g class="eco-node" transform="translate(450,500)">
         <a href="#dao">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🗳️</text>
-          <text class="label" x="-34" y="6">DAO</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-dao.jpg" xlink:href="./assets/emerald-dao.jpg"/>
+          <text class="label" x="-24" y="6">DAO</text>
+          <title>DAO</title>
         </a>
       </g>
 
@@ -199,8 +201,10 @@
       <g class="eco-node" transform="translate(308.6,441.4)">
         <a href="#trade-dex">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🔗</text>
-          <text class="label" x="-34" y="6">Trade DEX</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-trade-dex.png" xlink:href="./assets/emerald-trade-dex.png"/>
+          <text class="label" x="-24" y="6">Trade DEX</text>
+          <title>Trade DEX</title>
         </a>
       </g>
 
@@ -208,8 +212,10 @@
       <g class="eco-node" transform="translate(250,300)">
         <a href="#trade-api">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">📈</text>
-          <text class="label" x="-34" y="6">Trade API</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-trade-api.png" xlink:href="./assets/emerald-trade-api.png"/>
+          <text class="label" x="-24" y="6">Trade API</text>
+          <title>Trade API</title>
         </a>
       </g>
 
@@ -217,14 +223,14 @@
       <g class="eco-node" transform="translate(308.6,158.6)">
         <a href="#support">
           <rect x="-78" y="-30" width="156" height="60"/>
-          <text class="icon"  x="-62" y="6">🎫</text>
-          <text class="label" x="-34" y="6">Support</text>
+          <image class="eco-icon" x="-66" y="-16" width="32" height="32"
+                href="./assets/emerald-support.png" xlink:href="./assets/emerald-support.png"/>
+          <text class="label" x="-24" y="6">Support</text>
+          <title>Support</title>
         </a>
       </g>
     </svg>
     <!-- =================== /MODERNE ECOSYSTEM-SVG (DROP-IN END) =================== -->
-
-
 
     <!-- NEWS & UPDATES (statisch + optionaler JSON-Loader) -->
     <section class="content news" id="news">
