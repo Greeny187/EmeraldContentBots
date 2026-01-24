@@ -1312,8 +1312,8 @@
         botsList.innerHTML = data.bots.map(bot => `
           <div class="list-item">
             <div class="list-item-content">
-              <div class="item-title">🤖 ${bot.name}</div>
-              <div class="item-desc">${bot.slug}${bot.description ? ' • ' + bot.description : ''}</div>
+              <div class="item-title">🤖 ${bot.title || bot.username}</div>
+              <div class="item-desc">${bot.username}${bot.env_token_key ? ' • ' + bot.env_token_key : ''}</div>
             </div>
             <span class="item-status ${bot.is_active ? '' : 'inactive'}">
               ${bot.is_active ? 'Active' : 'Inactive'}
@@ -1406,10 +1406,10 @@
         `).join('');
 
         // Load bots for dropdown
-        const bots = await apiCall('/bots');
+        const bots = await apiCall('/devdash/bots');
         const botSelect = document.getElementById('adBot');
         botSelect.innerHTML = '<option value="">All Bots</option>' + 
-          bots.bots.map(b => `<option value="${b.slug}">${b.name}</option>`).join('');
+          bots.bots.map(b => `<option value="${b.username}">${b.title || b.username}</option>`).join('');
       } catch (error) {
         console.error('Failed to load ads:', error);
       }
