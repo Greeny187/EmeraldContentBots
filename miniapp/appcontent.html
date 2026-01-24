@@ -739,25 +739,45 @@ const qa = (s) => Array.from(document.querySelectorAll(s));
 const getUrlParam = (k, def=null) => new URL(location.href).searchParams.get(k) ?? def;
 
 const tg = window.Telegram?.WebApp;
+
+// InitData robust holen (Telegram liefert je nach Client entweder tg.initData oder tgWebAppData in der URL)
+function getInitData(){
+  try{
+    const fromTg = tg?.initData || '';
+    if (fromTg) return fromTg;
+
+    // Telegram Desktop/WebView2 packt es teils in die URL
+    const qp = new URLSearchParams(location.search);
+    const tgData = qp.get('tgWebAppData') || qp.get('init_data') || '';
+    if (tgData) return decodeURIComponent(tgData);
+
+    return '';
+  }catch(e){
+    return '';
+  }
+}
+
 // API-Base:
 // - wenn ?api=... gesetzt ist -> nutze das
 // - sonst: wenn NICHT GitHub Pages -> nutze die aktuelle Origin (praktisch, wenn du das HTML direkt vom Server auslieferst)
 // - sonst fallback auf die Heroku-URL
 const DEFAULT_API_BASE = "https://emeraldcontent-aac379fc581e.herokuapp.com";
 const API_BASE = getUrlParam("api") || (location.origin.includes("github.io") ? DEFAULT_API_BASE : location.origin) || DEFAULT_API_BASE;
-const INIT_DATA = tg?.initData || "";
+const INIT_DATA = getInitData();
 const uid = parseInt(getUrlParam("uid") || tg?.initDataUnsafe?.user?.id || 0);
 let cid = parseInt(getUrlParam("cid") || 0);
 
 // Auth Querystring (Fallback nur wenn kein initData vorhanden ist)
 const AUTH_UID = (Number.isFinite(uid) && uid>0) ? String(uid) : '' ;
 const AUTH_QS  = INIT_DATA ? '' : (AUTH_UID ? ('uid=' + encodeURIComponent(AUTH_UID)) : '');
+const INIT_HEADERS = INIT_DATA ? {'X-Telegram-Init-Data': INIT_DATA} : {};
 function withAuthQS(url){
   if (INIT_DATA) return url;
   if (!AUTH_QS) return url;
   return url + (url.includes('?') ? '&' : '?') + AUTH_QS;
-let STATE_READY = false;
 }
+let STATE_READY = false;
+
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
 
@@ -1635,6 +1655,17 @@ async function createStoryShare(templateId){
   }
 }
 
+async function createStoryShare(action){
+  const out = document.getElementById('storyOut');
+  out.innerHTML = '<div class="muted">Erstelle Story…</div>';
+  try{
+    const res = await fetch(withAuthQS(`${API_BASE}/api/stories/create`), {
+      method:'POST',
+      headers:{'Content-Type':'application/json', ...INIT_HEADERS},
+      body: JSON.stringify({ chat_id: cid, template: action, group_name: await getGroupTitle(cid) })
+     });
+     const j = await res.json();
+     
 function renderSharesInto(containerSel, shares){
   const root = qs(containerSel);
   if(!root) return;
@@ -1748,6 +1779,7 @@ qs('#pro_buy_1m_paypal')?.addEventListener('click', ()=>{
 qa('input,textarea,select').forEach(el=>el.addEventListener('input', validateAll));
 
 document.addEventListener('DOMContentLoaded', async ()=>{
+  try{ tg?.ready?.(); tg?.expand?.(); }catch(e){}
   try { setupSpamToolButtons(); } catch {}
   try { setupStorySharingButtons(); } catch {}
   await loadGroups();
