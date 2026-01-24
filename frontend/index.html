@@ -309,6 +309,7 @@
     .list-item:hover {
       border-color: var(--primary);
       background: rgba(0, 208, 132, 0.05);
+      transform: translateX(4px);
     }
 
     .list-item-content {
@@ -1147,10 +1148,20 @@
       document.getElementById('dashboard').classList.add('active');
 
       try {
-        await loadUserProfile();
-        await refreshOverview();
+        // Load all dashboard data in parallel
+        await Promise.all([
+          loadUserProfile(),
+          refreshOverview(),
+          loadAnalytics(),
+          loadMonitoring()
+        ]);
+        
         setupNavigation();
-        setInterval(refreshOverview, 30000); // Auto-refresh every 30s
+        
+        // Auto-refresh every 30s
+        setInterval(refreshOverview, 30000);
+        setInterval(loadAnalytics, 60000);
+        setInterval(loadMonitoring, 60000);
       } catch (error) {
         console.error('Failed to initialize dashboard:', error);
         logout();
@@ -1256,43 +1267,55 @@
     async function loadAnalytics() {
       try {
         const botActivity = await apiCall('/analytics/bot-activity');
-        const userGrowth = await apiCall('/analytics/user-growth');
+        const monitoring = await apiCall('/devdash/monitoring');
 
         // Bot Activity
-        const botActivityHtml = botActivity.bot_activity
+        const botActivityHtml = (botActivity.bots || [])
           .slice(0, 5)
           .map(item => `
             <div class="list-item">
               <div class="list-item-content">
-                <div class="item-title">${item.slug}</div>
-                <div class="item-desc">${item.events} events</div>
+                <div class="item-title">🤖 ${item.title || item.username}</div>
+                <div class="item-desc">${item.is_active ? '✅ Active' : '❌ Inactive'}</div>
               </div>
+              <span class="item-status">${new Date(item.updated_at).toLocaleDateString()}</span>
             </div>
           `).join('');
         document.getElementById('botActivityChart').innerHTML = botActivityHtml || '<p style="color: var(--text-secondary);">No data</p>';
 
-        // User Growth
-        const userGrowthHtml = userGrowth.weekly_growth
-          .slice(0, 5)
-          .map(item => `
-            <div class="list-item">
-              <div class="list-item-content">
-                <div class="item-title">${item.week}</div>
-                <div class="item-desc">${item.users} new users</div>
-              </div>
+        // Activity Stats
+        const activityHtml = `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">📊 New Users (24h)</div>
+              <div class="item-desc">${monitoring.activity_24h.new_users} users</div>
             </div>
-          `).join('');
-        document.getElementById('userGrowthChart').innerHTML = userGrowthHtml || '<p style="color: var(--text-secondary);">No data</p>';
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">📢 New Ads (24h)</div>
+              <div class="item-desc">${monitoring.activity_24h.new_ads} campaigns</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">💾 Database Status</div>
+              <div class="item-desc">${monitoring.database.users} users registered</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('userGrowthChart').innerHTML = activityHtml;
 
-        // Revenue
-        const payment = await apiCall('/payment/stats');
+        // System Stats
         document.getElementById('revenueStats').innerHTML = `
-          <div class="item-title">$${payment.total_revenue_usd.toFixed(2)}</div>
-          <div class="item-desc">${payment.transactions_total} transactions</div>
-          <div class="item-desc">Avg: $${payment.avg_transaction.toFixed(2)}</div>
+          <div class="item-title">🖥️ System Health</div>
+          <div class="item-desc">CPU: ${monitoring.system.cpu_percent.toFixed(1)}%</div>
+          <div class="item-desc">Memory: ${monitoring.system.memory_percent.toFixed(1)}%</div>
+          <div class="item-desc">Disk: ${monitoring.system.disk_percent.toFixed(1)}%</div>
         `;
       } catch (error) {
         console.error('Failed to load analytics:', error);
+        document.getElementById('botActivityChart').innerHTML = '<p style="color: var(--text-secondary);">Error loading data</p>';
       }
     }
 
