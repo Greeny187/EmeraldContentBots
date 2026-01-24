@@ -1162,7 +1162,7 @@
     // ============================================
     async function loadUserProfile() {
       try {
-        const data = await apiCall('/me');
+        const data = await apiCall('/devdash/me');
         currentUser = data;
 
         const userBox = document.getElementById('userBox');
@@ -1232,7 +1232,7 @@
     // ============================================
     async function refreshOverview() {
       try {
-        const data = await apiCall('/metrics/overview');
+        const data = await apiCall('/devdash/metrics/overview');
         document.getElementById('stat_users').textContent = data.users_total;
         document.getElementById('stat_bots').textContent = data.bots_active;
         document.getElementById('stat_ads').textContent = data.ads_active;
@@ -1301,7 +1301,7 @@
     // ============================================
     async function loadBots() {
       try {
-        const data = await apiCall('/bots');
+        const data = await apiCall('/devdash/bots');
         const botsList = document.getElementById('botsList');
 
         if (!data.bots || data.bots.length === 0) {
@@ -1384,7 +1384,7 @@
     // ============================================
     async function loadAds() {
       try {
-        const data = await apiCall('/ads');
+        const data = await apiCall('/devdash/ads');
         const adsList = document.getElementById('adsList');
 
         if (!data.ads || data.ads.length === 0) {
@@ -1420,7 +1420,7 @@
     // ============================================
     async function loadUsers() {
       try {
-        const data = await apiCall('/tiers?limit=50');
+        const data = await apiCall('/devdash/users?limit=50');
         const usersList = document.getElementById('usersList');
 
         if (!data.users || data.users.length === 0) {
@@ -1509,7 +1509,7 @@
     async function submitAddBot(event) {
       event.preventDefault();
       try {
-        const response = await apiCall('/bots', {
+        const response = await apiCall('/devdash/bots', {
           method: 'POST',
           body: JSON.stringify({
             name: document.getElementById('botName').value,
@@ -1531,7 +1531,7 @@
     async function submitAddAd(event) {
       event.preventDefault();
       try {
-        const response = await apiCall('/ads', {
+        const response = await apiCall('/devdash/ads', {
           method: 'POST',
           body: JSON.stringify({
             name: document.getElementById('adName').value,
