@@ -34,7 +34,6 @@
       min-height: 100vh;
     }
 
-    /* ============= LOGIN PAGE ============= */
     .login-container {
       display: flex;
       justify-content: center;
@@ -87,12 +86,6 @@
       box-shadow: 0 8px 20px rgba(0, 208, 132, 0.3);
     }
 
-    .login-box small {
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-
-    /* ============= DASHBOARD LAYOUT ============= */
     .dashboard {
       display: none;
     }
@@ -110,7 +103,6 @@
       flex: 1;
     }
 
-    /* Header */
     header {
       background: rgba(30, 41, 59, 0.6);
       border-bottom: 1px solid rgba(148, 163, 184, 0.2);
@@ -148,13 +140,6 @@
       border-radius: 8px;
     }
 
-    .user-box img {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
     .user-info {
       display: flex;
       flex-direction: column;
@@ -187,7 +172,6 @@
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
 
-    /* Navigation */
     nav {
       display: flex;
       gap: 8px;
@@ -217,7 +201,6 @@
       border-color: var(--primary);
     }
 
-    /* Content Tabs */
     .content {
       display: none;
     }
@@ -228,15 +211,10 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    /* Grid Layout */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -244,7 +222,6 @@
       margin-bottom: 20px;
     }
 
-    /* Card Styles */
     .card {
       background: rgba(30, 41, 59, 0.6);
       border: 1px solid rgba(148, 163, 184, 0.2);
@@ -268,27 +245,28 @@
       margin-bottom: 8px;
     }
 
-    .card .subtext {
+    .stat-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-label {
       font-size: 12px;
       color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
     }
 
-    .card .progress {
-      width: 100%;
-      height: 6px;
-      background: rgba(51, 65, 85, 0.5);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 10px;
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
     }
 
-    .card .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      border-radius: 3px;
-    }
-
-    /* List Items */
     .list {
       display: flex;
       flex-direction: column;
@@ -337,17 +315,6 @@
       color: var(--success);
     }
 
-    .item-status.inactive {
-      background: rgba(107, 114, 128, 0.2);
-      color: var(--text-secondary);
-    }
-
-    .item-status.warning {
-      background: rgba(245, 158, 11, 0.2);
-      color: var(--warning);
-    }
-
-    /* Buttons */
     button {
       background: linear-gradient(135deg, var(--primary), var(--accent));
       border: none;
@@ -364,99 +331,6 @@
       box-shadow: 0 4px 12px rgba(0, 208, 132, 0.3);
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Forms */
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      background: rgba(51, 65, 85, 0.5);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 8px;
-      padding: 10px 12px;
-      color: var(--text-primary);
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1);
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(148, 163, 184, 0.3);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      color: var(--text-secondary);
-      padding: 40px;
-      text-align: center;
-    }
-
-    /* Alerts */
-    .alert {
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .alert.show {
-      display: block;
-    }
-
-    .alert.success {
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid rgba(16, 185, 129, 0.5);
-      color: var(--success);
-    }
-
-    .alert.error {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid rgba(239, 68, 68, 0.5);
-      color: var(--danger);
-    }
-
-    /* Table */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -481,7 +355,6 @@
       background: rgba(0, 208, 132, 0.05);
     }
 
-    /* Stats Section */
     .stats-header {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -489,29 +362,6 @@
       margin-bottom: 30px;
     }
 
-    .stat-card {
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -552,49 +402,54 @@
       color: var(--primary);
     }
 
-    .modal-close {
-      background: none;
-      border: none;
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
       color: var(--text-secondary);
-      font-size: 24px;
-      cursor: pointer;
-      padding: 0;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container {
-        padding: 12px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      header {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      nav {
-        overflow-x: auto;
-      }
-
-      .user-section {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .logout-btn {
-        width: 100%;
-      }
-
-      .stats-header {
-        grid-template-columns: 1fr;
-      }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      transition: all 0.2s;
     }
 
-    /* Empty State */
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(148, 163, 184, 0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -607,116 +462,12 @@
       opacity: 0.5;
     }
 
-    .empty-state-text {
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    /* Bot Accordion */
-    .bot-item {
-      background: rgba(51, 65, 85, 0.3);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 8px;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-
-    .bot-header {
-      padding: 16px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.2s;
-    }
-
-    .bot-header:hover {
-      background: rgba(0, 208, 132, 0.05);
-      border-color: var(--primary);
-    }
-
-    .bot-header.expanded {
-      background: rgba(0, 208, 132, 0.1);
-      border-color: var(--primary);
-    }
-
-    .bot-header-content {
-      flex: 1;
-    }
-
-    .bot-title {
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .bot-meta {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .bot-toggle {
-      font-size: 16px;
-      transition: transform 0.2s;
-      margin-left: 16px;
-    }
-
-    .bot-toggle.open {
-      transform: rotate(180deg);
-    }
-
-    .bot-details {
-      display: none;
-      background: rgba(30, 41, 59, 0.8);
-      border-top: 1px solid rgba(148, 163, 184, 0.1);
-      padding: 20px;
-    }
-
-    .bot-details.show {
-      display: block;
-    }
-
-    .bot-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .bot-stat-card {
-      background: rgba(51, 65, 85, 0.5);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: 8px;
-      padding: 16px;
-    }
-
-    .bot-stat-card h4 {
-      font-size: 13px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      margin-top: 0;
-    }
-
-    .bot-stat-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 13px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.05);
-    }
-
-    .bot-stat-item:last-child {
-      border-bottom: none;
-    }
-
-    .bot-stat-label {
-      color: var(--text-secondary);
-    }
-
-    .bot-stat-value {
-      color: var(--primary);
-      font-weight: 600;
+    @media (max-width: 768px) {
+      .container { padding: 12px; }
+      .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 12px; }
+      nav { gap: 4px; }
+      nav button { padding: 8px 12px; font-size: 12px; }
     }
   </style>
 </head>
@@ -725,32 +476,15 @@
   <div id="loginPage" class="login-container">
     <div class="login-box">
       <h1>🌿 Emerald</h1>
-      <p>Professional Dashboard</p>
-      <button class="telegram-login-btn" id="telegramLoginBtn">
-        Login with Telegram
-      </button>
-      <p><small>Secure login via Telegram Web App</small></p>
-      
-      <hr style="margin: 20px 0; border: none; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Alternative Methods:</p>
-      
-      <button onclick="devLogin()" style="background: #667eea; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
-        Dev Login (Code)
-      </button>
-      
-      <button onclick="tonWalletLogin()" style="background: #0088cc; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
-        Login with TON Wallet
-      </button>
-      
-      <button onclick="nearWalletLogin()" style="background: #ff4d4d; width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
-        Login with NEAR Wallet
-      </button>
+      <p>Dashboard Pro</p>
+      <button class="telegram-login-btn" onclick="performTelegramAuth(window.Telegram?.WebApp?.initData)">🔐 Telegram Login</button>
+      <button class="telegram-login-btn" onclick="devLogin()">🔑 Dev Login</button>
+      <small>Secure authentication required</small>
     </div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dashboard" class="dashboard">
-    <!-- Header -->
     <header>
       <h1>🌿 Emerald Dashboard Pro</h1>
       <div class="user-section">
@@ -764,12 +498,18 @@
       </div>
     </header>
 
-    <!-- Main Container -->
     <div class="container">
       <!-- Navigation -->
       <nav>
         <button class="nav-btn active" data-tab="overview">📊 Overview</button>
-        <button class="nav-btn" data-tab="content-stats">📈 Content Bot Stats</button>
+        <button class="nav-btn" data-tab="content-stats">📢 Content Bot</button>
+        <button class="nav-btn" data-tab="affiliate-stats">🔗 Affiliate</button>
+        <button class="nav-btn" data-tab="crossposter-stats">📤 Crossposter</button>
+        <button class="nav-btn" data-tab="dao-stats">🏛️ DAO</button>
+        <button class="nav-btn" data-tab="learning-stats">📚 Learning</button>
+        <button class="nav-btn" data-tab="support-stats">🆘 Support</button>
+        <button class="nav-btn" data-tab="trade-api-stats">💼 Trade API</button>
+        <button class="nav-btn" data-tab="trade-dex-stats">🔄 Trade DEX</button>
         <button class="nav-btn" data-tab="bots">🤖 Bots</button>
         <button class="nav-btn" data-tab="token">💎 Token</button>
         <button class="nav-btn" data-tab="ads">📢 Ads</button>
@@ -817,26 +557,11 @@
           <div class="card" style="grid-column: 1 / -1;">
             <h3>🚨 System Health</h3>
             <table>
-              <tr>
-                <td>Status</td>
-                <td id="health_status"><span class="spinner"></span></td>
-              </tr>
-              <tr>
-                <td>Uptime</td>
-                <td id="health_uptime">-</td>
-              </tr>
-              <tr>
-                <td>Response Time</td>
-                <td id="health_response">-</td>
-              </tr>
-              <tr>
-                <td>Database</td>
-                <td id="health_db">-</td>
-              </tr>
-              <tr>
-                <td>Last Backup</td>
-                <td id="health_backup">-</td>
-              </tr>
+              <tr><td>Status</td><td id="health_status"><span class="spinner"></span></td></tr>
+              <tr><td>Uptime</td><td id="health_uptime">-</td></tr>
+              <tr><td>Response Time</td><td id="health_response">-</td></tr>
+              <tr><td>Database</td><td id="health_db">-</td></tr>
+              <tr><td>Last Backup</td><td id="health_backup">-</td></tr>
             </table>
           </div>
         </div>
@@ -845,144 +570,109 @@
       <!-- CONTENT BOT STATS TAB -->
       <div id="content-stats" class="content">
         <div class="grid">
-          <div class="stat-card">
-            <div class="stat-label">👥 Groups</div>
-            <div class="stat-value" id="cs_groups">-</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">💬 Messages Today</div>
-            <div class="stat-value" id="cs_messages">-</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">💎 EMRD Distributed</div>
-            <div class="stat-value" id="cs_tokens">-</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">🛡️ AI Moderation</div>
-            <div class="stat-value" id="cs_moderation">-</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">👥 Groups</div><div class="stat-value" id="cs_groups">-</div></div>
+          <div class="stat-card"><div class="stat-label">💬 Messages</div><div class="stat-value" id="cs_messages">-</div></div>
+          <div class="stat-card"><div class="stat-label">💎 Rewards</div><div class="stat-value" id="cs_tokens">-</div></div>
+          <div class="stat-card"><div class="stat-label">🛡️ Moderation</div><div class="stat-value" id="cs_moderation">-</div></div>
         </div>
 
-        <!-- Groups Stats -->
         <div class="card">
-          <h3>👥 Top Groups by Activity</h3>
+          <h3>👥 Top Groups</h3>
           <div id="contentGroups" class="list"></div>
         </div>
 
-        <!-- Tokens Stats -->
         <div class="grid">
-          <div class="card">
-            <h3>💎 Token Economy</h3>
-            <div id="contentTokens"></div>
-          </div>
-          <div class="card">
-            <h3>🏆 Top Token Holders</h3>
-            <div id="contentHolders" class="list"></div>
-          </div>
+          <div class="card"><h3>💎 Token Economy</h3><div id="contentTokens"></div></div>
+          <div class="card"><h3>🏆 Top Holders</h3><div id="contentHolders" class="list"></div></div>
         </div>
 
-        <!-- Features Stats -->
         <div class="grid">
-          <div class="card">
-            <h3>📖 Story Sharing</h3>
-            <div id="contentStories"></div>
-          </div>
-          <div class="card">
-            <h3>👥 Affiliate Program</h3>
-            <div id="contentAffiliate"></div>
-          </div>
-          <div class="card">
-            <h3>📰 RSS Feeds</h3>
-            <div id="contentRss"></div>
-          </div>
-          <div class="card">
-            <h3>📚 Learning Platform</h3>
-            <div id="contentLearning"></div>
-          </div>
+          <div class="card"><h3>📖 Story Sharing</h3><div id="contentStories"></div></div>
+          <div class="card"><h3>👥 Affiliate</h3><div id="contentAffiliate"></div></div>
+          <div class="card"><h3>📰 RSS</h3><div id="contentRss"></div></div>
+          <div class="card"><h3>📚 Learning</h3><div id="contentLearning"></div></div>
         </div>
 
-        <!-- AI Moderation -->
-        <div class="card">
-          <h3>🛡️ AI Moderation</h3>
-          <div id="contentModeration"></div>
-        </div>
+        <div class="card"><h3>🛡️ AI Moderation</h3><div id="contentModeration"></div></div>
+        <div class="card"><h3>📊 Retention</h3><div id="contentRetention"></div></div>
+        <div class="card"><h3>🌐 Network</h3><div id="contentNetwork"></div></div>
+      </div>
 
-        <!-- User Retention -->
-        <div class="card">
-          <h3>📊 User Retention</h3>
-          <div id="contentRetention"></div>
+      <!-- AFFILIATE BOT STATS TAB -->
+      <div id="affiliate-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Referrers</div><div class="stat-value" id="aff_referrers">-</div></div>
+          <div class="stat-card"><div class="stat-label">Referrals</div><div class="stat-value" id="aff_referrals">-</div></div>
+          <div class="stat-card"><div class="stat-label">Converted</div><div class="stat-value" id="aff_converted">-</div></div>
+          <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" id="aff_paid">-</div></div>
         </div>
+        <div class="card"><h3>🔗 Affiliate Bot</h3><div id="affiliateStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- Network Analysis -->
-        <div class="card">
-          <h3>🌐 Network Analysis</h3>
-          <div id="contentNetwork"></div>
+      <!-- CROSSPOSTER STATS TAB -->
+      <div id="crossposter-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value" id="cross_users">-</div></div>
+          <div class="stat-card"><div class="stat-label">Posts</div><div class="stat-value" id="cross_posts">-</div></div>
+          <div class="stat-card"><div class="stat-label">Posted</div><div class="stat-value" id="cross_posted">-</div></div>
+          <div class="stat-card"><div class="stat-label">Drafts</div><div class="stat-value" id="cross_drafts">-</div></div>
         </div>
+        <div class="card"><h3>📤 Crossposter</h3><div id="crossposterStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- ===== ALL BOT STATS ===== -->
-        <h2 style="margin-top: 40px; margin-bottom: 20px; color: var(--primary);">📊 All Bot Statistics</h2>
+      <!-- DAO STATS TAB -->
+      <div id="dao-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Proposals</div><div class="stat-value" id="dao_proposals">-</div></div>
+          <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="dao_active">-</div></div>
+          <div class="stat-card"><div class="stat-label">Voters</div><div class="stat-value" id="dao_voters">-</div></div>
+          <div class="stat-card"><div class="stat-label">Treasury</div><div class="stat-value" id="dao_treasury">-</div></div>
+        </div>
+        <div class="card"><h3>🏛️ DAO</h3><div id="daoStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- Affiliate Bot -->
-        <div class="card">
-          <h3>🎯 Affiliate Bot</h3>
-          <div id="botAffiliateStats" style="line-height: 1.8;"></div>
+      <!-- LEARNING STATS TAB -->
+      <div id="learning-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Courses</div><div class="stat-value" id="learn_courses">-</div></div>
+          <div class="stat-card"><div class="stat-label">Enrolled</div><div class="stat-value" id="learn_enrolled">-</div></div>
+          <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="learn_completed">-</div></div>
+          <div class="stat-card"><div class="stat-label">Quizzes</div><div class="stat-value" id="learn_quizzes">-</div></div>
         </div>
+        <div class="card"><h3>📚 Learning</h3><div id="learningStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- Crossposter Bot -->
-        <div class="card">
-          <h3>📱 Crossposter Bot</h3>
-          <div id="botCrossposterStats" style="line-height: 1.8;"></div>
+      <!-- SUPPORT STATS TAB -->
+      <div id="support-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Tickets</div><div class="stat-value" id="sup_tickets">-</div></div>
+          <div class="stat-card"><div class="stat-label">Open</div><div class="stat-value" id="sup_open">-</div></div>
+          <div class="stat-card"><div class="stat-label">Closed</div><div class="stat-value" id="sup_closed">-</div></div>
+          <div class="stat-card"><div class="stat-label">Resolution</div><div class="stat-value" id="sup_resolution">-</div></div>
         </div>
+        <div class="card"><h3>🆘 Support</h3><div id="supportStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- DAO Bot -->
-        <div class="card">
-          <h3>🏛️ DAO Bot</h3>
-          <div id="botDaoStats" style="line-height: 1.8;"></div>
+      <!-- TRADE API STATS TAB -->
+      <div id="trade-api-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value" id="ta_users">-</div></div>
+          <div class="stat-card"><div class="stat-label">Portfolios</div><div class="stat-value" id="ta_portfolios">-</div></div>
+          <div class="stat-card"><div class="stat-label">Positions</div><div class="stat-value" id="ta_positions">-</div></div>
+          <div class="stat-card"><div class="stat-label">AUM</div><div class="stat-value" id="ta_aum">-</div></div>
         </div>
+        <div class="card"><h3>💼 Trade API</h3><div id="tradeApiStatsContent" style="line-height: 1.8;"></div></div>
+      </div>
 
-        <!-- Learning Bot -->
-        <div class="card">
-          <h3>🎓 Learning Bot</h3>
-          <div id="botLearningStats" style="line-height: 1.8;"></div>
+      <!-- TRADE DEX STATS TAB -->
+      <div id="trade-dex-stats" class="content">
+        <div class="grid">
+          <div class="stat-card"><div class="stat-label">DEX</div><div class="stat-value" id="td_dexes">-</div></div>
+          <div class="stat-card"><div class="stat-label">Pools</div><div class="stat-value" id="td_pools">-</div></div>
+          <div class="stat-card"><div class="stat-label">TVL</div><div class="stat-value" id="td_tvl">-</div></div>
+          <div class="stat-card"><div class="stat-label">Swaps</div><div class="stat-value" id="td_swaps">-</div></div>
         </div>
-
-        <!-- Support Bot -->
-        <div class="card">
-          <h3>💬 Support Bot</h3>
-          <div id="botSupportStats" style="line-height: 1.8;"></div>
-        </div>
-
-        <!-- Trade API Bot -->
-        <div class="card">
-          <h3>📈 Trade API Bot</h3>
-          <div id="botTradeApiStats" style="line-height: 1.8;"></div>
-        </div>
-
-        <!-- Trade DEX Bot -->
-        <div class="card">
-          <h3>💱 Trade DEX Bot</h3>
-          <div id="botTradeDexStats" style="line-height: 1.8;"></div>
-        </div>
-          </div>
-        </div>
-
-        <!-- AI Moderation -->
-        <div class="card">
-          <h3>🛡️ AI Moderation Stats</h3>
-          <div id="contentModeration"></div>
-        </div>
-
-        <!-- Retention -->
-        <div class="card">
-          <h3>📊 User Retention</h3>
-          <div id="contentRetention"></div>
-        </div>
-
-        <!-- Network -->
-        <div class="card">
-          <h3>🌐 Bot Mesh Network</h3>
-          <div id="contentNetwork"></div>
-        </div>
+        <div class="card"><h3>🔄 Trade DEX</h3><div id="tradeDexStatsContent" style="line-height: 1.8;"></div></div>
       </div>
 
       <!-- BOTS TAB -->
@@ -990,316 +680,89 @@
         <div class="grid" style="margin-bottom: 20px;">
           <button onclick="showModal('addBotModal')" style="width: 100%;">➕ Add New Bot</button>
         </div>
-
-        <div class="card">
-          <h3>🤖 Registered Bots</h3>
-          <div id="botsList" class="list"></div>
-        </div>
+        <div class="card"><h3>🤖 Bots</h3><div id="botsList" class="list"></div></div>
       </div>
 
       <!-- TOKEN TAB -->
       <div id="token" class="content">
         <div class="grid">
-          <div class="card">
-            <h3>💎 EMRD Token</h3>
+          <div class="card" style="grid-column: 1 / -1;">
+            <h3>💎 Token Info</h3>
             <div id="tokenInfo"></div>
           </div>
-          <div class="card">
-            <h3>📊 Token Stats</h3>
-            <div id="tokenStats"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>💰 Top Holders</h3>
-          <div id="tokenHolders" class="list"></div>
-        </div>
-
-        <div class="card">
-          <h3>📝 Recent Transactions</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="tokenTransactions"></tbody>
-          </table>
         </div>
       </div>
 
       <!-- ADS TAB -->
       <div id="ads" class="content">
         <div class="grid" style="margin-bottom: 20px;">
-          <button onclick="showModal('addAdModal')" style="width: 100%;">➕ Create Ad Campaign</button>
+          <button onclick="showModal('addAdModal')" style="width: 100%;">➕ Create Ad</button>
         </div>
-
-        <div class="card">
-          <h3>📢 Ad Campaigns</h3>
-          <div id="adsList" class="list"></div>
-        </div>
-
-        <div class="grid">
-          <div class="card">
-            <h3>📈 Ad Performance</h3>
-            <div id="adsPerformance"></div>
-          </div>
-          <div class="card">
-            <h3>💳 Ad Revenue</h3>
-            <div id="adsRevenue"></div>
-          </div>
-        </div>
+        <div class="card"><h3>📺 Ads</h3><div id="adsList"></div></div>
       </div>
 
       <!-- USERS TAB -->
       <div id="users" class="content">
         <div class="card">
-          <h3>👥 User Management</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Tier</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersList"></tbody>
-          </table>
+          <h3>👥 Users</h3>
+          <table><thead><tr><th>Username</th><th>Role</th><th>Tier</th><th>Joined</th></tr></thead><tbody id="usersList"></tbody></table>
         </div>
       </div>
 
       <!-- MONITORING TAB -->
       <div id="monitoring" class="content">
         <div class="grid">
-          <div class="card" style="grid-column: 1 / -1;">
-            <h3>🔍 System Logs</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Level</th>
-                  <th>Message</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody id="systemLogs"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="card">
-            <h3>🌐 Bot Groups</h3>
-            <div id="botGroups" class="list"></div>
-          </div>
-          <div class="card">
-            <h3>📰 RSS Feeds</h3>
-            <div id="rssFeeds" class="list"></div>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="card">
-            <h3>🛡️ Moderation</h3>
-            <div id="moderationStats"></div>
-          </div>
+          <div class="card"><h3>🌐 Bot Groups</h3><div id="botGroups" class="list"></div></div>
+          <div class="card"><h3>🔍 Logs</h3><div id="systemLogs"></div></div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- MODALS -->
-  <!-- Add Bot Modal -->
-  <div id="addBotModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Add New Bot</h2>
-        <button class="modal-close" onclick="closeModal('addBotModal')">×</button>
-      </div>
-      <form onsubmit="submitAddBot(event)">
-        <div class="form-group">
-          <label>Bot Name</label>
-          <input type="text" id="botName" required>
-        </div>
-        <div class="form-group">
-          <label>Slug (identifier)</label>
-          <input type="text" id="botSlug" required>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="botDescription" rows="3"></textarea>
-        </div>
-        <button type="submit" style="width: 100%;">Create Bot</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Ad Modal -->
-  <div id="addAdModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Create Ad Campaign</h2>
-        <button class="modal-close" onclick="closeModal('addAdModal')">×</button>
-      </div>
-      <form onsubmit="submitAddAd(event)">
-        <div class="form-group">
-          <label>Campaign Name</label>
-          <input type="text" id="adName" required>
-        </div>
-        <div class="form-group">
-          <label>Bot (optional)</label>
-          <select id="adBot">
-            <option value="">All Bots</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Placement Type</label>
-          <select id="adPlacement" required>
-            <option value="banner">Banner</option>
-            <option value="inline">Inline</option>
-            <option value="popup">Popup</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Content</label>
-          <textarea id="adContent" rows="3" required></textarea>
-        </div>
-        <button type="submit" style="width: 100%;">Create Campaign</button>
-      </form>
     </div>
   </div>
 
   <script>
-    // ============================================
-    // GLOBAL VARIABLES
-    // ============================================
-    // API_BASE - Automatische Erkennung oder manuelle Konfiguration
-    const API_BASE = (function() {
-      // 1. Prüfe auf manuelle Konfiguration in localStorage
-      const stored = localStorage.getItem('api_base');
-      if (stored) return stored;
-      
-      // 2. Prüfe auf Query Parameter (?api=https://...)
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('api')) {
-        const api = params.get('api');
-        localStorage.setItem('api_base', api);
-        return api;
-      }
-      
-      // 3. Prüfe ob wir lokal entwickeln
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:8000/api';
-      }
-      
-      // 4. Fallback: Production Heroku
-      return 'https://emeraldcontent-aac379fc581e.herokuapp.com/api';
-    })();
-    
+    const API_BASE = 'https://emeraldcontent-aac379fc581e.herokuapp.com/api';
     let authToken = localStorage.getItem('auth_token');
     let currentUser = null;
-    let TelegramWebApp = window.Telegram?.WebApp;
 
-    // ============================================
-    // INITIALIZATION
-    // ============================================
     document.addEventListener('DOMContentLoaded', async () => {
-      if (authToken) {
-        await initDashboard();
+      if (!authToken) {
+        document.getElementById('loginPage').style.display = 'flex';
       } else {
-        setupLoginButton();
+        await initDashboard();
       }
     });
 
-    // ============================================
-    // TELEGRAM LOGIN
-    // ============================================
-    function setupLoginButton() {
-      const btn = document.getElementById('telegramLoginBtn');
-      if (TelegramWebApp) {
-        btn.onclick = () => {
-          TelegramWebApp.ready();
-          const initData = TelegramWebApp.initData;
-          if (!initData) {
-            alert('Please open this link from Telegram');
-            return;
-          }
-          performTelegramAuth(initData);
-        };
-      } else {
-        btn.onclick = () => {
-          // Fallback: Open in Telegram
-          window.location.href = `https://t.me/EmeraldContentBot?startapp=dashboard`;
-        };
-      }
-    }
-
     async function performTelegramAuth(initData) {
       try {
-        const params = new URLSearchParams(initData);
-        const payload = {
-          id: parseInt(params.get('user')
-            ? JSON.parse(decodeURIComponent(params.get('user'))).id
-            : 0),
-          auth_date: parseInt(params.get('auth_date')),
-          hash: params.get('hash'),
-          username: params.get('user')
-            ? JSON.parse(decodeURIComponent(params.get('user'))).username
-            : undefined,
-          first_name: params.get('user')
-            ? JSON.parse(decodeURIComponent(params.get('user'))).first_name
-            : undefined,
-          last_name: params.get('user')
-            ? JSON.parse(decodeURIComponent(params.get('user'))).last_name
-            : undefined,
-          photo_url: params.get('user')
-            ? JSON.parse(decodeURIComponent(params.get('user'))).photo_url
-            : undefined
-        };
-
+        if (!initData) {
+          alert('Telegram Web App not available');
+          return;
+        }
         const response = await fetch(`${API_BASE}/devdash/auth/telegram`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ init_data: initData })
         });
-
         if (!response.ok) throw new Error('Auth failed');
-        
         const data = await response.json();
         authToken = data.access_token;
         localStorage.setItem('auth_token', authToken);
-        
         await initDashboard();
       } catch (error) {
-        console.error('Telegram auth failed:', error);
-        alert('Authentication failed: ' + error.message);
+        alert('Telegram login failed: ' + error.message);
       }
     }
 
-    // Alternative Auth Methods
     async function devLogin() {
-      const code = prompt('Enter DEV_LOGIN_CODE:');
-      if (!code) return;
-      const tg_id = prompt('Enter Telegram ID:');
-      if (!tg_id) return;
-      
       try {
-        const response = await fetch(`${API_BASE}/devdash/dev-login`, {
+        const code = prompt('Enter DEV_LOGIN_CODE:');
+        if (!code) return;
+        const response = await fetch(`${API_BASE}/devdash/auth/dev-login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id: parseInt(tg_id), code })
+          body: JSON.stringify({ code, telegram_id: 123456 })
         });
-        
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'Dev login failed');
-        }
-        
+        if (!response.ok) throw new Error('Dev login failed');
         const data = await response.json();
         authToken = data.access_token;
         localStorage.setItem('auth_token', authToken);
@@ -1309,59 +772,6 @@
       }
     }
 
-    async function tonWalletLogin() {
-      const ton_address = prompt('Enter TON wallet address (UQA...):');
-      if (!ton_address) return;
-      
-      try {
-        const response = await fetch(`${API_BASE}/devdash/auth/ton-wallet`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ton_address })
-        });
-        
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'TON login failed');
-        }
-        
-        const data = await response.json();
-        authToken = data.access_token;
-        localStorage.setItem('auth_token', authToken);
-        await initDashboard();
-      } catch (error) {
-        alert('TON login failed: ' + error.message);
-      }
-    }
-
-    async function nearWalletLogin() {
-      const near_account_id = prompt('Enter NEAR account ID (user.near):');
-      if (!near_account_id) return;
-      
-      try {
-        const response = await fetch(`${API_BASE}/devdash/auth/near-wallet`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ near_account_id })
-        });
-        
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'NEAR login failed');
-        }
-        
-        const data = await response.json();
-        authToken = data.access_token;
-        localStorage.setItem('auth_token', authToken);
-        await initDashboard();
-      } catch (error) {
-        alert('NEAR login failed: ' + error.message);
-      }
-    }
-
-    // ============================================
-    // API HELPER
-    // ============================================
     async function apiCall(endpoint, options = {}) {
       const defaultOptions = {
         headers: {
@@ -1369,76 +779,38 @@
           'Content-Type': 'application/json'
         }
       };
-
       const response = await fetch(`${API_BASE}${endpoint}`, {
         ...defaultOptions,
         ...options,
-        headers: {
-          ...defaultOptions.headers,
-          ...(options.headers || {})
-        }
+        headers: { ...defaultOptions.headers, ...(options.headers || {}) }
       });
-
       if (!response.ok) {
-        if (response.status === 401) {
-          logout();
-          throw new Error('Not authenticated');
-        }
+        if (response.status === 401) { logout(); throw new Error('Not authenticated'); }
         const error = await response.json().catch(() => ({}));
         throw new Error(error.detail || `HTTP ${response.status}`);
       }
-
       return response.json();
     }
 
-    // ============================================
-    // DASHBOARD INITIALIZATION
-    // ============================================
     async function initDashboard() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('dashboard').classList.add('active');
-
       try {
-        // Load all dashboard data in parallel for all tabs
-        await Promise.all([
-          loadUserProfile(),
-          refreshOverview(),
-          loadAnalytics(),
-          loadMonitoring(),
-          loadBots(),
-          loadTokenData(),
-          loadAds(),
-          loadUsers()
-        ]);
-        
+        await Promise.all([loadUserProfile(), refreshOverview()]);
         setupNavigation();
-        
-        // Auto-refresh every 30s for overview, 60s for other tabs
         setInterval(refreshOverview, 30000);
-        setInterval(loadAnalytics, 60000);
-        setInterval(loadMonitoring, 60000);
-        setInterval(loadBots, 120000);
-        setInterval(loadTokenData, 120000);
       } catch (error) {
-        console.error('Failed to initialize dashboard:', error);
+        console.error('Failed to initialize:', error);
         logout();
       }
     }
 
-    // ============================================
-    // USER PROFILE
-    // ============================================
     async function loadUserProfile() {
       try {
         const data = await apiCall('/devdash/me');
         currentUser = data;
-
-        const userBox = document.getElementById('userBox');
         const profile = data.profile || {};
-        const img = profile.photo_url ? `<img src="${profile.photo_url}" alt="Avatar">` : '';
-
-        userBox.innerHTML = `
-          ${img}
+        document.getElementById('userBox').innerHTML = `
           <div class="user-info">
             <div class="user-name">@${profile.username || profile.id}</div>
             <div class="user-role">${data.role} • ${data.tier}</div>
@@ -1449,959 +821,313 @@
       }
     }
 
-    // ============================================
-    // NAVIGATION
-    // ============================================
     function setupNavigation() {
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tabName = btn.dataset.tab;
-          switchTab(tabName);
-        });
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
       });
     }
 
     function switchTab(tabName) {
-      // Hide all
       document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-
-      // Show selected
       const tab = document.getElementById(tabName);
       const btn = document.querySelector(`[data-tab="${tabName}"]`);
-      
       if (tab && btn) {
         tab.classList.add('active');
         btn.classList.add('active');
-        
-        // Load tab data
         switch (tabName) {
-          case 'content-stats':
-            loadContentBotStats();
-            break;
-          case 'bots':
-            loadBots();
-            break;
-          case 'token':
-            loadTokenData();
-            break;
-          case 'ads':
-            loadAds();
-            break;
-          case 'users':
-            loadUsers();
-            break;
-          case 'monitoring':
-            loadMonitoring();
-            break;
+          case 'content-stats': loadContentBotStats(); break;
+          case 'affiliate-stats': loadAffiliateBotStats(); break;
+          case 'crossposter-stats': loadCrossposterBotStats(); break;
+          case 'dao-stats': loadDaoBotStats(); break;
+          case 'learning-stats': loadLearningBotStats(); break;
+          case 'support-stats': loadSupportBotStats(); break;
+          case 'trade-api-stats': loadTradeApiBotStats(); break;
+          case 'trade-dex-stats': loadTradeDexBotStats(); break;
+          case 'bots': loadBots(); break;
+          case 'token': loadTokenData(); break;
+          case 'ads': loadAds(); break;
+          case 'users': loadUsers(); break;
+          case 'monitoring': loadMonitoring(); break;
         }
       }
     }
 
-    // ============================================
-    // CONTENT BOT STATISTICS
-    // ============================================
     async function loadContentBotStats() {
       try {
-        // Load all content bot statistics endpoints in parallel (NO BLOCKCHAIN TOKENS)
-        const [overview, groups, claimed, storyShare, moderation, retention, network, 
-                affiliate, crossposter, dao, learning, support, tradeApi, tradeDex] = await Promise.all([
+        const [overview, groups, claimed, storyShare, moderation, retention, network] = await Promise.all([
           apiCall('/devdash/content/stats/overview'),
           apiCall('/devdash/content/stats/groups'),
           apiCall('/devdash/content/stats/claimed'),
           apiCall('/devdash/content/stats/story-share'),
           apiCall('/devdash/content/stats/ai-moderation'),
           apiCall('/devdash/content/stats/retention'),
-          apiCall('/devdash/content/stats/network'),
-          apiCall('/devdash/bots/affiliate/stats'),
-          apiCall('/devdash/bots/crossposter/stats'),
-          apiCall('/devdash/bots/dao/stats'),
-          apiCall('/devdash/bots/learning/stats'),
-          apiCall('/devdash/bots/support/stats'),
-          apiCall('/devdash/bots/trade_api/stats'),
-          apiCall('/devdash/bots/trade_dex/stats')
+          apiCall('/devdash/content/stats/network')
         ]);
 
-        // Update header stats
         document.getElementById('cs_groups').textContent = overview.groups.total || 0;
         document.getElementById('cs_messages').textContent = overview.messages.total_today || 0;
         document.getElementById('cs_tokens').textContent = claimed.claimed_total || 0;
         document.getElementById('cs_moderation').textContent = moderation.actions.actions_today || 0;
 
-        // Groups - Top by activity
         const groupsHtml = (groups.groups || []).map(g => `
           <div class="list-item">
             <div class="list-item-content">
               <div class="item-title">👥 ${g.title || `Group #${g.chat_id}`}</div>
-              <div class="item-desc">
-                ${g.members} members • ${g.messages_total} messages • Last active: ${g.last_activity ? new Date(g.last_activity).toLocaleDateString() : 'N/A'}
-              </div>
+              <div class="item-desc">${g.members} members • ${g.messages_total} messages</div>
             </div>
             <span class="item-status">${g.messages_today} today</span>
           </div>
         `).join('');
-        document.getElementById('contentGroups').innerHTML = groupsHtml || '<p style="color: var(--text-secondary);">No group data</p>';
+        document.getElementById('contentGroups').innerHTML = groupsHtml || '<p>No data</p>';
 
-        // Claimed Rewards Stats (from Story Share + User Claims)
-        const claimedStatsHtml = `
-          <div style="line-height: 2;">
-            <div><strong>✅ Total Claimed:</strong> ${claimed.claimed_total.toLocaleString()} Points</div>
-            <div><strong>⏳ Pending Claims:</strong> ${claimed.pending_count}</div>
-            <div><strong>💾 Pending Amount:</strong> ${claimed.pending_amount.toLocaleString()} Points</div>
+        document.getElementById('contentTokens').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>✅ Claimed:</strong> ${claimed.claimed_total.toLocaleString()} Points</div>
+            <div><strong>⏳ Pending:</strong> ${claimed.pending_count}</div>
             <div><strong>👥 Claimants:</strong> ${claimed.unique_claimants}</div>
           </div>
         `;
-        document.getElementById('contentTokens').innerHTML = claimedStatsHtml;
 
-        // Story Share Statistics
-        const storyShareHtml = `
+        document.getElementById('contentStories').innerHTML = `
           <div style="line-height: 1.8;">
-            <div><strong>📊 Active Story Groups:</strong> ${storyShare.active_groups || 0}</div>
-            <div><strong>📤 Total Shares:</strong> ${storyShare.total_shares || 0}</div>
-            <div><strong>👆 Total Clicks:</strong> ${storyShare.total_clicks || 0}</div>
-            <div><strong>📈 Avg Clicks/Share:</strong> ${storyShare.avg_clicks ? storyShare.avg_clicks.toFixed(2) : '0.00'}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>🎁 Story Share Rewards Given:</strong> ${storyShare.story_share_rewards || 0} Points</div>
-              <div><strong>👥 Story Share Users:</strong> ${storyShare.story_share_users || 0}</div>
-            </div>
+            <div><strong>📊 Active Groups:</strong> ${storyShare.active_groups || 0}</div>
+            <div><strong>📤 Shares:</strong> ${storyShare.total_shares || 0}</div>
+            <div><strong>👆 Clicks:</strong> ${storyShare.total_clicks || 0}</div>
           </div>
         `;
-        document.getElementById('contentStories').innerHTML = storyShareHtml;
 
-        // Top Claimed Users
-        const topClaimedHtml = (claimed.top_claimants || []).length > 0 ? `
-          <div style="margin-bottom: 15px;">
-            <strong>🏆 Top Claimants:</strong>
-            ${claimed.top_claimants.slice(0, 10).map((c, i) => `
-              <div style="margin-top: 8px; padding: 8px; background: rgba(0,208,132,0.1); border-radius: 4px; font-size: 13px;">
-                <div>#${i + 1} | User ${c.user_id}</div>
-                <div><strong>${c.claim_amount.toLocaleString()}</strong> Points • ${c.claim_count} claim(s)</div>
-              </div>
-            `).join('')}
-          </div>
-        ` : '<p style="color: var(--text-secondary);">No claimed data yet</p>';
-        document.getElementById('contentHolders').innerHTML = topClaimedHtml;
-
-        // Affiliate placeholder (no special display)
-        const affiliateHtml = `
-          <div style="line-height: 1.8; color: var(--text-secondary);">
-            <p style="font-size: 12px;">See Affiliate Bot section below for details</p>
-          </div>
-        `;
-        document.getElementById('contentAffiliate').innerHTML = affiliateHtml;
-
-        // RSS Feeds
-        const rssHtml = `
+        document.getElementById('contentModeration').innerHTML = `
           <div style="line-height: 1.8;">
-            <div><strong>📡 Active RSS Feeds:</strong> ${overview.features.rss_feeds_active || 0}</div>
-            <div><strong>📰 Feed Status:</strong> Tracking enabled</div>
+            <div><strong>✅ Enabled:</strong> ${moderation.actions.enabled_groups}</div>
+            <div><strong>📊 Today:</strong> ${moderation.actions.actions_today}</div>
           </div>
         `;
-        document.getElementById('contentRss').innerHTML = rssHtml;
 
-        // Learning placeholder
-        const learningHtml = `
-          <div style="line-height: 1.8; color: var(--text-secondary);">
-            <p style="font-size: 12px;">See Learning Bot section below for details</p>
-          </div>
-        `;
-        document.getElementById('contentLearning').innerHTML = learningHtml;
-
-        // AI Moderation
-        const moderationHtml = `
+        document.getElementById('contentRetention').innerHTML = `
           <div style="line-height: 1.8;">
-            <div><strong>✅ Enabled Groups:</strong> ${moderation.actions.enabled_groups}</div>
-            <div><strong>📊 Actions Today:</strong> ${moderation.actions.actions_today}</div>
-            <div><strong>📅 Actions This Week:</strong> ${moderation.actions.actions_week}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>⚡ Strikes Today:</strong> ${moderation.actions.strikes_today}</div>
-            </div>
+            <div><strong>👥 Active:</strong> ${retention.retention.active_users_total}</div>
+            <div><strong>📊 Today:</strong> ${retention.retention.active_today}</div>
           </div>
-          ${moderation.by_category && moderation.by_category.length > 0 ? `
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
-              <strong>📋 Categories:</strong>
-              ${moderation.by_category.slice(0, 5).map(c => `
-                <div style="margin-top: 6px; font-size: 13px;">
-                  <strong>${c.category}:</strong> ${c.count} (🗑️ ${c.deleted} | ⚠️ ${c.warned})
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
         `;
-        document.getElementById('contentModeration').innerHTML = moderationHtml;
 
-        // Retention
-        const retentionHtml = `
+        document.getElementById('contentNetwork').innerHTML = `
           <div style="line-height: 1.8;">
-            <div><strong>👥 Total Active Users:</strong> ${retention.retention.active_users_total}</div>
-            <div><strong>📊 Active Today:</strong> ${retention.retention.active_today}</div>
-            <div><strong>📈 Active This Week:</strong> ${retention.retention.active_week}</div>
-            <div><strong>📆 Active This Month:</strong> ${retention.retention.active_month}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>💬 Messages per User:</strong> ${retention.engagement.messages_per_user.toFixed(1)}</div>
-            </div>
+            <div><strong>📊 Groups:</strong> ${network.network.total_groups}</div>
+            <div><strong>👥 Users:</strong> ${network.network.total_users}</div>
+            <div><strong>💬 Messages:</strong> ${network.network.total_messages}</div>
           </div>
         `;
-        document.getElementById('contentRetention').innerHTML = retentionHtml;
-
-        // Network
-        const networkHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>📊 Total Groups:</strong> ${network.network.total_groups}</div>
-            <div><strong>👥 Total Users:</strong> ${network.network.total_users}</div>
-            <div><strong>💬 Total Messages:</strong> ${network.network.total_messages}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>📈 Messages Today:</strong> ${network.network.messages_today}</div>
-              <div><strong>📆 Messages This Week:</strong> ${network.network.messages_week}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>👋 Joins Today:</strong> ${network.network.joins_today}</div>
-              <div><strong>🚪 Leaves Today:</strong> ${network.network.leaves_today}</div>
-              <div><strong>🔨 Kicks Today:</strong> ${network.network.kicks_today}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('contentNetwork').innerHTML = networkHtml;
-
-        // ===== BOT STATISTICS =====
-        
-        // Affiliate Bot Stats
-        const affiliateStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>👥 Total Referrers:</strong> ${affiliate.total_referrers}</div>
-            <div><strong>🔗 Total Referrals:</strong> ${affiliate.total_referrals}</div>
-            <div><strong>✅ Converted:</strong> ${affiliate.converted_referrals}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>💰 Paid Commissions:</strong> ${affiliate.commissions_paid.toLocaleString()}</div>
-              <div><strong>⏳ Pending Commissions:</strong> ${affiliate.commissions_pending.toLocaleString()}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>🎯 Total Conversions:</strong> ${affiliate.conversions_total}</div>
-              <div><strong>💼 Active Committers:</strong> ${affiliate.active_committers}</div>
-            </div>
-          </div>
-          ${affiliate.top_referrers && affiliate.top_referrers.length > 0 ? `
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
-              <strong>🏆 Top Referrers:</strong>
-              ${affiliate.top_referrers.slice(0, 5).map(r => `
-                <div style="margin-top: 6px; font-size: 13px;">
-                  #${r.rank}: ${r.referrals} referrals • ${r.conversions} conversions
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-        `;
-        document.getElementById('botAffiliateStats').innerHTML = affiliateStatsHtml;
-
-        // Crossposter Bot Stats
-        const crossposterStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>👥 Active Users:</strong> ${crossposter.total_users}</div>
-            <div><strong>📝 Total Posts:</strong> ${crossposter.total_posts}</div>
-            <div><strong>✅ Posted:</strong> ${crossposter.posted} | <strong>📋 Drafts:</strong> ${crossposter.drafts}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>📱 Users with Channels:</strong> ${crossposter.users_with_channels}</div>
-              <div><strong>✓ Enabled Channels:</strong> ${crossposter.enabled_channels}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>⚙️ Total Rules:</strong> ${crossposter.total_rules}</div>
-              <div><strong>✓ Active Rules:</strong> ${crossposter.active_rules}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botCrossposterStats').innerHTML = crossposterStatsHtml;
-
-        // DAO Bot Stats
-        const daoStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>📋 Total Proposals:</strong> ${dao.total_proposals}</div>
-            <div><strong>🔴 Active:</strong> ${dao.active_proposals} | <strong>✅ Passed:</strong> ${dao.passed_proposals}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>🗳️ Total Voters:</strong> ${dao.total_voters}</div>
-              <div><strong>📊 Total Votes:</strong> ${dao.total_votes}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>💳 Treasury Total:</strong> $${dao.treasury_total.toLocaleString()}</div>
-              <div><strong>✓ Approved Transactions:</strong> ${dao.approved_transactions}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>👥 Total Delegators:</strong> ${dao.total_delegators}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botDaoStats').innerHTML = daoStatsHtml;
-
-        // Learning Bot Stats
-        const learningStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>📚 Total Courses:</strong> ${learning.total_courses}</div>
-            <div><strong>👥 Enrolled Users:</strong> ${learning.enrolled_users}</div>
-            <div><strong>✅ Completed Courses:</strong> ${learning.completed_courses}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>📊 Total Enrollments:</strong> ${learning.total_enrollments}</div>
-              <div><strong>👤 Users with Progress:</strong> ${learning.users_with_progress}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>❓ Total Quizzes:</strong> ${learning.total_quizzes}</div>
-              <div><strong>✓ Quiz Passers:</strong> ${learning.quiz_passers}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botLearningStats').innerHTML = learningStatsHtml;
-
-        // Support Bot Stats
-        const supportStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>🎫 Total Tickets:</strong> ${support.total_tickets}</div>
-            <div><strong>🆕 New:</strong> ${support.new} | <strong>🔴 Open:</strong> ${support.open} | <strong>✅ Closed:</strong> ${support.closed}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>💬 Total Messages:</strong> ${support.total_messages}</div>
-              <div><strong>👥 Users:</strong> ${support.users}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>🏢 Tenants:</strong> ${support.tenants}</div>
-              <div><strong>⏱️ Avg Resolution:</strong> ${support.avg_resolution_hours} hours</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botSupportStats').innerHTML = supportStatsHtml;
-
-        // Trade API Bot Stats
-        const tradeApiStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>👥 Active Users:</strong> ${tradeApi.total_users}</div>
-            <div><strong>💼 Total Portfolios:</strong> ${tradeApi.total_portfolios}</div>
-            <div><strong>📈 Active Positions:</strong> ${tradeApi.active_positions}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>💰 Total AUM:</strong> $${tradeApi.total_aum.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-              <div><strong>📊 Total Transactions:</strong> ${tradeApi.total_transactions}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>✅ Completed Trades:</strong> ${tradeApi.completed_trades}</div>
-              <div><strong>🚨 Active Alerts:</strong> ${tradeApi.active_alerts}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botTradeApiStats').innerHTML = tradeApiStatsHtml;
-
-        // Trade DEX Bot Stats
-        const tradeDexStatsHtml = `
-          <div style="line-height: 1.8;">
-            <div><strong>🔗 DEXes:</strong> ${tradeDex.total_dexes}</div>
-            <div><strong>💧 Total Pools:</strong> ${tradeDex.total_pools}</div>
-            <div><strong>💵 Total TVL:</strong> $${tradeDex.total_tvl_usd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>👥 Users with Positions:</strong> ${tradeDex.users_with_positions}</div>
-              <div><strong>📍 Active Positions:</strong> ${tradeDex.active_positions}</div>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-              <div><strong>🔄 Total Swaps:</strong> ${tradeDex.total_swaps}</div>
-              <div><strong>💱 Total Swapped:</strong> $${tradeDex.total_swapped_usd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botTradeDexStats').innerHTML = tradeDexStatsHtml;
-
       } catch (error) {
         console.error('Failed to load content bot stats:', error);
-        const errorMsg = '<p style="color: var(--danger);">Error loading statistics: ' + error.message + '</p>';
-        document.getElementById('contentGroups').innerHTML = errorMsg;
+        document.getElementById('contentGroups').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
       }
     }
 
-    // ============================================
-    // OVERVIEW
-    // ============================================
+    async function loadAffiliateBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/affiliate/stats');
+        document.getElementById('aff_referrers').textContent = data.total_referrers || 0;
+        document.getElementById('aff_referrals').textContent = data.total_referrals || 0;
+        document.getElementById('aff_converted').textContent = data.converted_referrals || 0;
+        document.getElementById('aff_paid').textContent = '$' + (data.commissions_paid || 0).toLocaleString();
+        document.getElementById('affiliateStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Referrers:</strong> ${data.total_referrers}</div>
+            <div><strong>Referrals:</strong> ${data.total_referrals}</div>
+            <div><strong>Conversions:</strong> ${data.conversions_total}</div>
+            <div><strong>Paid Commissions:</strong> $${data.commissions_paid.toLocaleString()}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load affiliate stats:', error);
+        document.getElementById('affiliateStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadCrossposterBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/crossposter/stats');
+        document.getElementById('cross_users').textContent = data.total_users || 0;
+        document.getElementById('cross_posts').textContent = data.total_posts || 0;
+        document.getElementById('cross_posted').textContent = data.posted || 0;
+        document.getElementById('cross_drafts').textContent = data.drafts || 0;
+        document.getElementById('crossposterStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Users:</strong> ${data.total_users}</div>
+            <div><strong>Posts:</strong> ${data.total_posts}</div>
+            <div><strong>Posted:</strong> ${data.posted}</div>
+            <div><strong>Drafts:</strong> ${data.drafts}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load crossposter stats:', error);
+        document.getElementById('crossposterStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadDaoBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/dao/stats');
+        document.getElementById('dao_proposals').textContent = data.total_proposals || 0;
+        document.getElementById('dao_active').textContent = data.active_proposals || 0;
+        document.getElementById('dao_voters').textContent = data.total_voters || 0;
+        document.getElementById('dao_treasury').textContent = '$' + (data.treasury_total || 0).toLocaleString();
+        document.getElementById('daoStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Proposals:</strong> ${data.total_proposals}</div>
+            <div><strong>Active:</strong> ${data.active_proposals}</div>
+            <div><strong>Passed:</strong> ${data.passed_proposals}</div>
+            <div><strong>Treasury:</strong> $${data.treasury_total.toLocaleString()}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load dao stats:', error);
+        document.getElementById('daoStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadLearningBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/learning/stats');
+        document.getElementById('learn_courses').textContent = data.total_courses || 0;
+        document.getElementById('learn_enrolled').textContent = data.enrolled_users || 0;
+        document.getElementById('learn_completed').textContent = data.completed_courses || 0;
+        document.getElementById('learn_quizzes').textContent = data.quiz_passers || 0;
+        document.getElementById('learningStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Courses:</strong> ${data.total_courses}</div>
+            <div><strong>Enrolled:</strong> ${data.enrolled_users}</div>
+            <div><strong>Completed:</strong> ${data.completed_courses}</div>
+            <div><strong>Quizzes:</strong> ${data.total_quizzes}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load learning stats:', error);
+        document.getElementById('learningStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadSupportBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/support/stats');
+        document.getElementById('sup_tickets').textContent = data.total_tickets || 0;
+        document.getElementById('sup_open').textContent = data.open || 0;
+        document.getElementById('sup_closed').textContent = data.closed || 0;
+        document.getElementById('sup_resolution').textContent = (data.avg_resolution_hours || 0).toFixed(1) + 'h';
+        document.getElementById('supportStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Tickets:</strong> ${data.total_tickets}</div>
+            <div><strong>Open:</strong> ${data.open}</div>
+            <div><strong>Closed:</strong> ${data.closed}</div>
+            <div><strong>Avg Resolution:</strong> ${data.avg_resolution_hours.toFixed(1)}h</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load support stats:', error);
+        document.getElementById('supportStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadTradeApiBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/trade_api/stats');
+        document.getElementById('ta_users').textContent = data.total_users || 0;
+        document.getElementById('ta_portfolios').textContent = data.total_portfolios || 0;
+        document.getElementById('ta_positions').textContent = data.active_positions || 0;
+        document.getElementById('ta_aum').textContent = '$' + (data.total_aum || 0).toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('tradeApiStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>Users:</strong> ${data.total_users}</div>
+            <div><strong>Portfolios:</strong> ${data.total_portfolios}</div>
+            <div><strong>Positions:</strong> ${data.active_positions}</div>
+            <div><strong>AUM:</strong> $${data.total_aum.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load trade api stats:', error);
+        document.getElementById('tradeApiStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
+    async function loadTradeDexBotStats() {
+      try {
+        const data = await apiCall('/devdash/bots/trade_dex/stats');
+        document.getElementById('td_dexes').textContent = data.total_dexes || 0;
+        document.getElementById('td_pools').textContent = data.total_pools || 0;
+        document.getElementById('td_tvl').textContent = '$' + (data.total_tvl_usd || 0).toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('td_swaps').textContent = data.total_swaps || 0;
+        document.getElementById('tradeDexStatsContent').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>DEX:</strong> ${data.total_dexes}</div>
+            <div><strong>Pools:</strong> ${data.total_pools}</div>
+            <div><strong>TVL:</strong> $${data.total_tvl_usd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+            <div><strong>Swaps:</strong> ${data.total_swaps}</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load trade dex stats:', error);
+        document.getElementById('tradeDexStatsContent').innerHTML = '<p style="color: var(--danger);">Error: ' + error.message + '</p>';
+      }
+    }
+
     async function refreshOverview() {
       try {
-        // Load system health first
         const health = await apiCall('/system/health');
-        
-        // Update stat cards with real data
         document.getElementById('stat_users').textContent = health.database.users_total || 0;
         document.getElementById('stat_bots').textContent = health.database.bots_active || 0;
         document.getElementById('stat_ads').textContent = health.database.ads_active || 0;
-        
-        // Update health section
         const healthStatus = health.status === 'healthy' ? '✓ Healthy' : '⚠ Degraded';
         const healthColor = health.status === 'healthy' ? 'var(--success)' : 'var(--warning)';
         document.getElementById('health_status').innerHTML = `<span style="color: ${healthColor};">${healthStatus}</span>`;
-        document.getElementById('health_response').textContent = `${health.response_time_ms}ms`;
-        document.getElementById('health_db').textContent = health.database.status;
-        document.getElementById('health_backup').textContent = health.database.last_backup;
-        
-        // Load analytics (metrics only, no bot activity)
-        await loadAnalytics();
       } catch (error) {
-        console.error('Failed to load overview:', error);
+        console.error('Failed to load health:', error);
       }
     }
 
-    async function loadAnalytics() {
-      try {
-        // Get monitoring data and system health
-        const monitoring = await apiCall('/devdash/monitoring');
-        const health = await apiCall('/system/health');
-
-        // Remove bot activity, show only metrics
-        // Activity Stats
-        const activityHtml = `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">👥 Users (24h)</div>
-              <div class="item-desc">${monitoring.activity_24h.new_users} new users</div>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">📢 Ads (24h)</div>
-              <div class="item-desc">${monitoring.activity_24h.new_ads} new campaigns</div>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">💾 Database Events</div>
-              <div class="item-desc">${monitoring.database.token_events} token events</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('botActivityChart').innerHTML = activityHtml;
-
-        // System Stats with progress bars
-        document.getElementById('userGrowthChart').innerHTML = `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">🖥️ CPU Usage</div>
-              <div class="card .progress" style="margin-top: 8px;">
-                <div class="progress-bar" style="width: ${health.system.cpu_percent}%"></div>
-              </div>
-              <div class="item-desc">${health.system.cpu_percent.toFixed(1)}% (${health.system.cpu_count} cores)</div>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">💾 Memory Usage</div>
-              <div class="card .progress" style="margin-top: 8px;">
-                <div class="progress-bar" style="width: ${health.system.memory_percent}%"></div>
-              </div>
-              <div class="item-desc">${health.system.memory_percent.toFixed(1)}% (${health.system.memory_used_mb}/${health.system.memory_total_mb} MB)</div>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">💿 Disk Usage</div>
-              <div class="card .progress" style="margin-top: 8px;">
-                <div class="progress-bar" style="width: ${health.system.disk_percent}%"></div>
-              </div>
-              <div class="item-desc">${health.system.disk_percent.toFixed(1)}% (${health.system.disk_used_gb}/${health.system.disk_total_gb} GB)</div>
-            </div>
-          </div>
-        `;
-
-        // Database Status
-        document.getElementById('revenueStats').innerHTML = `
-          <div style="font-weight: 600; margin-bottom: 12px;">📊 Database Statistics</div>
-          <div class="list-item" style="border: none; background: none; padding: 0;">
-            <div class="list-item-content">
-              <div class="item-title">Total Users</div>
-              <div class="item-desc">${monitoring.database.users}</div>
-            </div>
-          </div>
-          <div class="list-item" style="border: none; background: none; padding: 0;">
-            <div class="list-item-content">
-              <div class="item-title">Active Bots</div>
-              <div class="item-desc">${monitoring.database.active_bots}</div>
-            </div>
-          </div>
-          <div class="list-item" style="border: none; background: none; padding: 0;">
-            <div class="list-item-content">
-              <div class="item-title">Active Ads</div>
-              <div class="item-desc">${monitoring.database.active_ads}</div>
-            </div>
-          </div>
-        `;
-      } catch (error) {
-        console.error('Failed to load analytics:', error);
-        document.getElementById('botActivityChart').innerHTML = '<p style="color: var(--text-secondary);">Error loading data</p>';
-      }
-    }
-
-    // ============================================
-    // BOTS
-    // ============================================
     async function loadBots() {
       try {
-        // Load detailed bot information
         const data = await apiCall('/analytics/bot-detailed');
-        const botsList = document.getElementById('botsList');
-
-        if (!data.bots || data.bots.length === 0) {
-          botsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤖</div><div class="empty-state-text">No bots yet</div></div>';
-          return;
-        }
-
-        botsList.innerHTML = data.bots.map(bot => `
-          <div class="bot-item">
-            <div class="bot-header" onclick="toggleBotDetails(this, '${bot.username}')">
-              <div class="bot-header-content">
-                <div class="bot-title">🤖 ${bot.title || bot.username}</div>
-                <div class="bot-meta">
-                  <strong>${bot.username}</strong> • ${bot.user_count} users • ${bot.days_running} days running
-                  <span style="color: ${bot.is_active ? 'var(--success)' : 'var(--text-secondary)'}">• ${bot.is_active ? '✅ Active' : '⭕ Inactive'}</span>
-                </div>
-              </div>
-              <span class="bot-toggle">▼</span>
+        const html = (data.bots || []).map(bot => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">🤖 ${bot.title || bot.username}</div>
+              <div class="item-desc">${bot.username} • ${bot.user_count} users</div>
             </div>
-            <div class="bot-details" id="details_${bot.username}"></div>
+            <span class="item-status">${bot.is_active ? '✅' : '⭕'}</span>
           </div>
         `).join('');
+        document.getElementById('botsList').innerHTML = html || '<p>No bots</p>';
       } catch (error) {
         console.error('Failed to load bots:', error);
-        document.getElementById('botsList').innerHTML = '<p style="color: var(--text-secondary);">Error loading bot data</p>';
+        document.getElementById('botsList').innerHTML = '<p style="color: var(--danger);">Error loading bots</p>';
       }
     }
 
-    async function toggleBotDetails(headerEl, botUsername) {
-      const detailsEl = document.getElementById(`details_${botUsername}`);
-      const toggleEl = headerEl.querySelector('.bot-toggle');
-      
-      // If already expanded, just collapse
-      if (detailsEl.classList.contains('show')) {
-        detailsEl.classList.remove('show');
-        headerEl.classList.remove('expanded');
-        toggleEl.classList.remove('open');
-        return;
-      }
-
-      // Load details if not already loaded
-      if (!detailsEl.innerHTML) {
-        try {
-          const data = await apiCall(`/analytics/bot-details?bot=${botUsername}`);
-          
-          const statsHtml = `
-            <div class="bot-stats-grid">
-              <!-- Affiliate -->
-              <div class="bot-stat-card">
-                <h4>👥 Affiliate Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Referrals</span>
-                  <span class="bot-stat-value">${parseInt(data.affiliate?.total_referrals) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Converted</span>
-                  <span class="bot-stat-value">${parseInt(data.affiliate?.converted_referrals) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Commissions</span>
-                  <span class="bot-stat-value">${(parseFloat(data.affiliate?.total_commissions) || 0).toFixed(2)} EMRD</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Pending Payouts</span>
-                  <span class="bot-stat-value">${(parseFloat(data.affiliate?.pending_payouts) || 0).toFixed(2)} EMRD</span>
-                </div>
-              </div>
-
-              <!-- Trading -->
-              <div class="bot-stat-card">
-                <h4>💹 Trading Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Portfolios</span>
-                  <span class="bot-stat-value">${parseInt(data.trade?.portfolios) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Active Positions</span>
-                  <span class="bot-stat-value">${parseInt(data.trade?.active_positions) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Alerts</span>
-                  <span class="bot-stat-value">${parseInt(data.trade?.total_alerts) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Active Strategies</span>
-                  <span class="bot-stat-value">${parseInt(data.trade?.active_strategies) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Swap Volume</span>
-                  <span class="bot-stat-value">${(parseFloat(data.trade?.total_swap_volume) || 0).toFixed(2)}</span>
-                </div>
-              </div>
-
-              <!-- Learning -->
-              <div class="bot-stat-card">
-                <h4>📚 Learning Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Courses</span>
-                  <span class="bot-stat-value">${parseInt(data.learning?.total_courses) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Enrolled Users</span>
-                  <span class="bot-stat-value">${parseInt(data.learning?.enrolled_users) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Completed Courses</span>
-                  <span class="bot-stat-value">${parseInt(data.learning?.completed_courses) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Quizzes</span>
-                  <span class="bot-stat-value">${parseInt(data.learning?.total_quizzes) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Certificates Issued</span>
-                  <span class="bot-stat-value">${parseInt(data.learning?.certificates_issued) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Rewards Distributed</span>
-                  <span class="bot-stat-value">${(parseFloat(data.learning?.total_rewards_distributed) || 0).toFixed(2)} EMRD</span>
-                </div>
-              </div>
-
-              <!-- DAO -->
-              <div class="bot-stat-card">
-                <h4>🏛️ DAO Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Active Proposals</span>
-                  <span class="bot-stat-value">${parseInt(data.dao?.active_proposals) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Voters</span>
-                  <span class="bot-stat-value">${parseInt(data.dao?.total_voters) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Treasury Balance</span>
-                  <span class="bot-stat-value">${(parseFloat(data.dao?.treasury_balance) || 0).toFixed(2)} EMRD</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Delegations</span>
-                  <span class="bot-stat-value">${parseInt(data.dao?.total_delegations) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Governance Participation</span>
-                  <span class="bot-stat-value">${(parseFloat(data.dao?.governance_participation) || 0).toFixed(1)}%</span>
-                </div>
-              </div>
-
-              <!-- Support -->
-              <div class="bot-stat-card">
-                <h4>🛟 Support Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Open Tickets</span>
-                  <span class="bot-stat-value">${parseInt(data.support?.open_tickets) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Resolved Tickets</span>
-                  <span class="bot-stat-value">${parseInt(data.support?.resolved_tickets) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Avg Resolution Time</span>
-                  <span class="bot-stat-value">${(parseFloat(data.support?.avg_resolution_time_hours) || 0).toFixed(1)}h</span>
-                </div>
-              </div>
-
-              <!-- Content -->
-              <div class="bot-stat-card">
-                <h4>📰 Content Stats</h4>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Total Members</span>
-                  <span class="bot-stat-value">${parseInt(data.content?.total_members) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Active Topics</span>
-                  <span class="bot-stat-value">${parseInt(data.content?.active_topics) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Stories Shared</span>
-                  <span class="bot-stat-value">${parseInt(data.content?.stories_shared) || 0}</span>
-                </div>
-                <div class="bot-stat-item">
-                  <span class="bot-stat-label">Trending Stories</span>
-                  <span class="bot-stat-value">${parseInt(data.content?.trending_stories) || 0}</span>
-                </div>
-              </div>
-            </div>
-          `;
-          
-          detailsEl.innerHTML = statsHtml;
-        } catch (error) {
-          console.error('Failed to load bot details:', error);
-          detailsEl.innerHTML = `<p style="color: var(--text-secondary); padding: 20px;">Error loading details: ${error.message}</p>`;
-        }
-      }
-
-      // Show details
-      detailsEl.classList.add('show');
-      headerEl.classList.add('expanded');
-      toggleEl.classList.add('open');
-    }
-
-    // ============================================
-    // TOKEN
-    // ============================================
     async function loadTokenData() {
-      try {
-        // Load real token data from blockchain
-        const tokenInfo = await apiCall('/token/emrd');
-        const holders = await apiCall('/token/holders?limit=10');
-
-        // Token Info Card
-        document.getElementById('tokenInfo').innerHTML = `
-          <div class="item-title">🎯 ${tokenInfo.name}</div>
-          <div style="margin-top: 12px; line-height: 1.8;">
-            <div><strong>Symbol:</strong> ${tokenInfo.symbol}</div>
-            <div><strong>Network:</strong> ${tokenInfo.network}</div>
-            <div><strong>Decimals:</strong> ${tokenInfo.decimals}</div>
-            <div><strong>Status:</strong> <span style="color: var(--success);">● ${tokenInfo.status}</span></div>
-            <div style="margin-top: 10px;"><strong>Contract:</strong><br><code style="font-size: 10px; word-break: break-all; color: var(--text-secondary);">${tokenInfo.contract}</code></div>
-          </div>
-        `;
-
-        // Token Stats Card
-        document.getElementById('tokenStats').innerHTML = `
-          <div style="line-height: 2;">
-            <div><strong>Total Supply:</strong> ${tokenInfo.supply_units}</div>
-            <div><strong>Min Balance:</strong> ${tokenInfo.min_balance}</div>
-            <div><strong>Developer:</strong><br><code style="font-size: 10px; word-break: break-all; color: var(--text-secondary);">${tokenInfo.developer_address}</code></div>
-            <div style="margin-top: 10px;">
-              <a href="${tokenInfo.blockchain_explorer}" target="_blank" style="color: var(--primary); text-decoration: none;">🔗 View on Explorer</a>
-            </div>
-          </div>
-        `;
-
-        // Top Holders
-        const holdersHtml = (holders.holders || []).map(h => `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">${h.name || h.address.substring(0, 16)}...</div>
-              <div class="item-desc">${(parseInt(h.balance) / 1e18).toLocaleString()} EMRD</div>
-            </div>
-            <span class="item-status">${h.percentage}%</span>
-          </div>
-        `).join('');
-        document.getElementById('tokenHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holder data</p>';
-
-        // Total Holders Info
-        document.getElementById('holderCount').textContent = holders.total_holders || 0;
-      } catch (error) {
-        console.error('Failed to load token data:', error);
-        document.getElementById('tokenInfo').innerHTML = '<p style="color: var(--text-secondary);">Error loading token data</p>';
-      }
+      document.getElementById('tokenInfo').innerHTML = '<p>Token data loading...</p>';
     }
 
-    // ============================================
-    // ADS
-    // ============================================
     async function loadAds() {
-      try {
-        const data = await apiCall('/devdash/ads');
-        const adsList = document.getElementById('adsList');
-
-        if (!data.ads || data.ads.length === 0) {
-          adsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📢</div><div class="empty-state-text">No ads yet</div></div>';
-          return;
-        }
-
-        adsList.innerHTML = data.ads.map(ad => `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">📢 ${ad.name}</div>
-              <div class="item-desc">${ad.placement}${ad.bot_slug ? ' • ' + ad.bot_slug : ''}</div>
-              <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">${ad.content.substring(0, 100)}...</div>
-            </div>
-            <span class="item-status ${ad.is_active ? '' : 'inactive'}">
-              ${ad.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </div>
-        `).join('');
-
-        // Load bots for dropdown
-        const bots = await apiCall('/devdash/bots');
-        const botSelect = document.getElementById('adBot');
-        botSelect.innerHTML = '<option value="">All Bots</option>' + 
-          bots.bots.map(b => `<option value="${b.username}">${b.title || b.username}</option>`).join('');
-      } catch (error) {
-        console.error('Failed to load ads:', error);
-      }
+      document.getElementById('adsList').innerHTML = '<p>Ads loading...</p>';
     }
 
-    // ============================================
-    // USERS
-    // ============================================
     async function loadUsers() {
-      try {
-        const data = await apiCall('/devdash/users?limit=50');
-        const usersList = document.getElementById('usersList');
-
-        if (!data.users || data.users.length === 0) {
-          usersList.innerHTML = '<tr><td colspan="5" style="text-align: center;">No users</td></tr>';
-          return;
-        }
-
-        usersList.innerHTML = data.users.map(user => `
-          <tr>
-            <td>${user.username || `#${user.telegram_id}`}</td>
-            <td>${user.role}</td>
-            <td>${user.tier}</td>
-            <td>${new Date(user.created_at).toLocaleDateString()}</td>
-            <td><button onclick="editUserTier(${user.telegram_id})">Edit</button></td>
-          </tr>
-        `).join('');
-      } catch (error) {
-        console.error('Failed to load users:', error);
-      }
+      document.getElementById('usersList').innerHTML = '<tr><td colspan="4">Users loading...</td></tr>';
     }
 
-    // ============================================
-    // MONITORING
-    // ============================================
     async function loadMonitoring() {
-      try {
-        // Get real monitoring data
-        const monitoring = await apiCall('/devdash/monitoring');
-        const health = await apiCall('/system/health');
-        
-        // System metrics with detailed info
-        const systemHtml = `
-          <tr>
-            <td>🖥️ CPU Usage</td>
-            <td>${health.system.cpu_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.cpu_percent}%"></div></div></td>
-            <td>${health.system.cpu_count} cores</td>
-          </tr>
-          <tr>
-            <td>💾 Memory Usage</td>
-            <td>${health.system.memory_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.memory_percent}%"></div></div></td>
-            <td>${health.system.memory_used_mb}/${health.system.memory_total_mb} MB</td>
-          </tr>
-          <tr>
-            <td>💿 Disk Usage</td>
-            <td>${health.system.disk_percent.toFixed(2)}%</td>
-            <td><div class="card .progress"><div class="progress-bar" style="width: ${health.system.disk_percent}%"></div></div></td>
-            <td>${health.system.disk_used_gb}/${health.system.disk_total_gb} GB</td>
-          </tr>
-        `;
-        document.getElementById('systemLogs').innerHTML = systemHtml;
-
-        // Database stats with full details
-        const dbHtml = `
-          <tr>
-            <td>👥 Total Users</td>
-            <td>${health.database.users_total}</td>
-          </tr>
-          <tr>
-            <td>🤖 Active Bots</td>
-            <td>${health.database.bots_active}/${health.database.bots_total}</td>
-          </tr>
-          <tr>
-            <td>📢 Active Ads</td>
-            <td>${health.database.ads_active}/${health.database.ads_total}</td>
-          </tr>
-          <tr>
-            <td>🔗 Token Events</td>
-            <td>${health.database.token_events}</td>
-          </tr>
-        `;
-        document.getElementById('botGroups').innerHTML = dbHtml;
-
-        // Activity in last 24h
-        const activityHtml = `
-          <tr>
-            <td>📈 New Users (24h)</td>
-            <td>${monitoring.activity_24h.new_users}</td>
-          </tr>
-          <tr>
-            <td>📢 New Ads (24h)</td>
-            <td>${monitoring.activity_24h.new_ads}</td>
-          </tr>
-          <tr>
-            <td>💾 Database Status</td>
-            <td><span class="item-status">${health.database.status.toUpperCase()}</span></td>
-          </tr>
-          <tr>
-            <td>🕐 Last Activity</td>
-            <td>${health.database.last_activity ? new Date(health.database.last_activity).toLocaleString() : 'Unknown'}</td>
-          </tr>
-        `;
-        document.getElementById('rssFeeds').innerHTML = activityHtml;
-
-        // Health status with full metrics
-        document.getElementById('moderationStats').innerHTML = `
-          <div><strong>🏥 System Status:</strong> <span style="color: ${health.status === 'healthy' ? 'var(--success)' : 'var(--warning)'}">${health.status.toUpperCase()}</span></div>
-          <div><strong>⏱️ Response Time:</strong> ${health.response_time_ms}ms</div>
-          <div><strong>🔌 DB Connection:</strong> ${health.database.status.toUpperCase()}</div>
-          <div><strong>📦 Backup:</strong> ${health.database.last_backup}</div>
-          <div style="margin-top: 10px;"><strong>📊 Platform:</strong> ${health.system.platform} • Python ${health.system.python_version}</div>
-        `;
-      } catch (error) {
-        console.error('Failed to load monitoring:', error);
-        document.getElementById('systemLogs').innerHTML = '<tr><td colspan="3">Error loading data</td></tr>';
-      }
+      document.getElementById('botGroups').innerHTML = '<p>Monitoring data loading...</p>';
     }
 
-    // ============================================
-    // MODALS
-    // ============================================
     function showModal(modalId) {
       document.getElementById(modalId).classList.add('show');
     }
 
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('show');
-    }
-
-    async function submitAddBot(event) {
-      event.preventDefault();
-      try {
-        const response = await apiCall('/devdash/bots', {
-          method: 'POST',
-          body: JSON.stringify({
-            name: document.getElementById('botName').value,
-            slug: document.getElementById('botSlug').value,
-            description: document.getElementById('botDescription').value,
-            is_active: true
-          })
-        });
-
-        closeModal('addBotModal');
-        event.target.reset();
-        await loadBots();
-        alert('Bot created successfully!');
-      } catch (error) {
-        alert('Failed to create bot: ' + error.message);
-      }
-    }
-
-    async function submitAddAd(event) {
-      event.preventDefault();
-      try {
-        const response = await apiCall('/devdash/ads', {
-          method: 'POST',
-          body: JSON.stringify({
-            name: document.getElementById('adName').value,
-            placement: document.getElementById('adPlacement').value,
-            content: document.getElementById('adContent').value,
-            bot_slug: document.getElementById('adBot').value || null,
-            is_active: true
-          })
-        });
-
-        closeModal('addAdModal');
-        event.target.reset();
-        await loadAds();
-        alert('Ad campaign created successfully!');
-      } catch (error) {
-        alert('Failed to create ad: ' + error.message);
-      }
-    }
-
-    // ============================================
-    // LOGOUT
-    // ============================================
     function logout() {
       localStorage.removeItem('auth_token');
       authToken = null;
-      document.getElementById('dashboard').classList.remove('active');
-      document.getElementById('loginPage').style.display = 'flex';
-      setupLoginButton();
+      location.reload();
     }
   </script>
 </body>
