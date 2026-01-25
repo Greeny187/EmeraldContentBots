@@ -7,6 +7,7 @@ from typing import Optional, Dict, Any
 from decimal import Decimal, getcontext
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from db import fetch, fetchrow, execute
 from jwt_tools import create_token, decode_token
@@ -65,6 +66,20 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
 @app.get("/healthz")
 async def healthz():
     return {"status": "ok", "time": int(time.time())}
+
+@app.get("/")
+async def root():
+    """Serve index.html for root path (supports GET and HEAD requests)"""
+    index_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    # Fallback if index.html not found
+    return {"status": "ok", "message": "Emerald Dashboard API"}
+
+@app.head("/")
+async def root_head():
+    """Support HEAD requests to root path"""
+    return None
 
 # ---------- Startup: kleine, idempotente Migrationen ----------
 @app.on_event("startup")
