@@ -769,6 +769,7 @@
       <!-- Navigation -->
       <nav>
         <button class="nav-btn active" data-tab="overview">📊 Overview</button>
+        <button class="nav-btn" data-tab="content-stats">📈 Content Bot Stats</button>
         <button class="nav-btn" data-tab="bots">🤖 Bots</button>
         <button class="nav-btn" data-tab="token">💎 Token</button>
         <button class="nav-btn" data-tab="ads">📢 Ads</button>
@@ -838,6 +839,84 @@
               </tr>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- CONTENT BOT STATS TAB -->
+      <div id="content-stats" class="content">
+        <div class="grid">
+          <div class="stat-card">
+            <div class="stat-label">👥 Groups</div>
+            <div class="stat-value" id="cs_groups">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">💬 Messages Today</div>
+            <div class="stat-value" id="cs_messages">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">💎 EMRD Distributed</div>
+            <div class="stat-value" id="cs_tokens">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">🛡️ AI Moderation</div>
+            <div class="stat-value" id="cs_moderation">-</div>
+          </div>
+        </div>
+
+        <!-- Groups Stats -->
+        <div class="card">
+          <h3>👥 Top Groups by Activity</h3>
+          <div id="contentGroups" class="list"></div>
+        </div>
+
+        <!-- Tokens Stats -->
+        <div class="grid">
+          <div class="card">
+            <h3>💎 Token Economy</h3>
+            <div id="contentTokens"></div>
+          </div>
+          <div class="card">
+            <h3>🏆 Top Token Holders</h3>
+            <div id="contentHolders" class="list"></div>
+          </div>
+        </div>
+
+        <!-- Features Stats -->
+        <div class="grid">
+          <div class="card">
+            <h3>📖 Story Sharing</h3>
+            <div id="contentStories"></div>
+          </div>
+          <div class="card">
+            <h3>👥 Affiliate Program</h3>
+            <div id="contentAffiliate"></div>
+          </div>
+          <div class="card">
+            <h3>📰 RSS Feeds</h3>
+            <div id="contentRss"></div>
+          </div>
+          <div class="card">
+            <h3>📚 Learning Platform</h3>
+            <div id="contentLearning"></div>
+          </div>
+        </div>
+
+        <!-- AI Moderation -->
+        <div class="card">
+          <h3>🛡️ AI Moderation Stats</h3>
+          <div id="contentModeration"></div>
+        </div>
+
+        <!-- Retention -->
+        <div class="card">
+          <h3>📊 User Retention</h3>
+          <div id="contentRetention"></div>
+        </div>
+
+        <!-- Network -->
+        <div class="card">
+          <h3>🌐 Bot Mesh Network</h3>
+          <div id="contentNetwork"></div>
         </div>
       </div>
 
@@ -1332,6 +1411,9 @@
         
         // Load tab data
         switch (tabName) {
+          case 'content-stats':
+            loadContentBotStats();
+            break;
           case 'bots':
             loadBots();
             break;
@@ -1348,6 +1430,192 @@
             loadMonitoring();
             break;
         }
+      }
+    }
+
+    // ============================================
+    // CONTENT BOT STATISTICS
+    // ============================================
+    async function loadContentBotStats() {
+      try {
+        // Load all 7 statistics endpoints in parallel
+        const [overview, groups, tokens, moderation, features, retention, network] = await Promise.all([
+          apiCall('/api/devdash/content/stats/overview'),
+          apiCall('/api/devdash/content/stats/groups'),
+          apiCall('/api/devdash/content/stats/tokens'),
+          apiCall('/api/devdash/content/stats/ai-moderation'),
+          apiCall('/api/devdash/content/stats/features'),
+          apiCall('/api/devdash/content/stats/retention'),
+          apiCall('/api/devdash/content/stats/network')
+        ]);
+
+        // Update header stats
+        document.getElementById('cs_groups').textContent = overview.groups.total_groups || 0;
+        document.getElementById('cs_messages').textContent = overview.messages.today || 0;
+        document.getElementById('cs_tokens').textContent = overview.tokens.total_distributed || 0;
+        document.getElementById('cs_moderation').textContent = moderation.actions.actions_today || 0;
+
+        // Groups - Top by activity
+        const groupsHtml = (groups.groups || []).map(g => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">👥 ${g.name || `Group #${g.id}`}</div>
+              <div class="item-desc">
+                ${g.member_count} members • ${g.messages_total} messages • Last active: ${new Date(g.last_activity).toLocaleDateString()}
+              </div>
+            </div>
+            <span class="item-status">${g.messages_today} today</span>
+          </div>
+        `).join('');
+        document.getElementById('contentGroups').innerHTML = groupsHtml || '<p style="color: var(--text-secondary);">No group data</p>';
+
+        // Tokens - Stats and holders
+        const tokenStatsHtml = `
+          <div style="line-height: 2;">
+            <div><strong>💰 Distributed:</strong> ${(tokens.EMRD.total_distributed / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>✅ Claimed:</strong> ${(tokens.EMRD.total_claimed / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>⏳ Pending:</strong> ${(tokens.EMRD.total_pending / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>👥 Holders:</strong> ${tokens.EMRD.holders_count}</div>
+          </div>
+        `;
+        document.getElementById('contentTokens').innerHTML = tokenStatsHtml;
+
+        const holdersHtml = (tokens.top_holders || []).map(h => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Holder ${h.rank}</div>
+              <div class="item-desc">${(h.amount / 1e18).toLocaleString()} EMRD</div>
+            </div>
+            <span class="item-status">${h.percentage.toFixed(2)}%</span>
+          </div>
+        `).join('');
+        document.getElementById('contentHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holders</p>';
+
+        // Features - Story Sharing
+        const storiesHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>📊 Enabled Groups:</strong> ${features.features.story_sharing.enabled_groups}</div>
+            <div><strong>📤 Total Shares:</strong> ${features.features.story_sharing.total_shares}</div>
+            <div><strong>👆 Total Clicks:</strong> ${features.features.story_sharing.total_clicks}</div>
+            <div><strong>📈 Avg Clicks/Share:</strong> ${features.features.story_sharing.avg_clicks_per_share.toFixed(2)}</div>
+          </div>
+        `;
+        document.getElementById('contentStories').innerHTML = storiesHtml;
+
+        // Features - Affiliate
+        const affiliateHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>🎯 Active Programs:</strong> ${features.features.affiliate.active_programs}</div>
+            <div><strong>👥 Active Referrers:</strong> ${features.features.affiliate.active_referrers}</div>
+            <div><strong>📌 Total Referrals:</strong> ${features.features.affiliate.total_referrals}</div>
+            <div><strong>💰 Total Earned:</strong> ${features.features.affiliate.total_earned.toFixed(2)} EMRD</div>
+            <div><strong>📊 Avg Commission:</strong> ${features.features.affiliate.avg_commission.toFixed(2)} EMRD</div>
+          </div>
+        `;
+        document.getElementById('contentAffiliate').innerHTML = affiliateHtml;
+
+        // Features - RSS
+        const rssHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>📡 Active Feeds:</strong> ${features.features.rss.active_feeds}</div>
+            <div><strong>📰 Posts Today:</strong> ${features.features.rss.posts_today}</div>
+            <div><strong>📅 Posts This Week:</strong> ${features.features.rss.posts_week}</div>
+            <div><strong>📆 Posts This Month:</strong> ${features.features.rss.posts_month}</div>
+          </div>
+        `;
+        document.getElementById('contentRss').innerHTML = rssHtml;
+
+        // Features - Learning
+        const learningHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>📚 Courses:</strong> ${features.features.learning.courses}</div>
+            <div><strong>👥 Enrolled:</strong> ${features.features.learning.users_enrolled}</div>
+            <div><strong>✅ Completed:</strong> ${features.features.learning.completed_courses}</div>
+            <div><strong>📈 Completion Rate:</strong> ${features.features.learning.completion_rate.toFixed(1)}%</div>
+            <div><strong>🎓 Certificates:</strong> ${features.features.learning.certificates_issued}</div>
+            <div><strong>🎁 Quizzes Passed:</strong> ${features.features.learning.quizzes_passed}</div>
+          </div>
+        `;
+        document.getElementById('contentLearning').innerHTML = learningHtml;
+
+        // AI Moderation
+        const moderationHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>✅ Enabled Groups:</strong> ${moderation.enabled_groups}</div>
+            <div><strong>📊 Actions Today:</strong> ${moderation.actions.actions_today}</div>
+            <div><strong>📅 Actions This Week:</strong> ${moderation.actions.actions_week}</div>
+            <div><strong>🗑️ Deleted Messages:</strong> ${moderation.deleted_messages_total}</div>
+            <div><strong>⚠️ Warnings Issued:</strong> ${moderation.warnings_total}</div>
+            <div><strong>📈 Avg Strike Score:</strong> ${moderation.avg_strike_score.toFixed(2)}</div>
+          </div>
+          ${moderation.top_offenders && moderation.top_offenders.length > 0 ? `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+              <strong>🚨 Top Offenders:</strong>
+              ${moderation.top_offenders.slice(0, 5).map((o, i) => `
+                <div style="margin-top: 8px; font-size: 13px;">
+                  ${i + 1}. Violations: ${o.violation_count} • Deleted: ${o.deleted_count}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        `;
+        document.getElementById('contentModeration').innerHTML = moderationHtml;
+
+        // Retention
+        const retentionHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>👥 Total Active Users:</strong> ${retention.retention.active_users_total}</div>
+            <div><strong>📊 Active Today:</strong> ${retention.retention.active_today}</div>
+            <div><strong>📈 Active This Week:</strong> ${retention.retention.active_week}</div>
+            <div><strong>📆 Active This Month:</strong> ${retention.retention.active_month}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong style="color: var(--success);">✓ Retention Rate:</strong> ${retention.retention.retention_rate.toFixed(1)}%</div>
+              <div><strong style="color: var(--warning);">⚠ Churn Rate:</strong> ${retention.retention.churn_rate.toFixed(1)}%</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>💬 Messages per User:</strong> ${retention.engagement.messages_per_user.toFixed(1)}</div>
+              <div><strong>👥 Groups per User:</strong> ${retention.engagement.groups_per_user.toFixed(1)}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('contentRetention').innerHTML = retentionHtml;
+
+        // Network
+        const networkHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>🤖 Total Bots:</strong> ${network.network.total_bots}</div>
+            <div><strong style="color: var(--success);">✓ Online:</strong> ${network.network.bots_online}</div>
+            <div><strong style="color: var(--warning);">✗ Offline:</strong> ${network.network.bots_offline}</div>
+            <div><strong>📊 Health:</strong> ${network.network.health_percentage.toFixed(1)}%</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>🔌 Total Endpoints:</strong> ${network.network.total_endpoints}</div>
+              <div><strong style="color: var(--success);">✓ Healthy:</strong> ${network.network.healthy_endpoints}</div>
+              <div><strong style="color: var(--warning);">⚠ Unhealthy:</strong> ${network.network.unhealthy_endpoints}</div>
+              <div><strong>⏱️ Avg Latency:</strong> ${network.network.average_latency_ms}ms</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>❌ Errors Today:</strong> ${network.network.errors_today}</div>
+              <div><strong>📊 Error Rate:</strong> ${network.network.error_rate.toFixed(2)}%</div>
+            </div>
+          </div>
+          ${network.network.bots && network.network.bots.length > 0 ? `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+              <strong>🤖 Bots Detail:</strong>
+              ${network.network.bots.slice(0, 10).map(b => `
+                <div style="margin-top: 8px; font-size: 13px; padding: 8px; background: rgba(0,208,132,0.1); border-radius: 4px;">
+                  <div><strong>${b.username}</strong> ${b.is_active ? '✓' : '✗'}</div>
+                  <div style="color: var(--text-secondary);">Endpoints: ${b.healthy_endpoints}/${b.endpoint_count} • Latency: ${b.endpoint_latency_ms}ms</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        `;
+        document.getElementById('contentNetwork').innerHTML = networkHtml;
+
+      } catch (error) {
+        console.error('Failed to load content bot stats:', error);
+        const errorMsg = '<p style="color: var(--danger);">Error loading statistics: ' + error.message + '</p>';
+        document.getElementById('contentGroups').innerHTML = errorMsg;
       }
     }
 
