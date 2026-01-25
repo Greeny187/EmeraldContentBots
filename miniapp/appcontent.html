@@ -50,6 +50,22 @@
     .footerbar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.08)),var(--bg);border-top:1px solid var(--ring);padding:10px 16px;display:flex;align-items:center;gap:12px;backdrop-filter:saturate(120%) blur(6px);z-index:100}
     .footerbar .right{margin-left:auto;display:flex;gap:8px}
     .footerbar .left{display:flex;gap:8px}
+
+    /* Mini Werbebanner (Footer) */
+    .adslot{display:flex;align-items:center;gap:10px;max-width:340px;min-width:180px;
+      padding:7px 10px;border-radius:12px;border:1px solid var(--ring);
+      background:rgba(0,0,0,.06);cursor:pointer;user-select:none;transition:all .2s ease}
+    .adslot:hover{transform:translateY(-1px);box-shadow:var(--shadow);border-color:var(--brand)}
+    .adslot .ad-icon{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;
+      border:1px solid var(--ring);background:rgba(0,0,0,.10);flex:0 0 auto}
+    .adslot .ad-text{min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.1}
+    .adslot .ad-title{font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .adslot .ad-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .adslot .ad-badge{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;
+      padding:4px 8px;border-radius:999px;border:1px solid var(--ring);background:rgba(34,197,94,.12);color:var(--brand)}
+    @media (max-width:760px){
+      .adslot{display:none}
+    }
     .btn{border:1px solid var(--ring);background:transparent;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer;transition:all 0.2s}
     .btn.primary{background:var(--brand);border-color:var(--brand);color:#08140f;font-weight:700}
     .btn.ghost{opacity:.9}
@@ -724,8 +740,18 @@
     <button class="btn ghost" id="backBtn">← Zurück</button>
     <div id="out" class="hint">Bereit.</div>
   </div>
+
+  <!-- Miniapp Werbebanner (AD Kampagnen) -->
+  <div id="adSlot" class="adslot" title="Werbung" role="button" tabindex="0" aria-label="Werbung">
+    <div class="ad-icon">🟢</div>
+    <div class="ad-text">
+      <div class="ad-title">Lade Kampagnen…</div>
+      <div class="ad-sub">—</div>
+    </div>
+    <div class="ad-badge">AD</div>
+  </div>
+
   <div class="right">
-    <span style="font-size:11px;color:var(--muted);margin-right:8px">Werbung</span>
     <button class="btn ghost" id="themeBtn" title="Hell/Dunkel">🌓</button>
     <button class="btn ghost" id="resetBtn">Zurücksetzen</button>
     <button class="btn ghost" id="closeBtn">Schließen</button>
@@ -779,6 +805,130 @@ let STATE_READY = false;
 
 // Gruppen-Titel Cache (für Story-Sharing group_name)
 let GROUPS_MAP = {};
+
+// ---------------------------
+// Miniapp Werbung / AD Kampagnen (Frontend)
+// ---------------------------
+const SUPPORT_LINK = "https://t.me/EmeraldEcoSystem";
+const EMERALD_SITE = "https://greeny187.github.io/GreenyManagementBots/";
+const PAYPAL_EMAIL = "Emerald@mail.de";
+const TON_WALLET = "UQBopac1WFJGC_K48T8JqcbRoH3evUoUDwS2oItlS-SgpR8L";
+
+const AD_FALLBACK = [
+  {
+    icon: '💎',
+    title: 'EMRD Rewards aktivieren',
+    subtitle: 'Belohne hilfreiche Beiträge in deiner Gruppe',
+    badge: 'EMRD',
+    url: EMERALD_SITE
+  },
+  {
+    icon: '🚀',
+    title: 'PRO freischalten',
+    subtitle: 'Ohne Werbung + KI Features (4,95€/Monat)',
+    badge: 'PRO',
+    url: 'https://t.me/EmeraldContentBot?start=buypro'
+  },
+  {
+    icon: '🆘',
+    title: 'Support & Community',
+    subtitle: 'Fragen? Schreib uns im Support-Chat',
+    badge: 'Help',
+    url: SUPPORT_LINK
+  },
+  {
+    icon: '💳',
+    title: 'PRO per PayPal',
+    subtitle: `Schnell zahlen: ${PAYPAL_EMAIL}`,
+    badge: 'PayPal',
+    url: `mailto:${PAYPAL_EMAIL}`
+  },
+  {
+    icon: '🟢',
+    title: 'TON Wallet',
+    subtitle: 'Spenden/Support: Copy & Send',
+    badge: 'TON',
+    url: `ton://transfer/${TON_WALLET}`
+  }
+];
+
+let AD_CAMPAIGNS = [];
+let AD_INDEX = 0;
+let AD_TIMER = null;
+
+function isTme(u){
+  try{ return /^https?:\/\/(t\.me|telegram\.me)\//i.test(String(u||'')); }catch{ return false; }
+}
+
+function openAd(url){
+  if(!url) return;
+  try{
+    if (isTme(url) && tg?.openTelegramLink) return tg.openTelegramLink(url);
+    if (tg?.openLink) return tg.openLink(url);
+    window.open(url, '_blank');
+  }catch(e){
+    try{ window.open(url, '_blank'); }catch{}
+  }
+}
+
+function renderAd(idx){
+  const slot = qs('#adSlot');
+  if(!slot) return;
+  const ad = (AD_CAMPAIGNS || [])[idx];
+  if(!ad){
+    slot.querySelector('.ad-icon').textContent = '🟢';
+    slot.querySelector('.ad-title').textContent = 'Keine Kampagnen';
+    slot.querySelector('.ad-sub').textContent = '—';
+    slot.querySelector('.ad-badge').textContent = 'AD';
+    slot.dataset.url = '';
+    return;
+  }
+  slot.querySelector('.ad-icon').textContent = ad.icon || '🟢';
+  slot.querySelector('.ad-title').textContent = ad.title || 'Werbung';
+  slot.querySelector('.ad-sub').textContent = ad.subtitle || '';
+  slot.querySelector('.ad-badge').textContent = ad.badge || 'AD';
+  slot.dataset.url = ad.url || '';
+}
+
+function startAdRotation(){
+  if(AD_TIMER) clearInterval(AD_TIMER);
+  if(!AD_CAMPAIGNS?.length){
+    AD_CAMPAIGNS = AD_FALLBACK.slice();
+  }
+  AD_INDEX = 0;
+  renderAd(AD_INDEX);
+  AD_TIMER = setInterval(()=>{
+    if(!AD_CAMPAIGNS?.length) return;
+    AD_INDEX = (AD_INDEX + 1) % AD_CAMPAIGNS.length;
+    renderAd(AD_INDEX);
+  }, 8000);
+}
+
+async function loadAdCampaigns(){
+  // Optionales Backend: /miniapp/ads?cid=...  -> { ok:true, ads:[...] }
+  // Falls nicht vorhanden: Fallback-Kampagnen.
+  try{
+    const headers = {};
+    if(INIT_DATA) headers['X-Telegram-Init-Data'] = INIT_DATA;
+    const res = await fetch(withAuthQS(`${API_BASE}/miniapp/ads?cid=${encodeURIComponent(cid||0)}`), {headers});
+    const j = await res.json().catch(()=>({}));
+    const ads = j?.ads || j?.campaigns || j?.data || [];
+    if(res.ok && Array.isArray(ads) && ads.length){
+      AD_CAMPAIGNS = ads.map(a=>({
+        icon: a.icon || a.emoji || '🟢',
+        title: a.title || a.name || 'Werbung',
+        subtitle: a.subtitle || a.text || a.description || '',
+        badge: a.badge || a.tag || 'AD',
+        url: a.url || a.link || ''
+      })).filter(x=>x.url);
+    } else {
+      AD_CAMPAIGNS = AD_FALLBACK.slice();
+    }
+  }catch(e){
+    AD_CAMPAIGNS = AD_FALLBACK.slice();
+  }
+  startAdRotation();
+}
 
 // --- Spam UI Globals (müssen VOR der ersten Nutzung existieren) ---
 // Fix für: "Cannot access 'SPAM_CACHE' before initialization"
@@ -873,7 +1023,7 @@ async function loadGroups() {
       if(cid) select.value = cid;
       select.addEventListener('change', ()=>{
         const v = select.value;
-        if(v) { showContentArea(v); loadState(); }
+        if(v) { showContentArea(v); loadAdCampaigns(); loadState(); }
       });
     }
     
@@ -892,7 +1042,7 @@ async function loadGroups() {
       qa('.group-item button').forEach(btn=>{
         btn.onclick = ()=>{
           const gid = btn.closest('.group-item').dataset.id;
-          if(gid) { showContentArea(gid); loadState(); }
+          if(gid) { showContentArea(gid); loadAdCampaigns(); loadState(); }
         };
       });
     }
@@ -1404,6 +1554,17 @@ function setupSpamToolButtons() {
 }
 
 qs('#backBtn')?.addEventListener('click', showStartPage);
+qs('#adSlot')?.addEventListener('click', ()=>{
+  const u = qs('#adSlot')?.dataset?.url;
+  if(u) openAd(u);
+});
+qs('#adSlot')?.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const u = qs('#adSlot')?.dataset?.url;
+    if(u) openAd(u);
+  }
+});
 qs('#closeBtn')?.addEventListener('click', ()=>{ try{ tg.close(); }catch{ window.close(); } });
 qs('#resetBtn')?.addEventListener('click', loadState);
 qs('#saveBtn')?.addEventListener('click', ()=>sendPayload());
@@ -1735,6 +1896,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   try{ tg?.ready?.(); tg?.expand?.(); }catch(e){}
   try { setupSpamToolButtons(); } catch {}
   try { setupStorySharingButtons(); } catch {}
+  try { await loadAdCampaigns(); } catch {}
   await loadGroups();
   if(cid) { showContentArea(cid); await loadState(); }
   else { showStartPage(); }
