@@ -903,6 +903,71 @@
 
         <!-- AI Moderation -->
         <div class="card">
+          <h3>🛡️ AI Moderation</h3>
+          <div id="contentModeration"></div>
+        </div>
+
+        <!-- User Retention -->
+        <div class="card">
+          <h3>📊 User Retention</h3>
+          <div id="contentRetention"></div>
+        </div>
+
+        <!-- Network Analysis -->
+        <div class="card">
+          <h3>🌐 Network Analysis</h3>
+          <div id="contentNetwork"></div>
+        </div>
+
+        <!-- ===== ALL BOT STATS ===== -->
+        <h2 style="margin-top: 40px; margin-bottom: 20px; color: var(--primary);">📊 All Bot Statistics</h2>
+
+        <!-- Affiliate Bot -->
+        <div class="card">
+          <h3>🎯 Affiliate Bot</h3>
+          <div id="botAffiliateStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- Crossposter Bot -->
+        <div class="card">
+          <h3>📱 Crossposter Bot</h3>
+          <div id="botCrossposterStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- DAO Bot -->
+        <div class="card">
+          <h3>🏛️ DAO Bot</h3>
+          <div id="botDaoStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- Learning Bot -->
+        <div class="card">
+          <h3>🎓 Learning Bot</h3>
+          <div id="botLearningStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- Support Bot -->
+        <div class="card">
+          <h3>💬 Support Bot</h3>
+          <div id="botSupportStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- Trade API Bot -->
+        <div class="card">
+          <h3>📈 Trade API Bot</h3>
+          <div id="botTradeApiStats" style="line-height: 1.8;"></div>
+        </div>
+
+        <!-- Trade DEX Bot -->
+        <div class="card">
+          <h3>💱 Trade DEX Bot</h3>
+          <div id="botTradeDexStats" style="line-height: 1.8;"></div>
+        </div>
+          </div>
+        </div>
+
+        <!-- AI Moderation -->
+        <div class="card">
           <h3>🛡️ AI Moderation Stats</h3>
           <div id="contentModeration"></div>
         </div>
@@ -1439,14 +1504,22 @@
     async function loadContentBotStats() {
       try {
         // Load all content bot statistics endpoints in parallel (NO BLOCKCHAIN TOKENS)
-        const [overview, groups, claimed, storyShare, moderation, retention, network] = await Promise.all([
+        const [overview, groups, claimed, storyShare, moderation, retention, network, 
+                affiliate, crossposter, dao, learning, support, tradeApi, tradeDex] = await Promise.all([
           apiCall('/devdash/content/stats/overview'),
           apiCall('/devdash/content/stats/groups'),
           apiCall('/devdash/content/stats/claimed'),
           apiCall('/devdash/content/stats/story-share'),
           apiCall('/devdash/content/stats/ai-moderation'),
           apiCall('/devdash/content/stats/retention'),
-          apiCall('/devdash/content/stats/network')
+          apiCall('/devdash/content/stats/network'),
+          apiCall('/devdash/bots/affiliate/stats'),
+          apiCall('/devdash/bots/crossposter/stats'),
+          apiCall('/devdash/bots/dao/stats'),
+          apiCall('/devdash/bots/learning/stats'),
+          apiCall('/devdash/bots/support/stats'),
+          apiCall('/devdash/bots/trade_api/stats'),
+          apiCall('/devdash/bots/trade_dex/stats')
         ]);
 
         // Update header stats
@@ -1509,15 +1582,15 @@
         ` : '<p style="color: var(--text-secondary);">No claimed data yet</p>';
         document.getElementById('contentHolders').innerHTML = topClaimedHtml;
 
-        // Affiliate (if available from features)
+        // Affiliate placeholder (no special display)
         const affiliateHtml = `
           <div style="line-height: 1.8; color: var(--text-secondary);">
-            <p style="font-size: 12px;">Affiliate feature details coming from bots/affiliate bot</p>
+            <p style="font-size: 12px;">See Affiliate Bot section below for details</p>
           </div>
         `;
         document.getElementById('contentAffiliate').innerHTML = affiliateHtml;
 
-        // RSS Feeds (from features)
+        // RSS Feeds
         const rssHtml = `
           <div style="line-height: 1.8;">
             <div><strong>📡 Active RSS Feeds:</strong> ${overview.features.rss_feeds_active || 0}</div>
@@ -1526,10 +1599,10 @@
         `;
         document.getElementById('contentRss').innerHTML = rssHtml;
 
-        // Learning (from features if available)
+        // Learning placeholder
         const learningHtml = `
           <div style="line-height: 1.8; color: var(--text-secondary);">
-            <p style="font-size: 12px;">Learning module details coming from bots/learning bot</p>
+            <p style="font-size: 12px;">See Learning Bot section below for details</p>
           </div>
         `;
         document.getElementById('contentLearning').innerHTML = learningHtml;
@@ -1589,6 +1662,145 @@
           </div>
         `;
         document.getElementById('contentNetwork').innerHTML = networkHtml;
+
+        // ===== BOT STATISTICS =====
+        
+        // Affiliate Bot Stats
+        const affiliateStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>👥 Total Referrers:</strong> ${affiliate.total_referrers}</div>
+            <div><strong>🔗 Total Referrals:</strong> ${affiliate.total_referrals}</div>
+            <div><strong>✅ Converted:</strong> ${affiliate.converted_referrals}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>💰 Paid Commissions:</strong> ${affiliate.commissions_paid.toLocaleString()}</div>
+              <div><strong>⏳ Pending Commissions:</strong> ${affiliate.commissions_pending.toLocaleString()}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>🎯 Total Conversions:</strong> ${affiliate.conversions_total}</div>
+              <div><strong>💼 Active Committers:</strong> ${affiliate.active_committers}</div>
+            </div>
+          </div>
+          ${affiliate.top_referrers && affiliate.top_referrers.length > 0 ? `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+              <strong>🏆 Top Referrers:</strong>
+              ${affiliate.top_referrers.slice(0, 5).map(r => `
+                <div style="margin-top: 6px; font-size: 13px;">
+                  #${r.rank}: ${r.referrals} referrals • ${r.conversions} conversions
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        `;
+        document.getElementById('botAffiliateStats').innerHTML = affiliateStatsHtml;
+
+        // Crossposter Bot Stats
+        const crossposterStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>👥 Active Users:</strong> ${crossposter.total_users}</div>
+            <div><strong>📝 Total Posts:</strong> ${crossposter.total_posts}</div>
+            <div><strong>✅ Posted:</strong> ${crossposter.posted} | <strong>📋 Drafts:</strong> ${crossposter.drafts}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>📱 Users with Channels:</strong> ${crossposter.users_with_channels}</div>
+              <div><strong>✓ Enabled Channels:</strong> ${crossposter.enabled_channels}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>⚙️ Total Rules:</strong> ${crossposter.total_rules}</div>
+              <div><strong>✓ Active Rules:</strong> ${crossposter.active_rules}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botCrossposterStats').innerHTML = crossposterStatsHtml;
+
+        // DAO Bot Stats
+        const daoStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>📋 Total Proposals:</strong> ${dao.total_proposals}</div>
+            <div><strong>🔴 Active:</strong> ${dao.active_proposals} | <strong>✅ Passed:</strong> ${dao.passed_proposals}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>🗳️ Total Voters:</strong> ${dao.total_voters}</div>
+              <div><strong>📊 Total Votes:</strong> ${dao.total_votes}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>💳 Treasury Total:</strong> $${dao.treasury_total.toLocaleString()}</div>
+              <div><strong>✓ Approved Transactions:</strong> ${dao.approved_transactions}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>👥 Total Delegators:</strong> ${dao.total_delegators}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botDaoStats').innerHTML = daoStatsHtml;
+
+        // Learning Bot Stats
+        const learningStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>📚 Total Courses:</strong> ${learning.total_courses}</div>
+            <div><strong>👥 Enrolled Users:</strong> ${learning.enrolled_users}</div>
+            <div><strong>✅ Completed Courses:</strong> ${learning.completed_courses}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>📊 Total Enrollments:</strong> ${learning.total_enrollments}</div>
+              <div><strong>👤 Users with Progress:</strong> ${learning.users_with_progress}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>❓ Total Quizzes:</strong> ${learning.total_quizzes}</div>
+              <div><strong>✓ Quiz Passers:</strong> ${learning.quiz_passers}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botLearningStats').innerHTML = learningStatsHtml;
+
+        // Support Bot Stats
+        const supportStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>🎫 Total Tickets:</strong> ${support.total_tickets}</div>
+            <div><strong>🆕 New:</strong> ${support.new} | <strong>🔴 Open:</strong> ${support.open} | <strong>✅ Closed:</strong> ${support.closed}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>💬 Total Messages:</strong> ${support.total_messages}</div>
+              <div><strong>👥 Users:</strong> ${support.users}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>🏢 Tenants:</strong> ${support.tenants}</div>
+              <div><strong>⏱️ Avg Resolution:</strong> ${support.avg_resolution_hours} hours</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botSupportStats').innerHTML = supportStatsHtml;
+
+        // Trade API Bot Stats
+        const tradeApiStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>👥 Active Users:</strong> ${tradeApi.total_users}</div>
+            <div><strong>💼 Total Portfolios:</strong> ${tradeApi.total_portfolios}</div>
+            <div><strong>📈 Active Positions:</strong> ${tradeApi.active_positions}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>💰 Total AUM:</strong> $${tradeApi.total_aum.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+              <div><strong>📊 Total Transactions:</strong> ${tradeApi.total_transactions}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>✅ Completed Trades:</strong> ${tradeApi.completed_trades}</div>
+              <div><strong>🚨 Active Alerts:</strong> ${tradeApi.active_alerts}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botTradeApiStats').innerHTML = tradeApiStatsHtml;
+
+        // Trade DEX Bot Stats
+        const tradeDexStatsHtml = `
+          <div style="line-height: 1.8;">
+            <div><strong>🔗 DEXes:</strong> ${tradeDex.total_dexes}</div>
+            <div><strong>💧 Total Pools:</strong> ${tradeDex.total_pools}</div>
+            <div><strong>💵 Total TVL:</strong> $${tradeDex.total_tvl_usd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>👥 Users with Positions:</strong> ${tradeDex.users_with_positions}</div>
+              <div><strong>📍 Active Positions:</strong> ${tradeDex.active_positions}</div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+              <div><strong>🔄 Total Swaps:</strong> ${tradeDex.total_swaps}</div>
+              <div><strong>💱 Total Swapped:</strong> $${tradeDex.total_swapped_usd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('botTradeDexStats').innerHTML = tradeDexStatsHtml;
 
       } catch (error) {
         console.error('Failed to load content bot stats:', error);
