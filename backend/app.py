@@ -17,7 +17,6 @@ getcontext().prec = 40
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-NEAR_RPC_URL = os.getenv("NEAR_RPC_URL", "https://rpc.mainnet.near.org")
 app = FastAPI(title="Emerald DevDash API", version="0.2-min")
 
 _origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
@@ -78,7 +77,7 @@ async def _migrate():
         await execute("""
           create table if not exists dashboard_watch_accounts(
             id serial primary key,
-            chain text not null check (chain in ('near','ton')),
+            chain text not null check (chain in ('ton')),
             account_id text not null,
             label TEXT NOT NULL DEFAULT '',
             meta jsonb default '{}'::jsonb,
@@ -88,14 +87,7 @@ async def _migrate():
         """)
     except Exception:
         pass  # Table might already exist
-    try:
-        await execute("""
-          insert into dashboard_watch_accounts(chain, account_id, label)
-          values ('near','emeraldcontent.near','Main Wallet')
-          on conflict do nothing;
-        """)
-    except Exception:
-        pass
+
 
 @app.post("/auth/telegram", response_model=TokenResponse)
 async def auth_telegram(payload: TelegramAuthPayload):
@@ -187,44 +179,6 @@ async def metrics_overview(current=Depends(get_current_user)):
         "token_events_total": 0
     }
 
-# ---------- NEAR: Account Overview ----------
-def _yocto_to_near(s: str) -> str:
-    try:
-        return str(Decimal(s) / Decimal(10**24))
-    except Exception:
-        return "0"
-
-async def _rpc_view_account_near(account_id: str):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        payload = {
-            "jsonrpc": "2.0",
-            "id": "view_account",
-            "method": "query",
-            "params": {
-                "request_type": "view_account",
-                "finality": "final",
-                "account_id": account_id
-            }
-        }
-        r = await client.post(NEAR_RPC_URL, json=payload)
-        r.raise_for_status()
-        return r.json()["result"]
-
-@app.get("/near/account/overview")
-async def near_account_overview(account_id: str, current=Depends(get_current_user)):
-    acct = await _rpc_view_account_near(account_id)
-    return {
-        "account_id": account_id,
-        "near": {
-            "amount_yocto": acct.get("amount", "0"),
-            "amount_near": _yocto_to_near(acct.get("amount", "0")),
-            "locked_yocto": acct.get("locked", "0"),
-            "locked_near": _yocto_to_near(acct.get("locked", "0")),
-            "storage_usage": acct.get("storage_usage", 0),
-            "code_hash": acct.get("code_hash"),
-        }
-    }
-
 # ---------- TON: Adresse setzen & Übersicht ----------
 @app.post("/wallets/ton")
 async def set_ton_address(payload: dict, current=Depends(get_current_user)):
@@ -239,7 +193,7 @@ async def set_ton_address(payload: dict, current=Depends(get_current_user)):
 @app.get("/wallets")
 async def wallets_overview(current=Depends(get_current_user)):
     me = await fetchrow(
-        "select near_account_id, ton_address from dashboard_users where telegram_id=$1",
+        "select ton_address from dashboard_users where telegram_id=$1",
         int(current["sub"])
     )
     watches = await fetch(
