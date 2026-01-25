@@ -582,19 +582,16 @@
 
         <div class="grid">
           <div class="card"><h3>💎 Token Economy</h3><div id="contentTokens"></div></div>
-          <div class="card"><h3>🏆 Top Holders</h3><div id="contentHolders" class="list"></div></div>
         </div>
 
         <div class="grid">
           <div class="card"><h3>📖 Story Sharing</h3><div id="contentStories"></div></div>
           <div class="card"><h3>👥 Affiliate</h3><div id="contentAffiliate"></div></div>
           <div class="card"><h3>📰 RSS</h3><div id="contentRss"></div></div>
-          <div class="card"><h3>📚 Learning</h3><div id="contentLearning"></div></div>
+          <div class="card"><h3>🛡️ AI Moderation</h3><div id="contentModeration"></div></div>
+          <div class="card"><h3>📊 Retention</h3><div id="contentRetention"></div></div>
+          <div class="card"><h3>🌐 Network</h3><div id="contentNetwork"></div></div>
         </div>
-
-        <div class="card"><h3>🛡️ AI Moderation</h3><div id="contentModeration"></div></div>
-        <div class="card"><h3>📊 Retention</h3><div id="contentRetention"></div></div>
-        <div class="card"><h3>🌐 Network</h3><div id="contentNetwork"></div></div>
       </div>
 
       <!-- AFFILIATE BOT STATS TAB -->
@@ -827,7 +824,7 @@
         tab.classList.add('active');
         btn.classList.add('active');
         switch (tabName) {
-          case 'content-stats': loadContentBotStats(); break;
+          case 'content-stats': loadContentBotStats(); loadRssFeeds(); break;
           case 'affiliate-stats': loadAffiliateBotStats(); break;
           case 'crossposter-stats': loadCrossposterBotStats(); break;
           case 'dao-stats': loadDaoBotStats(); break;
@@ -886,6 +883,16 @@
             <div><strong>👆 Clicks:</strong> ${storyShare.total_clicks || 0}</div>
           </div>
         `;
+
+        document.getElementById('contentAffiliate').innerHTML = `
+          <div style="line-height: 1.8;">
+            <div><strong>👤 Referrers:</strong> 0</div>
+            <div><strong>🔗 Referrals:</strong> 0</div>
+            <div><strong>💰 Earned:</strong> $0</div>
+          </div>
+        `;
+
+        // RSS Feeds werden nun durch loadRssFeeds() async geladen
 
         document.getElementById('contentModeration').innerHTML = `
           <div style="line-height: 1.8;">
@@ -1189,6 +1196,32 @@
       } catch (error) {
         console.error('Monitoring error:', error);
         document.getElementById('botGroups').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der Bot-Daten</p>';
+      }
+    }
+
+    async function loadRssFeeds() {
+      try {
+        const data = await apiCall('/devdash/content/rss');
+        if (!data || !data.feeds || data.feeds.length === 0) {
+          document.getElementById('contentRss').innerHTML = '<p>Keine RSS Feeds konfiguriert</p>';
+          return;
+        }
+        const html = data.feeds.map(feed => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">${feed.group_name}</div>
+              <div class="item-desc" style="word-break: break-all; font-size: 0.85em;">
+                🔗 ${feed.url}<br/>
+                📍 Topic: ${feed.topic_id || 'N/A'} | 🖼️ ${feed.post_images ? 'Mit Bildern' : 'Nur Text'}
+              </div>
+            </div>
+            <div class="item-status">${feed.enabled ? '✅ Aktiv' : '⏸️ Aus'}</div>
+          </div>
+        `).join('');
+        document.getElementById('contentRss').innerHTML = html;
+      } catch (error) {
+        console.error('RSS Feeds error:', error);
+        document.getElementById('contentRss').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der RSS Feeds</p>';
       }
     }
 
