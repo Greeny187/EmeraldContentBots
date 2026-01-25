@@ -1472,30 +1472,24 @@
         // Tokens - Stats and holders
         const tokenStatsHtml = `
           <div style="line-height: 2;">
-            <div><strong>💰 Distributed:</strong> ${(tokens.EMRD?.total_distributed || 0 / 1e18).toLocaleString()} EMRD</div>
-            <div><strong>✅ Claimed:</strong> ${(tokens.EMRD?.total_claimed || 0 / 1e18).toLocaleString()} EMRD</div>
-            <div><strong>⏳ Pending:</strong> ${(tokens.EMRD?.total_pending || 0 / 1e18).toLocaleString()} EMRD</div>
-            <div><strong>👥 Holders:</strong> ${tokens.EMRD?.holders_count || 0}</div>
+            <div><strong>💰 Distributed:</strong> ${(tokens.EMRD.total_distributed / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>✅ Claimed:</strong> ${(tokens.EMRD.total_claimed / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>⏳ Pending:</strong> ${(tokens.EMRD.total_pending / 1e18).toLocaleString()} EMRD</div>
+            <div><strong>👥 Holders:</strong> ${tokens.EMRD.holders_count}</div>
           </div>
         `;
         document.getElementById('contentTokens').innerHTML = tokenStatsHtml;
 
-        // Top Holders - REAL DATA from API
-        let holdersHtml = '';
-        if (tokens.top_holders && tokens.top_holders.length > 0) {
-          holdersHtml = tokens.top_holders.map((h, idx) => `
-            <div class="list-item">
-              <div class="list-item-content">
-                <div class="item-title">#${idx + 1} ${h.holder_id ? `Holder ${h.holder_id.substring(0, 8)}...` : `Holder ${idx + 1}`}</div>
-                <div class="item-desc">${((h.amount || 0) / 1e18).toLocaleString(undefined, {maximumFractionDigits: 2})} EMRD</div>
-              </div>
-              <span class="item-status">${((h.percentage || 0)).toFixed(2)}%</span>
+        const holdersHtml = (tokens.top_holders || []).map(h => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">Holder ${h.rank}</div>
+              <div class="item-desc">${(h.amount / 1e18).toLocaleString()} EMRD</div>
             </div>
-          `).join('');
-        } else {
-          holdersHtml = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No holder data available</p>';
-        }
-        document.getElementById('contentHolders').innerHTML = holdersHtml;
+            <span class="item-status">${h.percentage.toFixed(2)}%</span>
+          </div>
+        `).join('');
+        document.getElementById('contentHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holders</p>';
 
         // Features - Story Sharing
         const storiesHtml = `
