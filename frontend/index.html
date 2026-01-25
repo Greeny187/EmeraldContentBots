@@ -1469,7 +1469,7 @@
         `).join('');
         document.getElementById('contentGroups').innerHTML = groupsHtml || '<p style="color: var(--text-secondary);">No group data</p>';
 
-        // Tokens - Stats and holders
+        // Tokens - Stats (offchain totals)
         const tokenStatsHtml = `
           <div style="line-height: 2;">
             <div><strong>💰 Distributed:</strong> ${(tokens.EMRD.total_distributed / 1e18).toLocaleString()} EMRD</div>
@@ -1480,16 +1480,22 @@
         `;
         document.getElementById('contentTokens').innerHTML = tokenStatsHtml;
 
-        const holdersHtml = (tokens.top_holders || []).map(h => `
-          <div class="list-item">
-            <div class="list-item-content">
-              <div class="item-title">Holder ${h.rank}</div>
-              <div class="item-desc">${(h.amount / 1e18).toLocaleString()} EMRD</div>
+        // Top Holders (blockchain, real data)
+        try {
+          const holders = await apiCall('/token/holders?limit=20');
+          const holdersHtml = (holders.holders || []).map(h => `
+            <div class="list-item">
+              <div class="list-item-content">
+                <div class="item-title">${h.name || h.address.substring(0, 16)}...</div>
+                <div class="item-desc">${(parseInt(h.balance) / 1e18).toLocaleString()} EMRD</div>
+              </div>
+              <span class="item-status">${h.percentage}%</span>
             </div>
-            <span class="item-status">${h.percentage.toFixed(2)}%</span>
-          </div>
-        `).join('');
-        document.getElementById('contentHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holders</p>';
+          `).join('');
+          document.getElementById('contentHolders').innerHTML = holdersHtml || '<p style="color: var(--text-secondary);">No holder data</p>';
+        } catch (e) {
+          document.getElementById('contentHolders').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der Blockchain Holder.</p>';
+        }
 
         // Features - Story Sharing
         const storiesHtml = `
