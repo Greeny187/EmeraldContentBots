@@ -1095,19 +1095,101 @@
     }
 
     async function loadTokenData() {
-      document.getElementById('tokenInfo').innerHTML = '<p>Token data loading...</p>';
+      try {
+        const data = await apiCall('/devdash/token/emrd-info');
+        const html = `
+          <div class="grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Supply</div>
+              <div class="stat-value">${(data.total_supply || 0).toLocaleString('de-DE')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Circulating</div>
+              <div class="stat-value">${(data.circulating || 0).toLocaleString('de-DE')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Market Cap</div>
+              <div class="stat-value">$${(data.market_cap || 0).toLocaleString('de-DE')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Price</div>
+              <div class="stat-value">$${(data.price || 0).toFixed(4)}</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('tokenInfo').innerHTML = html;
+      } catch (error) {
+        console.error('Token data error:', error);
+        document.getElementById('tokenInfo').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der Token-Daten</p>';
+      }
     }
 
     async function loadAds() {
-      document.getElementById('adsList').innerHTML = '<p>Ads loading...</p>';
+      try {
+        const data = await apiCall('/devdash/ads');
+        if (!data || !data.campaigns || data.campaigns.length === 0) {
+          document.getElementById('adsList').innerHTML = '<p>Keine Kampagnen</p>';
+          return;
+        }
+        const html = data.campaigns.map((ad, i) => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">${ad.title || 'Kampagne'}</div>
+              <div class="item-desc">${ad.description || 'Keine Beschreibung'}</div>
+            </div>
+            <div class="item-status">${ad.is_active ? '✅ Aktiv' : '⏸️ Pause'}</div>
+          </div>
+        `).join('');
+        document.getElementById('adsList').innerHTML = html;
+      } catch (error) {
+        console.error('Ads error:', error);
+        document.getElementById('adsList').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der Kampagnen</p>';
+      }
     }
 
     async function loadUsers() {
-      document.getElementById('usersList').innerHTML = '<tr><td colspan="4">Users loading...</td></tr>';
+      try {
+        const data = await apiCall('/devdash/users');
+        if (!data || !data.users || data.users.length === 0) {
+          document.getElementById('usersList').innerHTML = '<tr><td colspan="4">Keine Benutzer</td></tr>';
+          return;
+        }
+        const html = data.users.map(u => `
+          <tr>
+            <td>${u.telegram_id || '-'}</td>
+            <td>${u.username || '-'}</td>
+            <td>${u.tier || 'free'}</td>
+            <td>${u.role || 'user'}</td>
+          </tr>
+        `).join('');
+        document.getElementById('usersList').innerHTML = html;
+      } catch (error) {
+        console.error('Users error:', error);
+        document.getElementById('usersList').innerHTML = '<tr><td colspan="4" style="color: var(--danger);">Fehler beim Laden der Benutzer</td></tr>';
+      }
     }
 
     async function loadMonitoring() {
-      document.getElementById('botGroups').innerHTML = '<p>Monitoring data loading...</p>';
+      try {
+        const data = await apiCall('/devdash/mesh/health');
+        if (!data || !data.bots || data.bots.length === 0) {
+          document.getElementById('botGroups').innerHTML = '<p>Keine Bots online</p>';
+          return;
+        }
+        const html = data.bots.map((bot, i) => `
+          <div class="list-item">
+            <div class="list-item-content">
+              <div class="item-title">${bot.username || `Bot ${i+1}`}</div>
+              <div class="item-desc">Status: ${bot.status || 'unknown'}</div>
+            </div>
+            <div class="item-status">${bot.healthy ? '✅ Healthy' : '⚠️ Issues'}</div>
+          </div>
+        `).join('');
+        document.getElementById('botGroups').innerHTML = html;
+      } catch (error) {
+        console.error('Monitoring error:', error);
+        document.getElementById('botGroups').innerHTML = '<p style="color: var(--danger);">Fehler beim Laden der Bot-Daten</p>';
+      }
     }
 
     function showModal(modalId) {
