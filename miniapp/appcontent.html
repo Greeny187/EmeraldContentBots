@@ -620,20 +620,10 @@
     </div>
     <div class="sep"></div>
     
-    <h4 style="margin:16px 0 8px; color:var(--brand)">🔗 Blockchain Zahlungen</h4>
+    <h4 style="margin:16px 0 8px; color:var(--brand)">🔗 Zahlungsoptionen</h4>
     <div class="grid">
       <label class="switch">
-        <input type="checkbox" data-key="pro.ton_enabled"> TON Wallet
-      </label>
-      <label class="switch">
-        <input type="checkbox" data-key="pro.near_enabled"> NEAR Protocol
-      </label>
-    </div>
-    
-    <h4 style="margin:16px 0 8px; color:var(--brand)">💳 Fiat Zahlungen</h4>
-    <div class="grid">
-      <label class="switch">
-        <input type="checkbox" data-key="pro.coinbase_enabled"> Coinbase Commerce
+        <input type="checkbox" data-key="pro.ton_enabled"> TonConnect (TON / EMRD)
       </label>
       <label class="switch">
         <input type="checkbox" data-key="pro.paypal_enabled"> PayPal
@@ -659,9 +649,6 @@
     <div class="grid">
       <button class="btn" id="pro_buy_1m_ton">
         1 Monat · 4,95 € · TonConnect
-      </button>
-      <button class="btn ghost" id="pro_buy_1m_coinbase">
-        1 Monat · 4,95 € · Coinbase
       </button>
       <button class="btn ghost" id="pro_buy_1m_paypal">
         1 Monat · 4,95 € · PayPal
@@ -1100,7 +1087,6 @@ async function startProCheckout(plan, provider) {
     // optional: prüfen, ob der Provider in der PRO-Konfig aktiviert ist
     const enabledKey = {
       "walletconnect_ton": "pro.ton_enabled",
-      "coinbase": "pro.coinbase_enabled",
       "paypal": "pro.paypal_enabled",
     }[provider];
 
@@ -1394,10 +1380,6 @@ async function loadState() {
     const proData = j.pro || {};
     setVal('pro.ton_enabled', proData.ton_enabled || false);
     setVal('pro.ton_wallet', proData.ton_wallet || '');
-    setVal('pro.near_enabled', proData.near_enabled || false);
-    setVal('pro.near_wallet', proData.near_wallet || 'emeraldcontent.near');
-    setVal('pro.coinbase_enabled', proData.coinbase_enabled || false);
-    setVal('pro.coinbase_key', proData.coinbase_key || '');
     setVal('pro.paypal_enabled', proData.paypal_enabled || false);
     setVal('pro.paypal_link', proData.paypal_link || '');
     setVal('pro.stars_enabled', proData.stars_enabled || false);
@@ -1880,10 +1862,6 @@ function setupStorySharingButtons(){
 // PRO Checkout Buttons
 qs('#pro_buy_1m_ton')?.addEventListener('click', ()=>{
   startProCheckout('pro_monthly', 'walletconnect_ton');
-});
-
-qs('#pro_buy_1m_coinbase')?.addEventListener('click', ()=>{
-  startProCheckout('pro_monthly', 'coinbase');
 });
 
 qs('#pro_buy_1m_paypal')?.addEventListener('click', ()=>{
