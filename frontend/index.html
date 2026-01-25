@@ -510,7 +510,6 @@
         <button class="nav-btn" data-tab="support-stats">🆘 Support</button>
         <button class="nav-btn" data-tab="trade-api-stats">💼 Trade API</button>
         <button class="nav-btn" data-tab="trade-dex-stats">🔄 Trade DEX</button>
-        <button class="nav-btn" data-tab="bots">🤖 Bots</button>
         <button class="nav-btn" data-tab="token">💎 Token</button>
         <button class="nav-btn" data-tab="ads">📢 Ads</button>
         <button class="nav-btn" data-tab="users">👥 Users</button>
@@ -675,14 +674,6 @@
         <div class="card"><h3>🔄 Trade DEX</h3><div id="tradeDexStatsContent" style="line-height: 1.8;"></div></div>
       </div>
 
-      <!-- BOTS TAB -->
-      <div id="bots" class="content">
-        <div class="grid" style="margin-bottom: 20px;">
-          <button onclick="showModal('addBotModal')" style="width: 100%;">➕ Add New Bot</button>
-        </div>
-        <div class="card"><h3>🤖 Bots</h3><div id="botsList" class="list"></div></div>
-      </div>
-
       <!-- TOKEN TAB -->
       <div id="token" class="content">
         <div class="grid">
@@ -844,7 +835,6 @@
           case 'support-stats': loadSupportBotStats(); break;
           case 'trade-api-stats': loadTradeApiBotStats(); break;
           case 'trade-dex-stats': loadTradeDexBotStats(); break;
-          case 'bots': loadBots(); break;
           case 'token': loadTokenData(); break;
           case 'ads': loadAds(); break;
           case 'users': loadUsers(); break;
