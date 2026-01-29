@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emerald Dashboard Pro</title>
   <script async src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram Login Widget wird dynamisch eingefügt (siehe Script unten) -->
   <style>
     * {
       margin: 0;
@@ -477,7 +478,13 @@
     <div class="login-box">
       <h1>🌿 Emerald</h1>
       <p>Dashboard Pro</p>
-      <button class="telegram-login-btn" onclick="performTelegramAuth(window.Telegram?.WebApp?.initData)">🔐 Telegram Login</button>
+      
+      <!-- Telegram WebApp Login (funktioniert nur in Telegram) -->
+      <button class="telegram-login-btn" id="webappLoginBtn" onclick="performTelegramAuth(window.Telegram?.WebApp?.initData)" style="display:none;">🔐 Telegram WebApp Login</button>
+      
+      <!-- Telegram Login Widget (funktioniert im Browser) - wird via Script injiziert -->
+      <div id="telegramLoginWidget" style="text-align: center; margin-bottom: 15px;"></div>
+      
       <button class="telegram-login-btn" onclick="devLogin()">🔑 Dev Login</button>
       <small>Secure authentication required</small>
     </div>
@@ -709,10 +716,26 @@
 
   <script>
     const API_BASE = 'https://emeraldcontent-aac379fc581e.herokuapp.com/api';
+    const TELEGRAM_BOT_NAME = 'EmeraldContentBot'; // ⚠️ Ändere diesen Namen zu deinem echten Bot!
     let authToken = localStorage.getItem('auth_token');
     let currentUser = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // 🔵 Initialisiere Telegram Login Widget
+      initializeTelegramWidget();
+      
+      // Prüfe ob in Telegram WebApp
+      const isInTelegramWebApp = window.Telegram?.WebApp?.initData;
+      if (isInTelegramWebApp) {
+        console.log('🔵 Running in Telegram WebApp');
+        document.getElementById('webappLoginBtn').style.display = 'block';
+        // Widget wird nicht angezeigt, stattdessen WebApp Button
+        document.getElementById('telegramLoginWidget').style.display = 'none';
+      } else {
+        console.log('🔵 Running in Browser - Telegram Widget wird verwendet');
+        document.getElementById('webappLoginBtn').style.display = 'none';
+      }
+
       if (!authToken) {
         document.getElementById('loginPage').style.display = 'flex';
       } else {
@@ -720,24 +743,83 @@
       }
     });
 
-    async function performTelegramAuth(initData) {
+    // 🔵 Initialisiere Telegram Login Widget dynamisch
+    function initializeTelegramWidget() {
+      const widgetContainer = document.getElementById('telegramLoginWidget');
+      if (!widgetContainer) return;
+
+      // Erstelle das Widget-Script dynamisch
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.setAttribute('data-telegram-login', TELEGRAM_BOT_NAME);
+      script.setAttribute('data-size', 'large');
+      script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+      script.setAttribute('data-request-access', 'write');
+      
+      widgetContainer.appendChild(script);
+    }
+
+    // 🔵 CALLBACK für Telegram Login Widget (Browser)
+    async function onTelegramAuth(user) {
       try {
-        if (!initData) {
-          alert('Telegram Web App not available');
-          return;
-        }
+        console.log('✅ Telegram Widget Auth successful:', user);
+        
         const response = await fetch(`${API_BASE}/devdash/auth/telegram`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ init_data: initData })
+          body: JSON.stringify({ 
+            telegram_user: user,  // Widget gibt user object statt init_data
+            auth_method: 'widget'
+          })
         });
-        if (!response.ok) throw new Error('Auth failed');
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || errorData.error || `HTTP ${response.status}: Telegram auth failed`);
+        }
+        
         const data = await response.json();
         authToken = data.access_token;
         localStorage.setItem('auth_token', authToken);
+        console.log('✅ Telegram login successful, redirecting to dashboard');
         await initDashboard();
       } catch (error) {
-        alert('Telegram login failed: ' + error.message);
+        console.error('❌ Telegram Widget auth error:', error);
+        alert('Telegram login failed: ' + error.message + '\n\nTry Dev Login instead.');
+      }
+    }
+
+    async function performTelegramAuth(initData) {
+      try {
+        // Check if running in Telegram WebApp
+        if (!initData || !window.Telegram?.WebApp?.initData) {
+          console.warn('⚠️  Not running in Telegram WebApp context');
+          alert('⚠️ Telegram Web App not available.\n\nYou can only use this feature when:\n1. Opening the link from within Telegram bot\n2. Use the Telegram Login Widget that appears below instead\n3. Or use Dev Login for testing');
+          return;
+        }
+        
+        console.log('🔵 Telegram WebApp auth starting');
+        
+        const response = await fetch(`${API_BASE}/devdash/auth/telegram`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ init_data: initData, auth_method: 'webapp' })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || errorData.error || `HTTP ${response.status}: Telegram auth failed`);
+        }
+        
+        const data = await response.json();
+        authToken = data.access_token;
+        localStorage.setItem('auth_token', authToken);
+        console.log('✅ Telegram login successful');
+        await initDashboard();
+      } catch (error) {
+        console.error('❌ Telegram auth error:', error);
+        alert('Telegram login failed: ' + error.message + '\n\nUse Dev Login instead for testing.');
       }
     }
 
@@ -745,17 +827,29 @@
       try {
         const code = prompt('Enter DEV_LOGIN_CODE:');
         if (!code) return;
+        const telegramId = prompt('Enter Telegram ID (optional, defaults to 123456):') || '123456';
+        
+        const payload = { code, telegram_id: parseInt(telegramId) };
+        console.log('🔵 Dev login payload:', payload);
+        
         const response = await fetch(`${API_BASE}/devdash/auth/dev-login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, telegram_id: 123456 })
+          body: JSON.stringify(payload)
         });
-        if (!response.ok) throw new Error('Dev login failed');
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || errorData.error || `HTTP ${response.status}: Dev login failed`);
+        }
+        
         const data = await response.json();
         authToken = data.access_token;
         localStorage.setItem('auth_token', authToken);
+        console.log('✅ Dev login successful, token:', authToken);
         await initDashboard();
       } catch (error) {
+        console.error('❌ Dev login error:', error);
         alert('Dev login failed: ' + error.message);
       }
     }
