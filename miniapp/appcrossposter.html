@@ -1,29 +1,64 @@
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Emerald Crossposter</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root{--bg:#0b0f10;--card:#11181c;--fg:#e6f1ff;--muted:#9fb3c8;--acc:#2dd4bf;--red:#ef4444}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
-    header{padding:16px 20px;border-bottom:1px solid #1f2a2e} h1{margin:0;font-size:18px;letter-spacing:.3px}
-    main{max-width:900px;margin:0 auto;padding:20px;display:grid;gap:16px}
-    .card{background:var(--card);border:1px solid #1f2a2e;border-radius:14px;padding:16px}
+    :root{
+      color-scheme: dark;
+      --bg:#0b0f10; --card:#11181c; --ring:#1f2a2e; --text:#e6f1ff; --muted:#9fb3c8;
+      --acc:#2dd4bf; --danger:#ef4444; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    [data-theme="light"]{
+      color-scheme: light;
+      --bg:#f7fafc; --card:#ffffff; --ring:#e5e7eb; --text:#0b0f10; --muted:#4b5563;
+      --acc:#16a34a; --danger:#dc2626; --shadow:0 6px 22px rgba(0,0,0,.12);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
+    header{padding:16px 20px;border-bottom:1px solid var(--ring)} h1{margin:0;font-size:18px;letter-spacing:.3px}
+    main{max-width:900px;margin:0 auto;padding:20px;display:grid;gap:16px;padding-bottom:100px}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:16px}
     .row{display:grid;gap:12px} .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     label{font-size:12px;color:var(--muted)}
-    input,select,textarea{width:100%;background:#0d1418;border:1px solid #223038;color:var(--fg);border-radius:10px;padding:10px}
-    button{background:var(--acc);color:#061316;border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
-    button.ghost{background:#0d1418;color:var(--fg);border:1px solid #223038}
+    input,select,textarea{width:100%;background:rgba(0,0,0,.2);border:1px solid var(--ring);color:var(--text);border-radius:10px;padding:10px}
+    button{background:var(--acc);color:#061316;border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer;transition:all .2s}
+    button:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    button.ghost{background:rgba(0,0,0,.2);color:var(--text);border:1px solid var(--ring)}
     .pill{font-size:11px;color:var(--muted)} .list{display:grid;gap:10px}
-    .item{display:flex;align-items:center;justify-content:space-between;background:#0d1418;border:1px solid #223038;border-radius:10px;padding:10px}
-    .muted{color:var(--muted)} .danger{color:var(--red)} .inline{display:flex;gap:8px;align-items:center}
+    .item{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.1);border:1px solid var(--ring);border-radius:10px;padding:10px}
+    .muted{color:var(--muted)} .danger{color:var(--danger)} .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    
+    /* Footer Bar */
+    .footerbar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.08)),var(--bg);border-top:1px solid var(--ring);padding:10px 16px;display:flex;align-items:center;gap:12px;backdrop-filter:saturate(120%) blur(6px);z-index:100}
+    .footerbar .left{display:flex;gap:8px;align-items:center}
+    .footerbar .right{margin-left:auto;display:flex;gap:8px}
+    
+    /* Ad Slot */
+    .adslot{display:flex;align-items:center;gap:10px;max-width:340px;min-width:180px;padding:7px 10px;border-radius:12px;border:1px solid var(--ring);background:rgba(0,0,0,.06);cursor:pointer;user-select:none;transition:all .2s}
+    .adslot:hover{transform:translateY(-1px);box-shadow:var(--shadow);border-color:var(--acc)}
+    .adslot .ad-icon{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--ring);background:rgba(0,0,0,.10);flex:0 0 auto}
+    .adslot .ad-text{min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.1}
+    .adslot .ad-title{font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .adslot .ad-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .adslot .ad-badge{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(45,212,191,.15);color:var(--acc)}
+    @media (max-width:760px){.adslot{display:none}}
   </style>
 </head>
 <body>
-<header><h1>Emerald Crossposter <span class="pill">v0.3</span></h1></header>
+<header>
+  <div class="inline" style="justify-content:space-between;align-items:center">
+    <h1>Emerald Crossposter <span class="pill">v0.3</span></h1>
+    <select id="language" style="width:auto;padding:6px 10px;border-radius:8px" title="Sprache / Language">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="fr">🇫🇷 Français</option>
+    </select>
+  </div>
+</header>
 <main>
   <section class="card">
     <div class="row">
@@ -54,11 +89,21 @@
   <section class="card">
     <div class="row">
       <div class="inline" style="justify-content:space-between">
+        <strong>💎 EMRD Rewards</strong>
+        <button id="btn_rewards_info" class="ghost" style="padding:4px 8px;font-size:12px">Info</button>
+      </div>
+      <div id="rewards_info" class="muted" style="font-size:12px;margin:8px 0">💎 Verdiene EMRD-Punkte für jede Route!</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div class="inline" style="justify-content:space-between">
         <strong>Deine Routen</strong>
         <button id="btn_reload" class="ghost">Neu laden</button>
       </div>
       <div id="routes" class="list"></div>
-      <div id="route_detail" class="card" style="display:none;margin-top:16px;border-color:#2dd4bf">
+      <div id="route_detail" class="card" style="display:none;margin-top:16px;border-color:var(--acc)">
         <div class="row">
           <button id="btn_close_detail" class="ghost">× Schließen</button>
           <div><label>Route #<span id="detail_id">-</span></label></div>
@@ -74,8 +119,8 @@
           <div><label>Hashtag-Whitelist</label><input id="detail_wl" type="text"/></div>
           <div><label>Hashtag-Blacklist</label><input id="detail_bl" type="text"/></div>
           <div class="inline">
-            <button id="btn_detail_save" style="background:#2dd4bf;color:#000">Aktualisieren</button>
-            <button id="btn_detail_delete" style="background:#ef4444;color:#fff">Löschen</button>
+            <button id="btn_detail_save" style="background:var(--acc);color:#000">Aktualisieren</button>
+            <button id="btn_detail_delete" style="background:var(--danger);color:#fff">Löschen</button>
           </div>
         </div>
       </div>
@@ -107,7 +152,7 @@
     </div>
   </section>
 
-  <section class="card"><div class="row"><strong>Statistik</strong><pre id="stats" class="muted">–</pre></div></section>
+  <section class="card"><div class="row"><strong>📊 Statistik</strong><pre id="stats" class="muted">–</pre></div></section>
 
   <section class="card">
     <div class="row">
@@ -120,9 +165,152 @@
   </section>
 </main>
 
+<!-- Footer Bar mit Ad Slot -->
+<div class="footerbar">
+  <div class="left">
+    <button class="ghost" id="backBtn" style="padding:6px 10px;font-size:12px">← Zurück</button>
+    <div id="status" class="muted" style="font-size:12px">Bereit</div>
+  </div>
+
+  <!-- Werbebanner -->
+  <div id="adSlot" class="adslot" title="Werbung" role="button" tabindex="0">
+    <div class="ad-icon">🟢</div>
+    <div class="ad-text">
+      <div class="ad-title">Kampagnen laden…</div>
+      <div class="ad-sub">—</div>
+    </div>
+    <div class="ad-badge">AD</div>
+  </div>
+
+  <div class="right">
+    <button class="ghost" id="themeBtn" style="padding:6px 10px;font-size:12px" title="Design umschalten">🌓</button>
+    <button class="ghost" id="resetBtn" style="padding:6px 10px;font-size:12px">Reset</button>
+    <button class="ghost" id="closeBtn" style="padding:6px 10px;font-size:12px">Schließen</button>
+  </div>
+</div>
+
 <script>
   const tg = window.Telegram?.WebApp; tg?.ready();
   const API_BASE = "/miniapi";
+  
+  // Multilanguage
+  let CURRENT_LANG = localStorage.getItem('crossposter_lang') || 'de';
+  const STRINGS = {
+    de: {
+      back: '← Zurück', ready: 'Bereit', close: 'Schließen',
+      tenant: 'Mandant', active: 'Aktiv', source: 'Quell-Chat ID',
+      destinations: 'Ziele (TG Chat IDs / x / Discord-Webhook-URL, Kommagetrennt)',
+      prefix: 'Prefix', suffix: 'Suffix', preview: 'Vorschau', save: 'Speichern',
+      plain_text: 'Plain-Text (Markdown entfernen)', whitelist: 'Hashtag-Whitelist',
+      blacklist: 'Hashtag-Blacklist', no_routes: 'Keine Routen gefunden',
+      your_routes: 'Deine Routen', load: 'Neu laden', edit: 'Bearbeiten',
+      update: 'Aktualisieren', delete: 'Löschen', close_detail: '× Schließen',
+      activity_log: 'Activity Log', filter: 'Filter Status', all: 'Alle',
+      connectors: 'Connectoren', x_token: 'X Access Token', stats: 'Statistik',
+      test_send: 'Test-Nachricht senden', route_id: 'Route ID', test_text: 'Test-Text',
+      send: 'Senden', success: '✅ Route gespeichert', error: '❌ Fehler',
+      rewards: '💎 EMRD Rewards', rewards_info: '💎 Verdiene EMRD-Punkte für jede Route!',
+      loading: '⏳ Lädt…',
+    },
+    en: {
+      back: '← Back', ready: 'Ready', close: 'Close',
+      tenant: 'Tenant', active: 'Active', source: 'Source Chat ID',
+      destinations: 'Destinations (TG Chat IDs / x / Discord-Webhook-URL, comma-separated)',
+      prefix: 'Prefix', suffix: 'Suffix', preview: 'Preview', save: 'Save',
+      plain_text: 'Plain-Text (remove Markdown)', whitelist: 'Hashtag Whitelist',
+      blacklist: 'Hashtag Blacklist', no_routes: 'No routes found',
+      your_routes: 'Your Routes', load: 'Reload', edit: 'Edit',
+      update: 'Update', delete: 'Delete', close_detail: '× Close',
+      activity_log: 'Activity Log', filter: 'Filter Status', all: 'All',
+      connectors: 'Connectors', x_token: 'X Access Token', stats: 'Statistics',
+      test_send: 'Send Test Message', route_id: 'Route ID', test_text: 'Test Text',
+      send: 'Send', success: '✅ Route saved', error: '❌ Error',
+      rewards: '💎 EMRD Rewards', rewards_info: '💎 Earn EMRD points for every route!',
+      loading: '⏳ Loading…',
+    },
+    fr: {
+      back: '← Retour', ready: 'Prêt', close: 'Fermer',
+      tenant: 'Locataire', active: 'Actif', source: 'ID de chat source',
+      destinations: 'Destinations (IDs de chat TG / x / URL de webhook Discord, séparées par des virgules)',
+      prefix: 'Préfixe', suffix: 'Suffixe', preview: 'Aperçu', save: 'Enregistrer',
+      plain_text: 'Texte brut (supprimer le Markdown)', whitelist: 'Liste blanche des hashtags',
+      blacklist: 'Liste noire des hashtags', no_routes: 'Aucun itinéraire trouvé',
+      your_routes: 'Vos itinéraires', load: 'Actualiser', edit: 'Modifier',
+      update: 'Mettre à jour', delete: 'Supprimer', close_detail: '× Fermer',
+      activity_log: 'Journal d\'activité', filter: 'Statut du filtre', all: 'Tous',
+      connectors: 'Connecteurs', x_token: 'Jeton d\'accès X', stats: 'Statistiques',
+      test_send: 'Envoyer un message de test', route_id: 'ID de la route', test_text: 'Texte de test',
+      send: 'Envoyer', success: '✅ Route enregistrée', error: '❌ Erreur',
+      rewards: '💎 Récompenses EMRD', rewards_info: '💎 Gagnez des points EMRD pour chaque itinéraire!',
+      loading: '⏳ Chargement…',
+    }
+  };
+
+  function getStr(key) { return (STRINGS[CURRENT_LANG] || STRINGS.de)[key] || key; }
+  function setLanguage(lang) {
+    CURRENT_LANG = lang;
+    localStorage.setItem('crossposter_lang', lang);
+    document.documentElement.lang = lang;
+    
+    // Update backend
+    fetch(API_BASE + '/language/set', {
+      method: 'POST',
+      headers: {...initHeaders()},
+      body: JSON.stringify({language: lang})
+    }).catch(e => console.warn('[I18N] Backend update failed:', e));
+  }
+
+  // AD Campaigns
+  let AD_CAMPAIGNS = [];
+  let AD_INDEX = 0;
+  let AD_TIMER = null;
+
+  function renderAd(idx){
+    const slot = document.getElementById('adSlot');
+    if(!slot) return;
+    const ad = (AD_CAMPAIGNS || [])[idx];
+    if(!ad){
+      slot.querySelector('.ad-icon').textContent = '🟢';
+      slot.querySelector('.ad-title').textContent = getStr('loading');
+      slot.querySelector('.ad-sub').textContent = '—';
+      slot.querySelector('.ad-badge').textContent = 'AD';
+      slot.dataset.url = '';
+      return;
+    }
+    slot.querySelector('.ad-icon').textContent = ad.icon || '🟢';
+    slot.querySelector('.ad-title').textContent = ad.title || 'Werbung';
+    slot.querySelector('.ad-sub').textContent = ad.subtitle || '';
+    slot.querySelector('.ad-badge').textContent = ad.badge || 'AD';
+    slot.dataset.url = ad.url || '';
+  }
+
+  function startAdRotation(){
+    if(AD_TIMER) clearInterval(AD_TIMER);
+    if(!AD_CAMPAIGNS?.length) return;
+    AD_INDEX = 0;
+    renderAd(AD_INDEX);
+    AD_TIMER = setInterval(()=>{
+      if(!AD_CAMPAIGNS?.length) return;
+      AD_INDEX = (AD_INDEX + 1) % AD_CAMPAIGNS.length;
+      renderAd(AD_INDEX);
+    }, 8000);
+  }
+
+  function openAd(){
+    const url = document.getElementById('adSlot')?.dataset?.url;
+    if(!url) return;
+    try{
+      if(/^https?:\/\/(t\.me|telegram\.me)\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url);
+      if(tg?.openLink) return tg.openLink(url);
+      window.open(url, '_blank');
+    }catch(e){
+      try{ window.open(url, '_blank'); }catch{}
+    }
+  }
+
+  document.getElementById('adSlot').addEventListener('click', openAd);
+  document.getElementById('language').addEventListener('change', (e) => setLanguage(e.target.value));
+  document.getElementById('language').value = CURRENT_LANG;
 
   function initHeaders(){
     const initData = tg?.initData || '';
@@ -148,6 +336,7 @@
   const $stats  = document.getElementById('stats');
   const $xToken = document.getElementById('x_token');
   const $conList= document.getElementById('connectors_list');
+  const $status = document.getElementById('status');
 
   // Route Detail View
   const $detail = document.getElementById('route_detail');
@@ -164,6 +353,16 @@
   const $logsList = document.getElementById('logs_list');
   const $logFilter = document.getElementById('log_filter');
   let currentRoute = null;
+
+  // Rewards Info
+  document.getElementById('btn_rewards_info').addEventListener('click', async ()=>{
+    try{
+      const data = await api('/rewards/info');
+      alert(data.message || '💎 Rewards aktiviert!');
+    }catch(e){
+      console.error('Rewards info error:', e);
+    }
+  });
 
   document.getElementById('btn_preview').addEventListener('click', ()=>{
     const sample = 'Beispieltext für Crossposting. #news #update';
@@ -191,8 +390,19 @@
         active: $act.value === 'true'
       };
       await api('/routes', { method:'POST', body: JSON.stringify(payload) });
-      await loadRoutes(); alert('Route gespeichert.');
-    }catch(e){ alert(String(e).slice(0,400)); }
+      
+      // Claim rewards
+      try{
+        await api('/rewards/claim', { method:'POST', body: JSON.stringify({tenant_id: tid}) });
+      }catch(e){ console.warn('Rewards claim failed:', e); }
+      
+      await loadRoutes();
+      $status.textContent = getStr('success');
+      setTimeout(() => { $status.textContent = getStr('ready'); }, 3000);
+    }catch(e){ 
+      $status.textContent = getStr('error');
+      alert(String(e).slice(0,400)); 
+    }
   });
 
   document.getElementById('btn_reload').addEventListener('click', loadRoutes);
@@ -203,7 +413,9 @@
       if(!tid){ alert('Bitte Mandant wählen.'); return; }
       const payload = { tenant_id: tid, type: 'x', label: 'default', config: { access_token: $xToken.value }, active: true };
       await api('/connectors', { method:'POST', body: JSON.stringify(payload) });
-      await loadConnectors(); alert('X-Connector gespeichert.');
+      await loadConnectors(); 
+      $status.textContent = '✅ Connector gespeichert';
+      setTimeout(() => { $status.textContent = getStr('ready'); }, 3000);
     }catch(e){ alert(String(e).slice(0,400)); }
   });
   document.getElementById('btn_reload_connectors').addEventListener('click', loadConnectors);
@@ -231,8 +443,10 @@
         active: $detailActive.value === 'true'
       };
       await api(`/routes/${rid}`, { method:'PATCH', body: JSON.stringify(payload) });
-      await loadRoutes(); alert('Route aktualisiert.');
+      await loadRoutes(); 
+      $status.textContent = '✅ Route aktualisiert';
       $detail.style.display='none'; currentRoute=null;
+      setTimeout(() => { $status.textContent = getStr('ready'); }, 3000);
     }catch(e){ alert(String(e).slice(0,400)); }
   });
 
@@ -242,8 +456,10 @@
       const tid = Number($tenant.value);
       const rid = Number($detailId.textContent);
       await api(`/routes/${rid}?tenant_id=${tid}`, { method:'DELETE' });
-      await loadRoutes(); alert('Route gelöscht.');
+      await loadRoutes(); 
+      $status.textContent = '✅ Route gelöscht';
       $detail.style.display='none'; currentRoute=null;
+      setTimeout(() => { $status.textContent = getStr('ready'); }, 3000);
     }catch(e){ alert(String(e).slice(0,400)); }
   });
 
@@ -257,52 +473,75 @@
       const txt = document.getElementById('test_text').value;
       if(!rid || !txt) { alert('Route ID und Text erforderlich'); return; }
       const $res = document.getElementById('test_result');
-      $res.textContent = 'Sende...';
+      $res.textContent = getStr('loading');
       $res.style.display='block';
       const res = await api('/test-send', { method:'POST', body: JSON.stringify({tenant_id:tid, route_id:rid, text:txt}) });
       $res.textContent = JSON.stringify(res, null, 2);
     }catch(e){ document.getElementById('test_result').textContent = 'Fehler: ' + String(e); document.getElementById('test_result').style.display='block'; }
   });
 
-  document.getElementById('btn_reload_connectors').addEventListener('click', loadConnectors);
+  document.getElementById('themeBtn')?.addEventListener('click', ()=>{
+    const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('crossposter_theme', theme);
+  });
+
+  document.getElementById('backBtn')?.addEventListener('click', ()=>{
+    if(tg?.close) tg.close();
+  });
+  
+  document.getElementById('closeBtn')?.addEventListener('click', ()=>{
+    if(tg?.close) tg.close();
+  });
 
   async function loadTenants(){
-    $tenant.innerHTML = '<option>Lade…</option>';
-    const list = await api('/tenants'); // auto-provision passiert serverseitig
-    $tenant.innerHTML = '';
-    list.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t.id; opt.textContent = `${t.name} (#${t.id})`;
-      $tenant.appendChild(opt);
-    });
+    $tenant.innerHTML = '<option>'+getStr('loading')+'</option>';
+    try{
+      const list = await api('/tenants');
+      $tenant.innerHTML = '';
+      list.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = `${t.name} (#${t.id})`;
+        $tenant.appendChild(opt);
+      });
+    }catch(e){
+      $tenant.innerHTML = '<option>'+getStr('error')+'</option>';
+      console.error('loadTenants error:', e);
+    }
   }
 
   async function loadRoutes(){
     const tid = $tenant.value;
     if(!tid){ $routes.innerHTML = '<span class="muted">Bitte Mandant wählen.</span>'; return; }
-    $routes.innerHTML = 'Lade…';
-    const list = await api('/routes?tenant_id=' + encodeURIComponent(tid));
-    if(!list.length){ $routes.innerHTML = '<span class="muted">Keine Routen.</span>'; }
-    else {
-      $routes.innerHTML = '';
-      list.forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        const dests = r.destinations.map(d=>{
-          if (d.type==='telegram') return `TG:${d.chat_id}`;
-          if (d.type==='x') return 'X';
-          if (d.type==='discord') return 'Discord Webhook';
-          return d.type;
-        }).join(', ');
-        div.innerHTML = `<div style="flex:1"><div><strong>#${r.id}</strong> – Mandant: <code>${r.tenant_id}</code> · Quelle: <code>${r.source_chat_id}</code></div><div class="muted">Ziele: ${dests} · Aktiv: ${r.active ? 'Ja' : 'Nein'}</div></div><button class="ghost" style="padding:4px 8px;font-size:12px">Bearbeiten</button>`;
-        div.querySelector('button').addEventListener('click', () => showRouteDetail(r));
-        $routes.appendChild(div);
-      });
-    }
+    $routes.innerHTML = '<span class="muted">'+getStr('loading')+'</span>';
     try{
-      const s = await api('/stats?tenant_id=' + encodeURIComponent(tid));
-      $stats.textContent = JSON.stringify(s, null, 2);
-    }catch(e){ $stats.textContent = '–'; }
+      const list = await api('/routes?tenant_id=' + encodeURIComponent(tid));
+      if(!list.length){ $routes.innerHTML = '<span class="muted">'+getStr('no_routes')+'</span>'; }
+      else {
+        $routes.innerHTML = '';
+        list.forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          const dests = r.destinations.map(d=>{
+            if (d.type==='telegram') return `TG:${d.chat_id}`;
+            if (d.type==='x') return 'X';
+            if (d.type==='discord') return 'Discord';
+            return d.type;
+          }).join(', ');
+          div.innerHTML = `<div style="flex:1"><div><strong>#${r.id}</strong> – Quelle: <code>${r.source_chat_id}</code></div><div class="muted" style="font-size:11px">Ziele: ${dests} · ${r.active ? '✅' : '❌'}</div></div><button class="ghost" style="padding:4px 8px;font-size:12px">Bearbeiten</button>`;
+          div.querySelector('button').addEventListener('click', () => showRouteDetail(r));
+          $routes.appendChild(div);
+        });
+      }
+      try{
+        const s = await api('/stats?tenant_id=' + encodeURIComponent(tid));
+        $stats.textContent = JSON.stringify(s, null, 2);
+      }catch(e){ $stats.textContent = '–'; }
+    }catch(e){
+      $routes.innerHTML = '<span class="muted">'+getStr('error')+'</span>';
+      console.error('loadRoutes error:', e);
+    }
   }
 
   async function showRouteDetail(r){
@@ -337,7 +576,7 @@
         const div = document.createElement('div');
         div.className = 'item';
         const color = l.status === 'sent' ? '#2dd4bf' : '#ef4444';
-        div.innerHTML = `<div><div style="color:${color};font-weight:600">${l.status}</div><div class="muted" style="font-size:11px">${new Date(l.created_at).toLocaleString()} – ${l.dest_descriptor}</div>${l.error ? '<div style="color:#ef4444;font-size:11px">'+l.error+'</div>' : ''}</div>`;
+        div.innerHTML = `<div><div style="color:${color};font-weight:600;font-size:12px">${l.status}</div><div class="muted" style="font-size:11px">${new Date(l.created_at).toLocaleString()} – ${l.dest_descriptor}</div>${l.error ? '<div style="color:#ef4444;font-size:11px">'+l.error+'</div>' : ''}</div>`;
         $logsList.appendChild(div);
       });
     }catch(e){ $logsList.innerHTML = '<span class="muted">Fehler beim Laden.</span>'; }
@@ -346,21 +585,43 @@
   async function loadConnectors(){
     const tid = $tenant.value;
     if(!tid){ $conList.innerHTML = '<span class="muted">Bitte Mandant wählen.</span>'; return; }
-    const list = await api('/connectors?tenant_id=' + encodeURIComponent(tid));
-    if(!list.length){ $conList.innerHTML = '<span class="muted">Keine Connectoren.</span>'; return; }
-    $conList.innerHTML = '';
-    list.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML = `<div><strong>${c.type}</strong> – ${c.label||''} · Aktiv: ${c.active ? 'Ja':'Nein'}</div>`;
-      $conList.appendChild(div);
-    });
+    try{
+      const list = await api('/connectors?tenant_id=' + encodeURIComponent(tid));
+      if(!list.length){ $conList.innerHTML = '<span class="muted">Keine Connectoren.</span>'; return; }
+      $conList.innerHTML = '';
+      list.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<div><strong>${c.type}</strong> – ${c.label||''} · ${c.active ? '✅':'❌'}</div>`;
+        $conList.appendChild(div);
+      });
+    }catch(e){ $conList.innerHTML = '<span class="muted">Fehler.</span>'; }
+  }
+
+  async function loadAdCampaigns(){
+    try{
+      const res = await api('/ads?cid=0');
+      if(res.ok && Array.isArray(res.ads)){
+        AD_CAMPAIGNS = res.ads;
+      }
+    }catch(e){
+      console.warn('[ADS] load failed:', e);
+    }
+    startAdRotation();
   }
 
   (async function init(){
+    try { tg?.ready?.(); tg?.expand?.(); }catch(e){}
+    
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('crossposter_theme');
+    if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+    
     await loadTenants();
     await loadRoutes();
     await loadConnectors();
+    await loadAdCampaigns();
+    $status.textContent = getStr('ready');
   })();
 </script>
 </body>
