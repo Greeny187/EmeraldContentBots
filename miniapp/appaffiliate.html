@@ -546,9 +546,15 @@
                     return;
                 }
 
-                const manifestUrl = apiBase
-                    ? new URL('/tonconnect-manifest.json', apiBase).toString()
-                    : new URL('tonconnect-manifest.json', window.location.href).toString();
+                // Build manifest URL - prioritize passed API base
+                let manifestUrl;
+                if (apiBase) {
+                    manifestUrl = new URL('/api/affiliate/tonconnect-manifest.json', apiBase).toString();
+                } else {
+                    manifestUrl = new URL('tonconnect-manifest.json', window.location.href).toString();
+                }
+                
+                console.debug(`[TONCONNECT] Init with manifest URL: ${manifestUrl}`);
 
                 tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
                     manifestUrl,
@@ -632,7 +638,10 @@
                 const tierName = tier?.tier ? `${tier.tier_emoji || '🥉'} ${(tier.tier || 'bronze').toUpperCase()} Tier` : '🥉 BRONZE Tier';
                 const commissionPct = Math.round(((tier?.commission_rate ?? 0.05) * 100));
                 setText('tierLabel', tierName);
-                setText('tierBenefits', `✓ ${commissionPct}% Provision pro Referral\n✓ Tracking & Statistiken\n✓ Auszahlung ab ${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`.replace(/\n/g, '\n'));
+                
+                const benefitsHTML = `✓ ${commissionPct}% Provision pro Referral<br>✓ Tracking & Statistiken<br>✓ Auszahlung ab ${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`;
+                const benefitsEl = document.getElementById('tierBenefits');
+                if (benefitsEl) benefitsEl.innerHTML = benefitsHTML;
 
                 // Update minimum payout + numeric cache
                 setText('minimumPayout', `${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`);
@@ -643,6 +652,9 @@
                 document.getElementById('affiliateLink').value = data.referral_link || '';
                 setValue('affiliateLink', data.referral_link || '');
 
+                // Load referrals
+                loadReferrals();
+                
                 // Payout button state
                 const payoutBtn = document.getElementById('payoutBtn');
                 const canPayout = !!connectedAddress && currentStats.pending >= currentStats.minimumPayout;
@@ -657,6 +669,38 @@
             } catch (error) {
                 console.error('Error fetching stats:', error);
                 alert('❌ Fehler beim Laden der Stats: ' + error.message);
+            }
+        }
+
+        async function loadReferrals() {
+            if (!userId) return;
+
+            try {
+                const response = await fetch(apiUrl('/api/affiliate/referrals'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ referrer_id: userId })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch referrals');
+                const data = await response.json();
+
+                const referralList = document.getElementById('referralList');
+                if (data.success && data.referrals && data.referrals.length > 0) {
+                    referralList.innerHTML = data.referrals.map(ref => `
+                        <div class="referral-item">
+                            <div>
+                                <div class="referral-name">ID: ${ref.referral_id}</div>
+                                <div class="referral-status">Status: ${ref.status}</div>
+                            </div>
+                            <div style="color: var(--accent); font-weight: 600;">✓</div>
+                        </div>
+                    `).join('');
+                } else {
+                    referralList.innerHTML = '<div class="muted">Noch keine Referrals</div>';
+                }
+            } catch (error) {
+                console.error('Load referrals error:', error);
             }
         }
 
