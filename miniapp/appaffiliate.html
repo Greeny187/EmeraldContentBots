@@ -533,16 +533,28 @@
 
         
         // ===================== API BASE =====================
-        // Get API base URL from query parameter or environment
-        // Usage: ?api=https://your-domain.com
+        // Get API base URL from query parameter, localStorage, or require setup
         let apiBase = (new URLSearchParams(window.location.search).get('api') || '').replace(/\/$/, '');
+        
+        // Fallback: Try localStorage (user saved it before)
+        if (!apiBase) {
+            const saved = localStorage.getItem('affiliate_api_base');
+            if (saved) {
+                apiBase = saved;
+                console.log(`📌 Using saved API Base from localStorage: ${apiBase}`);
+            }
+        }
+        
+        // Helper: Save API base to localStorage for next time
+        function saveApiBase(url) {
+            localStorage.setItem('affiliate_api_base', url);
+            console.log(`✅ API Base saved to localStorage: ${url}`);
+        }
         
         // CRITICAL: Require API base for API calls
         const apiUrl = (path) => {
             if (!apiBase) {
-                const msg = `❌ NO API BASE - Cannot make request to ${path}\n\nOpen with: https://...?api=http://localhost:8443`;
-                console.error(msg);
-                throw new Error('API Base URL nicht konfiguriert');
+                throw new Error('API Base URL nicht konfiguriert - bitte zuerst Setup durchführen');
             }
             return `${apiBase}${path}`;
         };
@@ -550,22 +562,14 @@
         console.log(`🔗 API Base: "${apiBase}"`);
         console.log(`📍 Current Location: ${window.location.href}`);
         
+        
         if (!apiBase) {
             const url = new URL(window.location.href);
-            const hasApi = url.searchParams.has('api');
-            console.warn(`⚠️  API_BASE_INIT: apiBase is EMPTY - cannot make API calls`);
-            console.warn(`   Current: ${window.location.href}`);
-            console.warn(`   Expected: ${url.origin}${url.pathname}?api=http://YOUR_BACKEND`);
-            const msg = '❌ SETUP ERROR: API Base URL nicht übergeben\n\n' +
-                       'URL muss den ?api= Parameter enthalten:\n\n' +
-                       url.origin + url.pathname + '?api=http://localhost:8443';
-            setTimeout(() => {
-                const infoBox = document.createElement('div');
-                infoBox.style.cssText = 'position:fixed;top:10px;left:10px;right:10px;padding:20px;background:#ff6b6b;color:white;border-radius:8px;z-index:10000;font-family:monospace;font-size:12px;white-space:pre-wrap';
-                infoBox.textContent = msg;
-                document.body.insertBefore(infoBox, document.body.firstChild);
-            }, 100);
-        }
+            console.log(`\n${'='.repeat(60)}`);
+            console.log(`⚠️  API Base ist nicht konfiguriert`);\n            console.log(`📍 Aktuelle URL: ${window.location.href}`);
+            console.log(`✅ Richtige URL: ${url.origin}${url.pathname}?api=http://localhost:8443`);
+            console.log(`\n💡 ODER: Dashboard Button im Telegram Bot verwenden`);
+            console.log(`${'='.repeat(60)}\n`);\n        }
 
         // Keep numeric stats for correct comparisons
         let currentStats = { pending: 0, minimumPayout: 1000 };
@@ -808,9 +812,9 @@
                 console.error('Stack:', error.stack);
                 const msg = '❌ STATS LOAD ERROR:\n\n' + error.message + '\n\n' +
                            'Überprüfen Sie:\n' +
-                           '1. ?api=http://YOUR_BACKEND in der URL\n' +
+                           '1. ?api=http://YOUR_BACKEND in URL\n' +
                            '2. Backend läuft (python bot.py)\n' +
-                           '3. Console (F12) und Backend Logs\n*';
+                           '3. Browser Console (F12) + Backend Logs';
                 alert(msg);
             }
         }
@@ -981,11 +985,122 @@
             }
         }
 
+        // ===================== SETUP MODAL =====================
+        function showSetupModal() {
+            const modal = document.createElement('div');
+            modal.id = 'setupModalOverlay';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.85);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            `;
+            
+            const box = document.createElement('div');
+            box.style.cssText = `
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 20px;
+                max-width: 450px;
+                width: 100%;
+                box-shadow: 0 20px 80px rgba(0,0,0,0.3);
+            `;
+            
+            box.innerHTML = `
+                <h2 style="color: var(--text); margin-bottom: 12px; font-size: 18px;">⚙️ API Base Setup</h2>
+                <p style="color: var(--muted); font-size: 12px; margin-bottom: 12px; line-height: 1.5;">
+                    Die MiniApp braucht deine <strong>Backend API URL</strong> um zu funktionieren.
+                </p>
+                <div style="background: rgba(16,199,160,.1); border-left: 3px solid var(--accent); padding: 10px; margin-bottom: 12px; border-radius: 4px; color: var(--muted); font-size: 12px; line-height: 1.5;">
+                    💡 <strong>Schnell:</strong> Öffne den <strong>💰 Dashboard</strong> Button im Telegram Bot<br>
+                    🔧 <strong>Manuell:</strong> Gib deine API URL hier ein
+                </div>
+                <input type="text" id="apiBaseInput" placeholder="http://localhost:8443" style="
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    background: rgba(16,199,160,.05);
+                    color: var(--text);
+                    font-family: monospace;
+                    font-size: 12px;
+                    box-sizing: border-box;
+                    margin-bottom: 10px;
+                ">
+                <button onclick="submitSetupModal()" style="
+                    width: 100%;
+                    padding: 10px;
+                    background: linear-gradient(135deg, var(--accent), #0a9e80);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    margin-bottom: 10px;
+                ">✅ Speichern & Fortfahren</button>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
+                    <strong>📍 Beispiele:</strong><br>
+                    • Lokal: <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:2px;">http://localhost:8443</code><br>
+                    • Heroku: <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:2px;">https://your-app.herokuapp.com</code>
+                </div>
+            `;
+            
+            modal.appendChild(box);
+            document.body.appendChild(modal);
+            
+            // Focus input
+            document.getElementById('apiBaseInput').focus();
+        }
+        
+        function submitSetupModal() {
+            const input = document.getElementById('apiBaseInput');
+            let url = (input.value || '').trim().replace(/\/$/, '');
+            
+            if (!url) {
+                alert('❌ Bitte gib eine gültige URL ein (z.B. http://localhost:8443)');
+                return;
+            }
+            
+            // Validate URL format
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert('❌ URL muss mit http:// oder https:// beginnen');
+                return;
+            }
+            
+            console.log(`✅ API Base configured: ${url}`);
+            saveApiBase(url);
+            apiBase = url;
+            
+            // Close modal
+            const modal = document.getElementById('setupModalOverlay');
+            if (modal) modal.remove();
+            
+            // Reload page with new apiBase
+            console.log('🔄 Reloading...');
+            setTimeout(() => location.reload(), 300);
+        }
+        
+        // Show setup modal if no API base
+        if (!apiBase) {
+            setTimeout(() => showSetupModal(), 300);
+        }
+
+
         // ===================== INIT =====================
         document.addEventListener('DOMContentLoaded', () => {
-            initTonConnect();
-            fetchStats();
-            setInterval(fetchStats, 30000); // Refresh every 30s
+            if (apiBase) {  // Only init if API base configured
+                initTonConnect();
+                fetchStats();
+                setInterval(fetchStats, 30000); // Refresh every 30s
+            }
         });
     </script>
 </body>
