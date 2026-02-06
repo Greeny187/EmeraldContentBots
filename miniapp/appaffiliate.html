@@ -537,18 +537,35 @@
         // Usage: ?api=https://your-domain.com
         let apiBase = (new URLSearchParams(window.location.search).get('api') || '').replace(/\/$/, '');
         
-        // Fallback: Try to detect from Heroku or common patterns
-        if (!apiBase && window.location.hostname) {
-            // If on GitHub Pages, expect API base to be passed as parameter
-            if (window.location.hostname.includes('github.io')) {
-                console.warn('⚠️ GitHub Pages detected - API Base must be passed via ?api= parameter');
+        // CRITICAL: Require API base for API calls
+        const apiUrl = (path) => {
+            if (!apiBase) {
+                const msg = `❌ NO API BASE - Cannot make request to ${path}\n\nOpen with: https://...?api=http://localhost:8443`;
+                console.error(msg);
+                throw new Error('API Base URL nicht konfiguriert');
             }
-        }
-        
-        const apiUrl = (path) => apiBase ? `${apiBase}${path}` : path;
+            return `${apiBase}${path}`;
+        };
         
         console.log(`🔗 API Base: "${apiBase}"`);
         console.log(`📍 Current Location: ${window.location.href}`);
+        
+        if (!apiBase) {
+            const url = new URL(window.location.href);
+            const hasApi = url.searchParams.has('api');
+            console.warn(`⚠️  API_BASE_INIT: apiBase is EMPTY - cannot make API calls`);
+            console.warn(`   Current: ${window.location.href}`);
+            console.warn(`   Expected: ${url.origin}${url.pathname}?api=http://YOUR_BACKEND`);
+            const msg = '❌ SETUP ERROR: API Base URL nicht übergeben\n\n' +
+                       'URL muss den ?api= Parameter enthalten:\n\n' +
+                       url.origin + url.pathname + '?api=http://localhost:8443';
+            setTimeout(() => {
+                const infoBox = document.createElement('div');
+                infoBox.style.cssText = 'position:fixed;top:10px;left:10px;right:10px;padding:20px;background:#ff6b6b;color:white;border-radius:8px;z-index:10000;font-family:monospace;font-size:12px;white-space:pre-wrap';
+                infoBox.textContent = msg;
+                document.body.insertBefore(infoBox, document.body.firstChild);
+            }, 100);
+        }
 
         // Keep numeric stats for correct comparisons
         let currentStats = { pending: 0, minimumPayout: 1000 };
@@ -687,6 +704,11 @@
             console.log(`[STATS] Fetching stats for userId=${userId}`);
 
             try {
+                if (!apiBase) {
+                    console.error('[STATS] ❌ Cannot fetch - no API base');
+                    throw new Error('API Base nicht konfiguriert - URL Parameter ?api= erforderlich');
+                }
+                
                 const url = apiUrl('/api/affiliate/stats');
                 const payload = { referrer_id: userId };
                 
@@ -700,8 +722,23 @@
                 });
 
                 console.log(`[STATS] Response status: ${response.status}`);
-
-                const data = await response.json();
+                console.log(`[STATS] Response headers:`, {
+                    contentType: response.headers.get('content-type'),
+                    status: response.status
+                });
+                
+                const text = await response.text();
+                console.log(`[STATS] Response text (first 200 chars):`, text.substring(0, 200));
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('[STATS] ❌ INVALID JSON Response:');
+                    console.error('Status:', response.status);
+                    console.error('Raw text:', text.substring(0, 500));
+                    throw new Error(`Server hat ungültiges Format zurückgegeben (${response.status})`);
+                }
                 console.log(`[STATS] Response:`, data);
 
                 if (!data.success) {
@@ -768,7 +805,13 @@
 
             } catch (error) {
                 console.error('❌ Error fetching stats:', error);
-                alert('❌ Fehler beim Laden der Stats: ' + error.message);
+                console.error('Stack:', error.stack);
+                const msg = '❌ STATS LOAD ERROR:\n\n' + error.message + '\n\n' +
+                           'Überprüfen Sie:\n' +
+                           '1. ?api=http://YOUR_BACKEND in der URL\n' +
+                           '2. Backend läuft (python bot.py)\n' +
+                           '3. Console (F12) und Backend Logs\n*';
+                alert(msg);
             }
         }
 
