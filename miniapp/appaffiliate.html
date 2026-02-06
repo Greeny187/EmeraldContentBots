@@ -340,51 +340,11 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* ===================== DEBUG PANEL ===================== */
-        #debugPanel {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,.9);
-            color: #0f0;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-family: monospace;
-            max-width: 300px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 9999;
-            display: none;
-            border: 1px solid #0f0;
-        }
-
-        #debugPanel.visible {
-            display: block;
-        }
-
-        #debugToggle {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0,0,0,.7);
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            z-index: 9999;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
-        <button id="debugToggle" onclick="toggleDebugPanel()">🐛 DEBUG</button>
-        <div id="debugPanel"></div>
 
         <div class="header">
             <h1>💚 Emerald Affiliate Dashboard</h1>
@@ -502,48 +462,6 @@
     </div>
 
     <script>
-        // ===================== DEBUG PANEL =====================
-        let debugVisible = false;
-        const debugLogs = [];
-
-        function toggleDebugPanel() {
-            debugVisible = !debugVisible;
-            const panel = document.getElementById('debugPanel');
-            panel.classList.toggle('visible', debugVisible);
-            updateDebugPanel();
-        }
-
-        function addDebugLog(msg) {
-            debugLogs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
-            if (debugLogs.length > 50) debugLogs.shift();
-            if (debugVisible) updateDebugPanel();
-        }
-
-        function updateDebugPanel() {
-            const panel = document.getElementById('debugPanel');
-            panel.innerHTML = debugLogs.map(log => `<div>${log}</div>`).join('');
-            panel.scrollTop = panel.scrollHeight;
-        }
-
-        // Override console.log for debug panel
-        const originalLog = console.log;
-        const originalError = console.error;
-        const originalWarn = console.warn;
-
-        console.log = function(...args) {
-            addDebugLog('LOG: ' + args.join(' '));
-            originalLog.apply(console, args);
-        };
-
-        console.error = function(...args) {
-            addDebugLog('ERR: ' + args.join(' '));
-            originalError.apply(console, args);
-        };
-
-        console.warn = function(...args) {
-            addDebugLog('WARN: ' + args.join(' '));
-            originalWarn.apply(console, args);
-        };
         // ===================== THEME =====================
         const body = document.body;
         const saved = localStorage.getItem('theme');
@@ -563,6 +481,7 @@
         let userId = null;
         let userFirstName = 'User';
 
+        // Try to get data from Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             const webapp = window.Telegram.WebApp;
             webapp.ready();
@@ -571,11 +490,34 @@
                 userId = user.id;
                 userFirstName = user.first_name || 'User';
                 console.log(`✅ Telegram WebApp initialized: userId=${userId}, name=${userFirstName}`);
-            } else {
-                console.warn('⚠️ No user data from Telegram');
             }
+        }
+
+        // Fallback: Parse from URL hash (tgWebAppData)
+        if (!userId) {
+            try {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const tgWebAppData = hashParams.get('tgWebAppData');
+                if (tgWebAppData) {
+                    const decoder = new TextDecoder();
+                    const params = new URLSearchParams(tgWebAppData);
+                    const userJson = params.get('user');
+                    if (userJson) {
+                        const userData = JSON.parse(userJson);
+                        userId = userData.id;
+                        userFirstName = userData.first_name || 'User';
+                        console.log(`✅ Parsed userId from URL hash: ${userId}`);
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not parse Telegram data from URL:', e);
+            }
+        }
+
+        if (userId) {
+            console.log(`✅ User ID available: ${userId}`);
         } else {
-            console.warn('⚠️ Not running in Telegram WebApp context');
+            console.warn('⚠️ No user ID found - make sure to open in Telegram WebApp');
         }
 
         // ===================== TABS =====================
@@ -591,8 +533,18 @@
 
         
         // ===================== API BASE =====================
-        // If you host this HTML statically (e.g. GitHub Pages), append ?api=https://<your-backend>
-        const apiBase = (new URLSearchParams(window.location.search).get('api') || '').replace(/\/$/, '');
+        // Get API base URL from query parameter or environment
+        // Usage: ?api=https://your-domain.com
+        let apiBase = (new URLSearchParams(window.location.search).get('api') || '').replace(/\/$/, '');
+        
+        // Fallback: Try to detect from Heroku or common patterns
+        if (!apiBase && window.location.hostname) {
+            // If on GitHub Pages, expect API base to be passed as parameter
+            if (window.location.hostname.includes('github.io')) {
+                console.warn('⚠️ GitHub Pages detected - API Base must be passed via ?api= parameter');
+            }
+        }
+        
         const apiUrl = (path) => apiBase ? `${apiBase}${path}` : path;
         
         console.log(`🔗 API Base: "${apiBase}"`);
@@ -638,21 +590,21 @@
 
                 console.log('[TONCONNECT] TON_CONNECT_UI library found');
 
-                // Build manifest URL
-                let manifestUrl;
+                // Always use backend manifest if API base available
+                let manifestUrl = null;
+                
                 if (apiBase) {
-                    // Use backend manifest
                     manifestUrl = `${apiBase}/api/affiliate/tonconnect-manifest.json`;
                     console.log(`[TONCONNECT] Using backend manifest: ${manifestUrl}`);
                 } else {
-                    // Try local manifest
-                    manifestUrl = new URL('tonconnect-manifest.json', window.location.href).toString();
-                    console.log(`[TONCONNECT] Using local manifest: ${manifestUrl}`);
+                    console.warn('[TONCONNECT] ⚠️ No API base URL - TON Connect may not work');
+                    console.warn('[TONCONNECT] Pass API URL via ?api=https://your-domain.com');
+                    return;
                 }
 
-                console.log(`[TONCONNECT] Manifest URL: ${manifestUrl}`);
+                console.log(`[TONCONNECT] Final manifest URL: ${manifestUrl}`);
 
-                // Initialize TonConnect UI
+                // Initialize ToneConnect UI with minimal config
                 tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
                     manifestUrl: manifestUrl,
                     buttonRootId: 'ton-connect'
@@ -669,11 +621,9 @@
                         console.log(`✅ Wallet connected: ${connectedAddress}`);
                         setWalletUI(true, connectedAddress);
 
-                        // Verify wallet on backend
+                        // Verify wallet on backend if userId available
                         if (userId) {
                             verifyWalletBackend(connectedAddress);
-                        } else {
-                            console.warn('⚠️ userId not available for wallet verification');
                         }
                     } else {
                         console.log('❌ Wallet disconnected');
@@ -693,7 +643,7 @@
                 }
 
             } catch (e) {
-                console.error('❌ TonConnect init error:', e);
+                console.error('❌ TonConnect init error:', e.message || e);
             }
         }
 
