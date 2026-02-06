@@ -340,11 +340,51 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===================== DEBUG PANEL ===================== */
+        #debugPanel {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,.9);
+            color: #0f0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-family: monospace;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+            border: 1px solid #0f0;
+        }
+
+        #debugPanel.visible {
+            display: block;
+        }
+
+        #debugToggle {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,.7);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            z-index: 9999;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+        <button id="debugToggle" onclick="toggleDebugPanel()">🐛 DEBUG</button>
+        <div id="debugPanel"></div>
 
         <div class="header">
             <h1>💚 Emerald Affiliate Dashboard</h1>
@@ -437,7 +477,6 @@
                         </div>
                     </div>
                     <div id="ton-connect"></div>
-                    <button class="btn" onclick="connectWallet()" id="connectBtn">🪙 Wallet Verbinden</button>
                     <div style="font-size:12px;color:var(--muted);margin-top:8px;" id="walletAddressText"></div>
                 </div>
 
@@ -463,6 +502,48 @@
     </div>
 
     <script>
+        // ===================== DEBUG PANEL =====================
+        let debugVisible = false;
+        const debugLogs = [];
+
+        function toggleDebugPanel() {
+            debugVisible = !debugVisible;
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('visible', debugVisible);
+            updateDebugPanel();
+        }
+
+        function addDebugLog(msg) {
+            debugLogs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+            if (debugLogs.length > 50) debugLogs.shift();
+            if (debugVisible) updateDebugPanel();
+        }
+
+        function updateDebugPanel() {
+            const panel = document.getElementById('debugPanel');
+            panel.innerHTML = debugLogs.map(log => `<div>${log}</div>`).join('');
+            panel.scrollTop = panel.scrollHeight;
+        }
+
+        // Override console.log for debug panel
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            addDebugLog('LOG: ' + args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            addDebugLog('ERR: ' + args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            addDebugLog('WARN: ' + args.join(' '));
+            originalWarn.apply(console, args);
+        };
         // ===================== THEME =====================
         const body = document.body;
         const saved = localStorage.getItem('theme');
@@ -489,7 +570,12 @@
             if (user) {
                 userId = user.id;
                 userFirstName = user.first_name || 'User';
+                console.log(`✅ Telegram WebApp initialized: userId=${userId}, name=${userFirstName}`);
+            } else {
+                console.warn('⚠️ No user data from Telegram');
             }
+        } else {
+            console.warn('⚠️ Not running in Telegram WebApp context');
         }
 
         // ===================== TABS =====================
@@ -508,6 +594,9 @@
         // If you host this HTML statically (e.g. GitHub Pages), append ?api=https://<your-backend>
         const apiBase = (new URLSearchParams(window.location.search).get('api') || '').replace(/\/$/, '');
         const apiUrl = (path) => apiBase ? `${apiBase}${path}` : path;
+        
+        console.log(`🔗 API Base: "${apiBase}"`);
+        console.log(`📍 Current Location: ${window.location.href}`);
 
         // Keep numeric stats for correct comparisons
         let currentStats = { pending: 0, minimumPayout: 1000 };
@@ -540,55 +629,90 @@
         }
 
         async function initTonConnect() {
+            console.log('[TONCONNECT] Starting initialization...');
             try {
                 if (!window.TON_CONNECT_UI || !window.TON_CONNECT_UI.TonConnectUI) {
-                    console.warn('TON Connect UI not loaded');
+                    console.error('❌ TON Connect UI library not loaded');
                     return;
                 }
 
-                // Build manifest URL - prioritize passed API base
+                console.log('[TONCONNECT] TON_CONNECT_UI library found');
+
+                // Build manifest URL
                 let manifestUrl;
                 if (apiBase) {
-                    manifestUrl = new URL('/api/affiliate/tonconnect-manifest.json', apiBase).toString();
+                    // Use backend manifest
+                    manifestUrl = `${apiBase}/api/affiliate/tonconnect-manifest.json`;
+                    console.log(`[TONCONNECT] Using backend manifest: ${manifestUrl}`);
                 } else {
+                    // Try local manifest
                     manifestUrl = new URL('tonconnect-manifest.json', window.location.href).toString();
+                    console.log(`[TONCONNECT] Using local manifest: ${manifestUrl}`);
                 }
-                
-                console.debug(`[TONCONNECT] Init with manifest URL: ${manifestUrl}`);
 
+                console.log(`[TONCONNECT] Manifest URL: ${manifestUrl}`);
+
+                // Initialize TonConnect UI
                 tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl,
+                    manifestUrl: manifestUrl,
                     buttonRootId: 'ton-connect'
                 });
 
-                tonConnectUI.onStatusChange(async (wallet) => {
+                console.log('✅ TON Connect UI initialized');
+
+                // Listen for wallet changes
+                tonConnectUI.onStatusChange((wallet) => {
+                    console.log('[TONCONNECT] Wallet status changed:', wallet);
+                    
                     if (wallet && wallet.account && wallet.account.address) {
                         connectedAddress = wallet.account.address;
+                        console.log(`✅ Wallet connected: ${connectedAddress}`);
                         setWalletUI(true, connectedAddress);
 
-                        // Persist wallet in backend for payouts/claims
+                        // Verify wallet on backend
                         if (userId) {
-                            try {
-                                await fetch(apiUrl('/api/affiliate/ton-verify'), {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ referrer_id: userId, wallet_address: connectedAddress })
-                                });
-                            } catch (e) {
-                                console.error('Wallet verify failed:', e);
-                            }
+                            verifyWalletBackend(connectedAddress);
+                        } else {
+                            console.warn('⚠️ userId not available for wallet verification');
                         }
                     } else {
+                        console.log('❌ Wallet disconnected');
                         connectedAddress = null;
                         setWalletUI(false);
                     }
                 });
 
-                // initial state
-                setWalletUI(!!tonConnectUI.account?.address, tonConnectUI.account?.address);
-                if (tonConnectUI.account?.address) connectedAddress = tonConnectUI.account.address;
+                // Set initial state
+                if (tonConnectUI.account?.address) {
+                    connectedAddress = tonConnectUI.account.address;
+                    console.log(`[TONCONNECT] Initial wallet: ${connectedAddress}`);
+                    setWalletUI(true, connectedAddress);
+                } else {
+                    console.log('[TONCONNECT] No wallet initially connected');
+                    setWalletUI(false);
+                }
+
             } catch (e) {
-                console.error('TonConnect init error:', e);
+                console.error('❌ TonConnect init error:', e);
+            }
+        }
+
+        async function verifyWalletBackend(walletAddress) {
+            try {
+                console.log(`[WALLET_VERIFY] Sending to backend: userId=${userId}, wallet=${walletAddress}`);
+                const response = await fetch(apiUrl('/api/affiliate/ton-verify'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        referrer_id: userId, 
+                        wallet_address: walletAddress 
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('✅ Wallet verified on backend:', data);
+            } catch (e) {
+                console.error('❌ Wallet verification failed:', e);
             }
         }
 
@@ -606,56 +730,79 @@
 
         async function fetchStats() {
             if (!userId) {
-                console.warn('User ID not available');
+                console.error('❌ User ID not available - cannot fetch stats');
                 return;
             }
 
+            console.log(`[STATS] Fetching stats for userId=${userId}`);
+
             try {
-                const response = await fetch(apiUrl('/api/affiliate/stats'), {
+                const url = apiUrl('/api/affiliate/stats');
+                const payload = { referrer_id: userId };
+                
+                console.log(`[STATS] Calling: ${url}`);
+                console.log(`[STATS] Payload:`, payload);
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ referrer_id: userId })
+                    body: JSON.stringify(payload)
                 });
 
+                console.log(`[STATS] Response status: ${response.status}`);
+
                 const data = await response.json();
+                console.log(`[STATS] Response:`, data);
 
                 if (!data.success) {
-                    throw new Error(data.error || 'API Fehler');
+                    throw new Error(data.error || 'API error');
                 }
 
                 const stats = data.stats || {};
                 const tier = data.tier || {};
 
-                // Update stats (IDs that actually exist in this HTML)
+                // Update header stats
                 const totalEarnedTxt = `${Number(stats.total_earned || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
                 const pendingTxt = `${Number(stats.pending || 0).toLocaleString('de-DE', { minimumFractionDigits: 2 })} EMRD`;
+                
                 setText('totalEarned', totalEarnedTxt);
                 setText('pending', pendingTxt);
                 setText('payoutAmount', pendingTxt);
                 setText('activeReferralCount', stats.active_referrals ?? 0);
 
-                // Update tier (existing IDs: tierLabel + tierBenefits)
+                console.log(`[STATS] Total Earned: ${totalEarnedTxt}`);
+                console.log(`[STATS] Pending: ${pendingTxt}`);
+
+                // Update tier
                 const tierName = tier?.tier ? `${tier.tier_emoji || '🥉'} ${(tier.tier || 'bronze').toUpperCase()} Tier` : '🥉 BRONZE Tier';
                 const commissionPct = Math.round(((tier?.commission_rate ?? 0.05) * 100));
                 setText('tierLabel', tierName);
                 
                 const benefitsHTML = `✓ ${commissionPct}% Provision pro Referral<br>✓ Tracking & Statistiken<br>✓ Auszahlung ab ${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`;
                 const benefitsEl = document.getElementById('tierBenefits');
-                if (benefitsEl) benefitsEl.innerHTML = benefitsHTML;
+                if (benefitsEl) {
+                    benefitsEl.innerHTML = benefitsHTML;
+                    console.log(`[STATS] Tier benefits updated: ${tierName}`);
+                }
 
-                // Update minimum payout + numeric cache
+                // Update minimum payout
                 setText('minimumPayout', `${Number(data.minimum_payout || 1000).toLocaleString('de-DE')} EMRD`);
                 currentStats.pending = Number(stats.pending || 0);
                 currentStats.minimumPayout = Number(data.minimum_payout || 1000);
 
-                // Referral link
-                document.getElementById('affiliateLink').value = data.referral_link || '';
-                setValue('affiliateLink', data.referral_link || '');
-
-                // Load referrals
-                loadReferrals();
+                // Set referral link
+                const refLink = data.referral_link || '';
+                console.log(`[STATS] Referral link: ${refLink}`);
                 
-                // Payout button state
+                const linkInput = document.getElementById('affiliateLink');
+                if (linkInput) {
+                    linkInput.value = refLink;
+                    console.log(`✅ Referral link set in HTML`);
+                } else {
+                    console.error('❌ affiliateLink input element not found');
+                }
+
+                // Update buttons
                 const payoutBtn = document.getElementById('payoutBtn');
                 const canPayout = !!connectedAddress && currentStats.pending >= currentStats.minimumPayout;
                 payoutBtn.disabled = !canPayout;
@@ -663,11 +810,14 @@
                     ? '💰 Auszahlung Anfordern'
                     : (!connectedAddress ? '🪙 Wallet verbinden' : '⛔ Minimum nicht erreicht');
 
-                // Refresh payouts list
+                // Load referrals and payouts
+                loadReferrals();
                 loadPayouts();
 
+                console.log('✅ Stats updated successfully');
+
             } catch (error) {
-                console.error('Error fetching stats:', error);
+                console.error('❌ Error fetching stats:', error);
                 alert('❌ Fehler beim Laden der Stats: ' + error.message);
             }
         }
@@ -797,18 +947,7 @@
         }
 
 
-        async function connectWallet() {
-            if (!tonConnectUI) {
-                alert('❌ TON Connect ist nicht verfügbar. Prüfe den Script-Load / CSP.');
-                return;
-            }
-            try {
-                await tonConnectUI.openModal();
-            } catch (e) {
-                alert('❌ Wallet Connect fehlgeschlagen: ' + (e?.message || e));
-            }
-        }
-
+        
         async function claimRewards() {
             if (!userId) {
                 alert('Benutzer ID erforderlich');
